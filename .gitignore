@@ -1,0 +1,11 @@
+# データ（業務情報。リポジトリに載せない）
+tasks.json
+calendar.json
+inbox.json
+backups/
+sync.log
+sync_tmp/
+
+# Python
+__pycache__/
+*.pyc

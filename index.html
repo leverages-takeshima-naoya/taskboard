@@ -1,0 +1,3942 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
+<title>task backlog</title>
+<link rel="icon" id="favicon" href="data:,">
+<style>
+:root{
+  --bg:#F6F7F8; --panel:#FFFFFF; --sunk:#EFF1F3; --hover:#F3F5F7; --field:#FFFFFF;
+  --ink:#1A1D21; --ink2:#5A6270; --ink3:#8B94A3;
+  --line:#E1E5EA; --line2:#EDF0F3;
+  --accent:#2A6F97; --accent-bg:#E7F0F6; --on-accent:#fff;
+  --red:#B4402F; --red-bg:#FAEAE7;
+  --amber:#8A5B12; --amber-bg:#FAF0DD;
+  --green:#2F6B4F; --green-bg:#E6F1EA;
+  --violet:#5B4A8A; --violet-bg:#EEEBF7;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 6px 20px rgba(16,24,40,.07);
+  --radius:8px;
+  /* ハタラクティブのロゴガイドライン v3.0 の推奨に合わせる: 欧文・数字 Montserrat、和文 Noto Sans JP。
+     どちらも Google Fonts。ネットワークが無い環境では落ちてこないので、
+     その下の並び（Segoe UI / Yu Gothic UI）だけで成立するようにしてある。 */
+  --f:"Montserrat","Noto Sans JP","Segoe UI","Yu Gothic UI","Hiragino Sans",system-ui,sans-serif;
+  /* Slack リストの色名に合わせた見出し用の色。Slack 側は色名しか持っていないので、
+     色味はここで決めている。前が文字色、後ろが背景。 */
+  --sc-gray:#5F5E5A;   --sc-gray-bg:#EFEEE9;
+  --sc-brown:#7A5230;  --sc-brown-bg:#F4EDE4;
+  --sc-orange:#9A5A15; --sc-orange-bg:#FAEFE0;
+  --sc-yellow:#836613; --sc-yellow-bg:#F9F2D9;
+  --sc-green:#2F6B4F;  --sc-green-bg:#E5F1E9;
+  --sc-cyan:#16697A;   --sc-cyan-bg:#E1F0F3;
+  --sc-blue:#1F5FA8;   --sc-blue-bg:#E7F0FA;
+  --sc-indigo:#4A47A8; --sc-indigo-bg:#EAE9F9;
+  --sc-purple:#6B46A8; --sc-purple-bg:#F0E9FA;
+  --sc-pink:#A8386B;   --sc-pink-bg:#FAE8EF;
+  --sc-red:#A83228;    --sc-red-bg:#FAE9E6;
+  --fm:"Cascadia Mono",Consolas,ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#262624; --panel:#2B2A28; --sunk:#30302E; --hover:#353431; --field:#30302E;
+    --ink:#F2F1EC; --ink2:#C2C0B6; --ink3:#8E8C84;
+    --line:#3D3C38; --line2:#33322F;
+    --accent:#6FB0D6; --accent-bg:#1B2E3A; --on-accent:#1F1E1D;
+    --red:#E08C7C; --red-bg:#33211E;
+    --amber:#D8A855; --amber-bg:#2E2617;
+    --green:#7BB595; --green-bg:#1A2A22;
+    --violet:#A99BD6; --violet-bg:#25213A;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.28);
+  --sc-gray:#A6A69E;   --sc-gray-bg:#33322F;
+  --sc-brown:#C9A47D;  --sc-brown-bg:#2E2419;
+  --sc-orange:#D79B55; --sc-orange-bg:#30251A;
+  --sc-yellow:#CFB65C; --sc-yellow-bg:#2C2818;
+  --sc-green:#7FB89A;  --sc-green-bg:#1A2A22;
+  --sc-cyan:#6FBECE;   --sc-cyan-bg:#16292F;
+  --sc-blue:#7FB0E0;   --sc-blue-bg:#182635;
+  --sc-indigo:#A9A5EE; --sc-indigo-bg:#22213A;
+  --sc-purple:#BFA0E8; --sc-purple-bg:#281F38;
+  --sc-pink:#E59BBE;   --sc-pink-bg:#341F2A;
+  --sc-red:#E08C7C;    --sc-red-bg:#33211E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#262624; --panel:#2B2A28; --sunk:#30302E; --hover:#353431; --field:#30302E;
+  --ink:#F2F1EC; --ink2:#C2C0B6; --ink3:#8E8C84;
+  --line:#3D3C38; --line2:#33322F;
+  --accent:#6FB0D6; --accent-bg:#1B2E3A; --on-accent:#1F1E1D;
+  --red:#E08C7C; --red-bg:#33211E;
+  --amber:#D8A855; --amber-bg:#2E2617;
+  --green:#7BB595; --green-bg:#1A2A22;
+  --violet:#A99BD6; --violet-bg:#25213A;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.28);
+  --sc-gray:#A6A69E;   --sc-gray-bg:#33322F;
+  --sc-brown:#C9A47D;  --sc-brown-bg:#2E2419;
+  --sc-orange:#D79B55; --sc-orange-bg:#30251A;
+  --sc-yellow:#CFB65C; --sc-yellow-bg:#2C2818;
+  --sc-green:#7FB89A;  --sc-green-bg:#1A2A22;
+  --sc-cyan:#6FBECE;   --sc-cyan-bg:#16292F;
+  --sc-blue:#7FB0E0;   --sc-blue-bg:#182635;
+  --sc-indigo:#A9A5EE; --sc-indigo-bg:#22213A;
+  --sc-purple:#BFA0E8; --sc-purple-bg:#281F38;
+  --sc-pink:#E59BBE;   --sc-pink-bg:#341F2A;
+  --sc-red:#E08C7C;    --sc-red-bg:#33211E;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--f); font-size:13.5px; line-height:1.6;
+  letter-spacing:-.003em;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+::selection{background:var(--accent-bg)}
+
+.app{display:grid;grid-template-columns:236px 1fr;height:100vh}
+
+/* ---------- sidebar ---------- */
+.side{
+  background:var(--panel); border-right:1px solid var(--line);
+  display:flex; flex-direction:column; min-height:0;
+}
+.side-head{padding:14px 14px 10px;border-bottom:1px solid var(--line2)}
+.brand{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.brand b{color:var(--ink);font-weight:700}
+.storage{
+  margin-top:9px; display:flex; align-items:center; gap:6px;
+  font-size:11.5px; color:var(--ink2);
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ink3);flex:none}
+.dot.ok{background:var(--green)}
+.dot.warn{background:var(--amber)}
+.storage button{
+  font-size:11.5px;color:var(--accent);text-decoration:underline;
+  text-underline-offset:2px;
+}
+.side-scroll{flex:1;overflow-y:auto;padding:10px 8px}
+.side-label{
+  font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.06em;
+  padding:8px 6px 5px;display:flex;justify-content:space-between;align-items:center;
+}
+.side-label button{color:var(--ink3);font-size:15px;line-height:1;padding:2px 5px;border-radius:5px}
+.side-label button:hover{background:var(--hover);color:var(--ink)}
+.prow{display:flex;align-items:center;border-radius:6px}
+.prow:hover{background:var(--hover)}
+.prow.on{background:var(--accent-bg)}
+.pitem{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;text-align:left;
+  padding:6px 8px;border-radius:6px;color:var(--ink2);
+}
+.prow.on .pitem{color:var(--ink);font-weight:600}
+.pmenu{
+  flex:none;color:var(--ink3);padding:2px 7px;border-radius:5px;
+  opacity:0;font-size:14px;line-height:1;
+}
+.prow:hover .pmenu{opacity:1}
+.pmenu:hover{background:var(--sunk);color:var(--ink)}
+.pitem .swatch{width:8px;height:8px;border-radius:2px;flex:none;background:var(--accent)}
+.pitem .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pitem .ct{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.side-foot{
+  border-top:1px solid var(--line2); padding:9px 12px;
+  display:flex; gap:12px; flex-wrap:wrap;
+}
+.side-foot button{font-size:11.5px;color:var(--ink2)}
+.side-foot button:hover{color:var(--accent)}
+
+/* ---------- main ---------- */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+/* Asana と同じ並び: 検索（中央）→ プロジェクト名 → ビューのタブ */
+.top{
+  background:var(--panel);border-bottom:1px solid var(--line);
+  padding:10px 20px 0;
+}
+.top-search{position:relative;display:flex;justify-content:center;padding-bottom:12px;margin:0 -20px 12px;
+  border-bottom:1px solid var(--line2)}
+.top-row{display:flex;align-items:center;gap:12px}
+.title{
+  font-size:24px;font-weight:700;letter-spacing:-.01em;
+  background:none;border:0;padding:2px 4px;margin-left:-4px;border-radius:5px;
+  min-width:60px;max-width:640px;
+}
+.title:hover{background:var(--hover)}
+.title:focus{outline:2px solid var(--accent);outline-offset:0;background:var(--panel)}
+.spacer{flex:1}
+.search{
+  background:var(--sunk);border:1px solid var(--line);border-radius:999px;
+  padding:7px 16px;width:min(540px, 90%);font-size:13px;color:var(--ink);
+}
+.search:focus{outline:none;border-color:var(--accent);background:var(--panel)}
+.iconbtn{
+  padding:5px 9px;border-radius:6px;color:var(--ink2);border:1px solid var(--line);
+}
+.iconbtn:hover{background:var(--hover);color:var(--ink)}
+.chips{display:flex;gap:6px;padding:11px 0 10px;flex-wrap:wrap;align-items:center}
+.chip{
+  padding:3px 10px;border-radius:20px;font-size:12px;color:var(--ink2);
+  border:1px solid var(--line);
+}
+.chip:hover{background:var(--hover)}
+.chip.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.chip .n{font-variant-numeric:tabular-nums;opacity:.7;margin-left:4px}
+.chip.alert:not(.on){color:var(--red);border-color:var(--red)}
+.sep{width:1px;height:16px;background:var(--line);margin:0 3px}
+.toggle{font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:5px;cursor:pointer}
+
+.fnote{
+  margin:0 0 10px;padding:6px 11px;border-radius:6px;font-size:12px;
+  background:var(--amber-bg);color:var(--amber);
+  display:flex;align-items:center;gap:10px;
+}
+.fnote button{
+  color:inherit;text-decoration:underline;text-underline-offset:2px;font-weight:600;
+}
+.list{flex:1;overflow-y:auto;padding:14px 20px 160px}
+/* Backlog は列（セクション）ごとに縦スクロール。画面全体は横にだけ流れる */
+.list.board-mode{overflow-x:auto;overflow-y:hidden;padding:14px 20px 16px;display:block}
+.list.board-mode .board{height:100%;align-items:stretch}
+.list.board-mode .col{max-height:100%;min-height:0;align-self:flex-start}
+.list.board-mode .cards{overflow-y:auto;min-height:24px;flex:1 1 auto}
+.list.board-mode .card{flex:none}
+.list.board-mode .newcol{align-self:flex-start}
+
+/* スクロールバーは細く、丸く（Chrome / Edge）。標準の scrollbar-width を書くと
+   Chrome はこちらを無視して角ばった細バーになるので、あえて書かない */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--ink3);background-clip:padding-box}
+::-webkit-scrollbar-corner{background:transparent}
+
+/* ---------- ビュー切替 ---------- */
+/* 「カレンダーに追加」。ハタラグリーン（ハタラクティブ ロゴガイドライン v3.0 のメインカラー）に白文字 */
+.cal-btn{
+  flex:none;background:var(--main);color:#fff;font-weight:700;font-size:13px;
+  padding:7px 16px;border-radius:7px;letter-spacing:.02em;
+}
+.cal-btn:hover{filter:brightness(.9)}
+/* 週カレンダー表示中は「Backlog に戻る」ボタン。ハタラオレンジ（同ガイドラインのアクセントカラー） */
+.cal-btn.back{background:var(--sub)}
+/* ビューの切り替えはタブ。選んでいるものに下線 */
+.vswitch{display:flex;gap:4px;margin:8px -20px 0;padding:0 16px;border-bottom:1px solid var(--line2)}
+.vswitch button{padding:6px 10px 8px;font-size:13px;color:var(--ink2);border-bottom:2px solid transparent;
+  border-radius:6px 6px 0 0;margin-bottom:-1px}
+.vswitch button:hover{background:var(--hover);color:var(--ink)}
+.vswitch button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+
+/* ---------- ボード ---------- */
+/* 列ごとにスクロールさせない。ボードごと縦に伸ばして、
+   スクロールは外側（.list）の1本だけにする。 */
+.board{
+  display:flex;gap:12px;align-items:flex-start;
+  width:max-content;min-width:100%;
+}
+.col{
+  flex:0 0 300px;max-width:300px;background:var(--sunk);border-radius:10px;
+  display:flex;flex-direction:column;
+}
+.col.drop{box-shadow:inset 0 0 0 2px var(--accent)}
+.col-head{
+  display:flex;align-items:center;gap:7px;padding:10px 12px 8px;flex:none;
+  position:sticky;top:0;z-index:2;background:var(--sunk);border-radius:10px 10px 0 0;
+}
+.col-name{
+  font-weight:700;font-size:13px;background:none;border:0;padding:2px 4px;
+  border-radius:5px;flex:1;min-width:0;
+}
+.col-name:hover{background:var(--hover)}
+.col-name:focus{outline:2px solid var(--accent);background:var(--panel)}
+.col-ct{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.col-dot{width:8px;height:8px;border-radius:2px;flex:none}
+.col-menu{color:var(--ink3);padding:2px 6px;border-radius:5px;opacity:0;font-size:14px;line-height:1}
+.col-head:hover .col-menu{opacity:1}
+.col-menu:hover{background:var(--hover);color:var(--ink)}
+.cards{
+  padding:0 8px 8px;
+  display:flex;flex-direction:column;gap:9px;min-height:24px;
+}
+.col-add{padding:0 8px 10px;flex:none;display:flex;flex-direction:column;gap:5px}
+.addproj{
+  background:none;border:1px solid transparent;border-radius:6px;
+  padding:3px 5px;font-size:11.5px;color:var(--ink3);max-width:100%;
+}
+.addproj:hover{border-color:var(--line);color:var(--ink2)}
+.addproj:focus{outline:none;border-color:var(--accent);color:var(--ink)}
+.add .addproj{flex:none;width:auto;max-width:130px}
+.col-add input{
+  width:100%;background:none;border:1px dashed var(--line);border-radius:7px;
+  padding:7px 9px;font-size:12.5px;color:var(--ink);
+}
+.col-add input::placeholder{color:var(--ink3)}
+.col-add input:focus{outline:none;border-style:solid;border-color:var(--accent);background:var(--panel)}
+.newcol{flex:0 0 180px}
+.newcol button{
+  width:100%;text-align:left;padding:10px 12px;border-radius:10px;
+  border:1px dashed var(--line);color:var(--ink3);font-size:12.5px;
+}
+.newcol button:hover{background:var(--hover);color:var(--accent);border-color:var(--accent)}
+
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:20px 14px;min-height:104px;cursor:grab;position:relative;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.card:hover{border-color:var(--ink3)}
+.card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.card.dragging{opacity:.4}
+.card.drop-before::before,.card.drop-after::after{
+  content:"";position:absolute;left:0;right:0;height:2px;background:var(--accent);
+}
+.card.drop-before::before{top:-5px}
+.card.drop-after::after{bottom:-5px}
+.card-top{display:flex;align-items:flex-start;gap:8px}
+.card-title{
+  flex:1;min-width:0;font-size:13px;line-height:1.6;
+  background:none;border:0;padding:1px 3px;margin:-1px -3px;border-radius:4px;
+  font-family:inherit;color:inherit;
+}
+.card-title:focus{outline:none;background:var(--sunk)}
+.card.done .card-title{color:var(--ink3);text-decoration:line-through}
+.card .cb{margin-top:2px}
+.card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px;padding-left:24px}
+.b-note{color:var(--ink3);font-size:12px}
+.b-est{background:var(--sunk);color:var(--ink2);font-variant-numeric:tabular-nums}
+.b-est.partial{color:var(--ink3)}
+.est-ro{
+  display:flex;align-items:baseline;gap:9px;padding:5px 0;
+  font-variant-numeric:tabular-nums;
+}
+.est-note{font-size:11.5px;color:var(--ink3)}
+@media (min-width:940px){
+  body.drawer-open .main{margin-right:624px}
+}
+
+/* ---------- sections ---------- */
+.sec{margin-bottom:18px}
+.sec-head{
+  display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:6px;
+  position:sticky;top:0;background:var(--bg);z-index:2;
+}
+.sec-head.drop{box-shadow:inset 0 0 0 2px var(--accent)}
+.caret{
+  color:var(--ink3);font-size:10px;width:16px;height:16px;flex:none;
+  display:grid;place-items:center;border-radius:4px;transition:transform .12s;
+}
+.caret:hover{background:var(--hover);color:var(--ink)}
+.sec.collapsed .caret{transform:rotate(-90deg)}
+.sec-name{
+  font-weight:700;font-size:13.5px;background:none;border:0;padding:2px 4px;
+  border-radius:5px;min-width:40px;
+}
+.sec-name:hover{background:var(--hover)}
+.sec-name:focus{outline:2px solid var(--accent);background:var(--panel)}
+.sec-ct{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.sec-menu{
+  margin-left:auto;color:var(--ink3);padding:2px 7px;border-radius:5px;
+  opacity:0;font-size:14px;line-height:1;
+}
+.sec-head:hover .sec-menu{opacity:1}
+.sec-menu:hover{background:var(--hover);color:var(--ink)}
+.sec-body{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  margin-top:5px;overflow:hidden;
+}
+.sec.collapsed .sec-body{display:none}
+
+/* ---------- rows ---------- */
+.row{
+  display:flex;align-items:center;gap:9px;padding:0 12px 0 6px;
+  min-height:37px;border-bottom:1px solid var(--line2);position:relative;
+}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--hover)}
+.row.sel{background:var(--accent-bg)}
+.row.dragging{opacity:.4}
+.row.drop-before::before,.row.drop-after::after{
+  content:"";position:absolute;left:0;right:0;height:2px;background:var(--accent);
+}
+.row.drop-before::before{top:-1px}
+.row.drop-after::after{bottom:-1px}
+.grip{
+  width:16px;flex:none;color:var(--ink3);opacity:0;cursor:grab;
+  text-align:center;font-size:12px;line-height:1;user-select:none;
+}
+.row:hover .grip{opacity:.8}
+.cb{
+  width:16px;height:16px;flex:none;border:1.5px solid var(--ink3);border-radius:50%;
+  display:grid;place-items:center;color:transparent;font-size:10px;
+}
+.cb:hover{border-color:var(--green);color:var(--green)}
+.row.done .cb{background:var(--green);border-color:var(--green);color:#fff}
+.t-title{
+  flex:1;min-width:0;background:none;border:0;padding:6px 2px;border-radius:4px;
+}
+.t-title:focus{outline:none;background:var(--sunk)}
+.row.done .t-title{color:var(--ink3);text-decoration:line-through}
+.meta{display:flex;align-items:center;gap:8px;flex:none}
+/* 一覧の行の工数・期日の欄。普段はバッジのように見せ、触ると入力欄になる */
+.row-est{display:inline-flex;align-items:center;gap:2px;background:var(--sunk);border:1px solid transparent;
+  border-radius:6px;padding:0 8px 0 2px;font-size:12.5px;color:var(--ink2);cursor:text}
+.row-est:hover,.row-due:hover{border-color:var(--line)}
+.row-est:focus-within{border-color:var(--accent);background:var(--field)}
+.row-est input{width:48px;background:none;border:0;padding:4px 0 4px 4px;text-align:right;font-size:12.5px;
+  color:var(--ink);font-variant-numeric:tabular-nums;font-family:inherit;-moz-appearance:textfield}
+.row-est input::-webkit-inner-spin-button{opacity:0;width:0}
+.row-est input:focus{outline:none}
+.row-due{background:var(--sunk);border:1px solid transparent;border-radius:6px;padding:4px 8px;font-size:12.5px;
+  color:var(--ink2);font-family:inherit;font-variant-numeric:tabular-nums;width:132px;cursor:pointer}
+.row-due.nodue{color:var(--ink3)}
+.row-due:focus{outline:none;border-color:var(--accent);background:var(--field)}
+.row-due::-webkit-calendar-picker-indicator{opacity:.6;cursor:pointer}
+.row-due.over{background:var(--red-bg);color:var(--red);font-weight:600}
+.row-due.today{background:var(--amber-bg);color:var(--amber);font-weight:600}
+.row-due.soon{background:var(--accent-bg);color:var(--accent)}
+.badge{
+  font-size:12.5px;padding:3px 9px;border-radius:5px;white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.b-sub{color:var(--ink3)}
+.b-link{color:var(--ink3);text-decoration:none;font-size:12px}
+.b-link:hover{color:var(--accent)}
+.b-pri-high{background:var(--red-bg);color:var(--red)}
+.b-pri-mid{background:var(--amber-bg);color:var(--amber)}
+.b-pri-low{background:var(--sunk);color:var(--ink2)}
+.b-st{background:var(--sunk);color:var(--ink2)}
+.b-st-doing{background:var(--accent-bg);color:var(--accent)}
+.b-st-ticketed{background:var(--violet-bg);color:var(--violet)}
+.b-st-release{background:var(--green-bg);color:var(--green)}
+.b-sub.late{background:var(--red-bg);color:var(--red)}
+.b-due{color:var(--ink2);background:var(--sunk)}
+.b-due.over{background:var(--red-bg);color:var(--red);font-weight:600}
+.b-due.today{background:var(--amber-bg);color:var(--amber);font-weight:600}
+.b-due.soon{background:var(--accent-bg);color:var(--accent)}
+.open{
+  color:var(--ink3);font-size:11.5px;padding:2px 7px;border-radius:5px;
+  border:1px solid var(--line);opacity:0;
+}
+.row:hover .open{opacity:1}
+.open:hover{background:var(--sunk);color:var(--ink)}
+.proj-tag{font-size:11.5px;font-weight:600;flex:none;padding:2px 9px;border-radius:999px;line-height:1.5;white-space:nowrap}
+
+.add{display:flex;align-items:center;gap:9px;padding:0 12px 0 28px;min-height:36px}
+.add input{
+  flex:1;background:none;border:0;padding:7px 2px;color:var(--ink);
+}
+.add input::placeholder{color:var(--ink3)}
+.add input:focus{outline:none}
+.add .plus{color:var(--ink3);font-size:13px;flex:none}
+.sec-add{
+  margin-top:8px;font-size:12px;color:var(--ink3);padding:4px 8px;border-radius:5px;
+}
+.sec-add:hover{background:var(--hover);color:var(--accent)}
+.empty{padding:36px 16px;text-align:center;color:var(--ink3);font-size:13px}
+.empty b{display:block;color:var(--ink2);font-size:14px;margin-bottom:5px}
+
+/* ---------- drawer ---------- */
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:624px;max-width:92vw;
+  background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;transform:translateX(100%);
+  transition:transform .16s ease;z-index:40;
+}
+.drawer.on{transform:none}
+.dr-head{
+  padding:10px 12px;border-bottom:1px solid var(--line2);
+  display:flex;align-items:center;gap:8px;
+}
+.dr-body{flex:1;overflow-y:auto;padding:14px 16px 40px}
+.dr-title{
+  width:100%;font-size:21px;font-weight:700;line-height:1.45;background:var(--sunk);
+  border:1px solid transparent;border-radius:6px;padding:8px 10px;resize:none;
+  font-family:inherit;
+}
+.dr-title:focus{outline:none;border-color:var(--accent);background:var(--panel)}
+.fields{display:grid;grid-template-columns:74px 1fr;gap:9px 10px;align-items:center;margin-top:16px}
+.fields label{font-size:12px;color:var(--ink2)}
+.fields input,.fields select{
+  width:100%;background:var(--sunk);border:1px solid transparent;border-radius:6px;padding:5px 8px;
+}
+.fields input:focus,.fields select:focus{outline:none;border-color:var(--accent);background:var(--panel)}
+.dr-sec{margin-top:20px}
+.dr-sec h4{
+  margin:0 0 7px;font-size:11.5px;font-weight:700;color:var(--ink3);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.notes{
+  width:100%;min-height:96px;background:var(--sunk);border:1px solid transparent;
+  border-radius:6px;padding:8px 10px;resize:vertical;font-family:inherit;line-height:1.7;
+}
+.notes:focus{outline:none;border-color:var(--accent);background:var(--panel)}
+.subs{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:6px}
+/* 行は一段沈めた面に置き、入力欄は白い面にする。背景と入力欄が同じ色で見分けにくかったため */
+.subs li{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:7px 8px 8px 6px;position:relative;
+  background:var(--bg);border-radius:8px}
+/* 工数と期日は2段目。名前の欄を横幅いっぱいに使うため */
+.sub-meta{flex-basis:100%;display:flex;align-items:center;gap:7px;padding-left:47px}
+.sub-add .sub-meta{padding-left:0}
+.subs .grip{
+  width:14px;flex:none;color:var(--ink3);opacity:0;cursor:grab;
+  text-align:center;font-size:11px;line-height:1;user-select:none;
+}
+.subs li:hover .grip{opacity:.8}
+.subs li.dragging{opacity:.4}
+.subs li.drop-before::before,.subs li.drop-after::after{
+  content:"";position:absolute;left:10px;right:0;height:2px;background:var(--accent);
+}
+.subs li.drop-before::before{top:-4px}
+.subs li.drop-after::after{bottom:-4px}
+.subs input[type=text],.sub-add input[type=text]{
+  flex:1;min-width:0;background:var(--field);border:1px solid var(--line);border-radius:6px;
+  padding:7px 9px;font-size:13px;color:var(--ink);
+}
+.subs input[type=text]:focus,.sub-add input[type=text]:focus{outline:none;border-color:var(--accent)}
+.subs li.on input[type=text]{color:var(--ink3);text-decoration:line-through}
+.sub-est{
+  flex:none;width:52px;background:var(--field);border:1px solid var(--line);border-radius:6px;
+  padding:7px 5px;font-size:12.5px;color:var(--ink2);text-align:right;
+}
+.sub-est:focus{outline:none;border-color:var(--accent);color:var(--ink)}
+.sub-due{
+  flex:none;width:128px;background:var(--field);border:1px solid var(--line);border-radius:6px;
+  padding:6px 6px;font-size:12.5px;color:var(--ink2);cursor:pointer;font-family:inherit;
+}
+.sub-due:focus{outline:none;border-color:var(--accent);color:var(--ink)}
+.sub-due::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.7}
+.subs .sub-due.over{color:var(--red);font-weight:600}
+.subs .sub-due.today{color:var(--amber);font-weight:600}
+.subs li.on .sub-due{color:var(--ink3);font-weight:400}
+/* 丸いチェック。押すと緑に塗られてチェックが出る */
+.sub-cb{
+  appearance:none;-webkit-appearance:none;margin:0;flex:none;width:19px;height:19px;
+  border:1.5px solid var(--ink3);border-radius:50%;background:var(--field);cursor:pointer;
+  display:grid;place-items:center;transition:background .12s,border-color .12s;
+}
+.sub-cb:hover{border-color:var(--green)}
+.sub-cb::after{
+  content:"";width:5px;height:9px;border:solid transparent;border-width:0 2px 2px 0;
+  transform:translateY(-1px) rotate(45deg);
+}
+.sub-cb:hover::after{border-color:var(--green)}
+.sub-cb:checked{background:var(--green);border-color:var(--green)}
+.sub-cb:checked::after{border-color:#fff}
+.subs .del{color:var(--ink3);font-size:13px;padding:2px 5px;opacity:.35;flex:none}
+.subs li:hover .del{opacity:1}
+.subs .del:hover{color:var(--red)}
+.sub-add{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:7px 8px 8px;border:1px dashed var(--line);border-radius:8px}
+.sub-add input[type=text]{border-color:transparent;background:none}
+.sub-add input[type=text]:focus{background:var(--field)}
+.sub-add-go{flex:none;font-size:12.5px;padding:6px 11px;border-radius:6px;background:var(--accent);
+  color:var(--on-accent);font-weight:600}
+.dr-top{display:flex;justify-content:flex-end;margin:-4px 0 6px}
+.dr-top .danger{margin-top:0}
+.linkout{color:var(--accent);word-break:break-all;font-size:12px}
+.danger{color:var(--red);font-size:12px;margin-top:26px}
+.danger:hover{text-decoration:underline}
+.stamp{font-size:11.5px;color:var(--ink3);margin-top:22px;line-height:1.9}
+
+/* ---------- modal / toast ---------- */
+.veil{
+  position:fixed;inset:0;background:rgba(16,24,40,.34);z-index:50;
+  display:grid;place-items:center;padding:24px;
+}
+.modal{
+  background:var(--panel);border-radius:10px;box-shadow:var(--shadow);
+  width:min(680px,100%);max-height:86vh;display:flex;flex-direction:column;
+  border:1px solid var(--line);
+}
+.mo-head{padding:14px 18px;border-bottom:1px solid var(--line2);font-weight:700;font-size:15px}
+.mo-body{padding:16px 18px;overflow-y:auto}
+.mo-foot{
+  padding:12px 18px;border-top:1px solid var(--line2);
+  display:flex;gap:9px;justify-content:flex-end;
+}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid var(--line);color:var(--ink2)}
+.btn:hover{background:var(--hover);color:var(--ink)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+.btn.pri:hover{filter:brightness(1.08)}
+.map{display:grid;grid-template-columns:110px 1fr;gap:8px 12px;align-items:center}
+.map select,.map input{width:100%;background:var(--sunk);border:1px solid transparent;border-radius:6px;padding:5px 8px}
+.hint{font-size:12px;color:var(--ink2);margin:0 0 14px;line-height:1.75}
+.crow{display:flex;align-items:center;gap:14px;margin:0 0 16px}
+.crow>span{font-size:12px;color:var(--ink2);flex:none}
+.cpick{display:flex;gap:6px;flex-wrap:wrap}
+.cswatch{
+  width:20px;height:20px;border-radius:5px;flex:none;
+  border:1px solid var(--line);
+}
+.cswatch:hover{transform:scale(1.12)}
+.cswatch.on{box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--ink)}
+.prev{
+  margin-top:16px;font-size:11.5px;font-family:var(--fm);color:var(--ink2);
+  background:var(--sunk);border-radius:6px;padding:10px;max-height:170px;overflow:auto;white-space:pre;
+}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+  background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;
+  box-shadow:var(--shadow);z-index:60;display:flex;align-items:center;gap:14px;font-size:13px;
+}
+.toast button{color:var(--bg);text-decoration:underline;text-underline-offset:2px;font-weight:600}
+.dropzone{
+  position:fixed;inset:0;z-index:70;background:rgba(42,111,151,.14);
+  border:3px dashed var(--accent);display:grid;place-items:center;
+  font-size:18px;font-weight:700;color:var(--accent);
+}
+/* ボタンの色。設定の「メインカラー / サブカラー」で上書きされる */
+:root{--main:#6db52d;--sub:#f29419}
+[hidden]{display:none!important}
+
+/* ---------- 週ビュー（左にタスクバー、右に週カレンダー） ---------- */
+.week{flex:1;overflow:auto;padding:12px 20px 40px}
+.wk-top{display:flex;align-items:center;gap:6px;font-size:13px;position:sticky;top:-12px;z-index:9;
+  background:var(--bg);padding:8px 0 10px;margin:-8px 0 0;height:46px;box-sizing:border-box}
+.wk-top button{padding:3px 9px;border:1px solid var(--line);border-radius:6px;color:var(--ink2);font-size:12px}
+.wk-top button:hover{background:var(--hover);color:var(--ink)}
+.wk-range{font-weight:700;margin-left:6px}
+.wk-sync{font-size:11.5px;color:var(--ink3)}
+.wk-sync b{color:var(--amber);font-weight:600}
+/* 「Claude で同期」。検索窓の行の右端。ハタラグリーンに白文字 */
+.sync-btn{
+  position:absolute;right:20px;top:50%;transform:translateY(calc(-50% - 6px));
+  border:0;color:#fff;font-weight:700;font-size:12.5px;
+  padding:6px 15px;border-radius:999px;background:var(--main);
+}
+.sync-btn:hover{filter:brightness(.9)}
+.sync-btn:disabled{background:var(--sunk);color:var(--ink2);cursor:default}
+/* 同期の結果のポップアップ。画面右上、検索窓の行の下に出す */
+.sync-pop{
+  position:fixed;top:58px;right:20px;z-index:60;display:flex;align-items:center;gap:10px;
+  padding:11px 14px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);
+  max-width:440px;animation:syncpop .18s ease-out;
+}
+.sync-pop.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green)}
+.sync-pop.err{background:var(--red-bg);color:var(--red);border:1px solid var(--red)}
+.sync-pop-i{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;flex:none;
+  font-size:12px;font-weight:800;color:#fff}
+.sync-pop.ok .sync-pop-i{background:var(--green)}
+.sync-pop.err .sync-pop-i{background:var(--red)}
+.sync-pop button{margin-left:6px;color:inherit;opacity:.7;padding:0 2px}
+.sync-pop button:hover{opacity:1}
+@keyframes syncpop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.wk-wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px;align-items:start}
+.wk-bar{background:var(--sunk);border-radius:10px;padding:10px 8px;position:sticky;top:34px;
+  max-height:calc(100vh - 150px);overflow-y:auto}
+.wk-bar.drop{box-shadow:inset 0 0 0 2px var(--accent)}
+.wk-bar-h{display:flex;justify-content:space-between;font-size:12px;font-weight:700;padding:2px 4px 8px}
+.wk-bar-h span{font-weight:400;color:var(--ink3)}
+.wk-items{display:flex;flex-direction:column;gap:6px;min-height:20px}
+.wk-item{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:5px 9px;
+  cursor:grab;font-size:12.5px;line-height:1.45;overflow:hidden;flex:none;box-sizing:border-box}
+.wk-item-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.wk-item:hover{border-color:var(--ink3)}
+.wk-item.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.wk-item.ib{border-left:3px solid var(--accent)}
+.wk-ib-tag{color:var(--accent);font-weight:600}
+.wk-sep{height:1px;background:var(--line);margin:12px 2px 10px}
+.wk-item.sub{border-left:3px solid var(--violet)}
+.wk-parent{color:var(--ink2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wk-item-m{display:flex;gap:6px;flex-wrap:nowrap;margin-top:1px;font-size:11px;color:var(--ink3);
+  white-space:nowrap;overflow:hidden}
+.wk-item-m > span{flex:none}
+.wk-item-m > .wk-parent{flex:0 1 auto;min-width:0}
+.wk-more{display:block;width:100%;text-align:left;font-size:12px;color:var(--ink2);padding:10px 4px 6px}
+.wk-more:hover{color:var(--accent)}
+.wk-hint{font-size:11.5px;color:var(--ink3);padding:6px 4px 0;line-height:1.6}
+.wk-cal{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+/* 日付と曜日の行は、下にスクロールしても上に貼りついたまま */
+.wk-head{position:sticky;top:34px;z-index:7;background:var(--panel);border-radius:10px 10px 0 0;
+  border-bottom:1px solid var(--line2);box-shadow:0 1px 0 var(--line2)}
+.wk-head,.wk-allday,.wk-grid{display:grid;grid-template-columns:44px repeat(7,minmax(150px,1fr));min-width:max-content}
+.wk-head div{padding:7px 6px;font-size:12px;color:var(--ink2);border-left:1px solid var(--line2)}
+.wk-head div.today{color:var(--accent);font-weight:700}
+.wk-head div.off{color:var(--ink3)}
+.wk-allday{border-top:1px solid var(--line2)}
+.wk-allday div{border-left:1px solid var(--line2);padding:2px 3px;min-height:6px;display:flex;flex-direction:column;gap:2px}
+.wk-chip{font-size:10.5px;background:var(--sunk);color:var(--ink2);border-radius:4px;padding:1px 5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-grid{border-top:1px solid var(--line)}
+.wk-hours{position:relative}
+.wk-hours span{position:absolute;right:6px;font-size:11.5px;color:var(--ink2);font-variant-numeric:tabular-nums;transform:translateY(-50%)}
+.wk-day{position:relative;border-left:1px solid var(--line2)}
+.wk-day.today{background:color-mix(in srgb, var(--accent-bg) 45%, transparent)}
+.wk-day.drop{background:color-mix(in srgb, var(--accent-bg) 80%, transparent)}
+.wk-blk{position:absolute;border-radius:5px;padding:2px 5px;font-size:11px;line-height:1.35;
+  overflow:hidden;box-sizing:border-box}
+.wk-blk small{display:block;font-size:11px;opacity:1;font-variant-numeric:tabular-nums}
+/* 30分未満は名前と時刻を1行に。2行目がはみ出して下の予定に重なるのを防ぐ */
+.wk-blk.short{display:flex;align-items:center;gap:5px;white-space:nowrap;padding-top:1px;padding-bottom:1px}
+.wk-blk.short small{display:inline;flex:none}
+.wk-blk.meet.mv{cursor:grab}
+.wk-blk.meet.mv:hover{border-color:var(--ink3)}
+.wk-blk.meet.pending{border-style:dashed;border-color:var(--ink2)}
+.wk-blk.meet{background:var(--sunk);color:var(--ink2);border:1px solid var(--line)}
+.wk-blk.task{background:var(--violet-bg);color:var(--violet);border:1px solid var(--violet);cursor:grab}
+/* 下端のつまみ。乗せると上下の矢印になり、ドラッグで長さ（工数）を変えられる */
+.wk-rs{position:absolute;left:0;right:0;bottom:0;height:7px;cursor:ns-resize}
+.wk-rs::after{content:"";position:absolute;left:50%;bottom:2px;width:18px;height:3px;margin-left:-9px;
+  border-radius:2px;background:currentColor;opacity:0}
+.wk-blk.task:hover .wk-rs::after,.wk-blk.resizing .wk-rs::after{opacity:.6}
+.wk-blk.resizing{z-index:6;box-shadow:0 0 0 2px var(--accent)}
+.wk-blk.task.pending{border-style:dashed}
+.wk-blk.task.done{opacity:.55;text-decoration:line-through}
+.wk-blk.task.sel{box-shadow:0 0 0 2px var(--accent)}
+.wk-blk.dragging,.wk-item.dragging{opacity:.4}
+.wk-ghost{position:absolute;left:2px;right:2px;border:2px solid var(--accent);border-radius:5px;
+  background:var(--accent-bg);color:var(--accent);font-size:11px;padding:1px 5px;pointer-events:none;z-index:5}
+.wk-now{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:4;pointer-events:none}
+.wk-legend{display:flex;gap:14px;font-size:11px;color:var(--ink3);margin-top:8px}
+.wk-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+/* ---------- inbox ---------- */
+/* 入力欄が多いので、ほかの画面より一回り（約1.3倍）大きくしてある */
+.ib{max-width:1080px}
+.ib-add input{width:100%;background:none;border:1px dashed var(--line);border-radius:8px;
+  padding:11px 13px;font-size:16px;color:var(--ink);margin-bottom:12px}
+.ib-add input:focus{outline:none;border-style:solid;border-color:var(--accent);background:var(--panel)}
+.ib-row{padding:11px 10px 13px;border-bottom:1px solid var(--line2)}
+.ib-row:hover{background:var(--hover)}
+.ib-line{display:flex;align-items:center;gap:12px}
+.ib-ctl{flex-wrap:wrap;gap:10px;margin-top:8px;padding-left:5px}
+.ib-title{flex:1;min-width:0;background:none;border:0;font-size:17px;color:var(--ink);padding:4px 5px;border-radius:5px}
+.ib-title:focus{outline:none;background:var(--sunk)}
+.ib-when{font-size:14px;color:var(--ink3);flex:none;font-variant-numeric:tabular-nums}
+.ib-sel,.ib-f input{font-size:15px;border:1px solid var(--line);border-radius:7px;padding:6px 9px;
+  background:var(--field);color:var(--ink2);font-family:inherit}
+.ib-sel{max-width:300px}
+.ib-sel:disabled{opacity:.5}
+.ib-f{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink3)}
+.ib-f input[type=number]{width:84px}
+.ib-go{font-size:15px;padding:7px 15px;border-radius:7px;background:var(--accent);color:var(--on-accent);font-weight:600}
+.ib-go:disabled{background:var(--sunk);color:var(--ink3);cursor:default}
+.ib-del{flex:none;color:var(--ink3);padding:3px 8px;border-radius:6px;font-size:16px}
+.ib-del:hover{background:var(--red-bg);color:var(--red)}
+.ib-hint{font-size:14px;color:var(--ink3);padding:12px 5px;line-height:1.7}
+.ib-swatch{background:var(--ink)!important;border-radius:50%!important}
+.pitem .ct.ib-ct{color:var(--accent);font-weight:700}
+/* ---------- 左上の名前・アイコン ---------- */
+.brand{display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:.02em;
+  font-size:13.5px;color:var(--ink);font-weight:700}
+.brand-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ico{display:inline-grid;place-items:center;border-radius:6px;flex:none;overflow:hidden;line-height:1}
+.ico img{width:100%;height:100%;object-fit:cover;display:block}
+/* ---------- 設定 ---------- */
+.set-open{display:inline-flex;align-items:center;gap:6px}
+.set-open svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.set{display:flex;flex-direction:column;gap:14px}
+.set-sec{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.set-sec-h{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sunk);border-bottom:1px solid var(--line2)}
+.set-sec-i{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--main);color:#fff;flex:none}
+.set-svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.set-sec-t{font-size:14.5px;font-weight:700;color:var(--ink)}
+.set-sec-n{font-size:12px;color:var(--ink2);margin-top:1px}
+.set-sec-b{padding:14px 16px 16px}
+.set-grid{display:grid;grid-template-columns:84px 1fr;gap:14px 14px;align-items:start}
+.set-grid > .set-l{padding-top:8px}
+.set-preview{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:14px;
+  border-radius:10px;border:1px dashed var(--line)}
+.set-preview .ico{border-radius:9px}
+.set-preview-name{font-size:16px;font-weight:700}
+.set-l{font-size:13px;color:var(--ink2);font-weight:600}
+.set-in{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 11px;
+  color:var(--ink);font-size:13.5px;font-family:inherit}
+.set-in:focus{outline:none;border-color:var(--accent)}
+.set-tabs{display:inline-flex;gap:4px;padding:3px;border-radius:999px;background:var(--sunk);margin-bottom:10px}
+.set-tabs button{padding:5px 16px;border-radius:999px;color:var(--ink2);font-size:12.5px}
+.set-tabs button.on{background:var(--panel);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.set-emojis{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.set-emojis button{width:36px;height:36px;border-radius:8px;font-size:19px;border:1px solid var(--line);background:var(--field)}
+.set-emojis button:hover{border-color:var(--ink3)}
+.set-emoji{width:64px;height:36px;font-size:18px;text-align:center;padding:4px}
+.set-file{display:inline-block;padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:var(--field);
+  font-size:13px;color:var(--ink);cursor:pointer;margin-right:10px}
+.set-file:hover{border-color:var(--ink3)}
+.set-file input{display:none}
+.set-note{font-size:12px;color:var(--ink3)}
+.set-bgs{display:flex;gap:8px;flex-wrap:wrap}
+.set-bgs button{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);font-size:10px;color:var(--ink3)}
+.set-bgs button.on{box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--ink)}
+.set-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.set-themes button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 8px;border-radius:10px;
+  border:1px solid var(--line);background:var(--field);color:var(--ink2);font-size:13px}
+.set-themes button .set-svg{width:22px;height:22px}
+.set-themes button:hover{border-color:var(--ink3)}
+.set-themes button.on{border:2px solid var(--main);color:var(--ink);font-weight:700;padding:13px 7px}
+.set-row{display:flex;align-items:center;gap:10px}
+.set-colors{margin-top:16px}
+.set-colors .set-note{margin-top:6px}
+.set-tilde{color:var(--ink3)}
+.set-err{color:var(--red);font-size:13px;margin:0;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="side">
+    <div class="side-head">
+      <div class="brand"><span class="brand-icon" id="brandIcon"></span><span class="brand-name" id="brandName">task backlog</span></div>
+      <div class="storage">
+        <span class="dot" id="dot"></span>
+        <span id="storeText">読み込み中</span>
+        <button id="storeBtn" hidden></button>
+      </div>
+    </div>
+    <div class="side-scroll">
+      <div class="side-label">プロジェクト <button id="addProj" title="プロジェクトを追加">＋</button></div>
+      <nav id="projList"></nav>
+    </div>
+    <div class="side-foot">
+      <button id="btnSettings" class="set-open"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 4.3c.4-1.7 3-1.7 3.4 0a1.7 1.7 0 0 0 2.6 1.1c1.5-.9 3.3.8 2.4 2.4a1.7 1.7 0 0 0 1 2.5c1.8.4 1.8 3 0 3.4a1.7 1.7 0 0 0-1 2.6c.9 1.5-.9 3.3-2.4 2.4a1.7 1.7 0 0 0-2.6 1c-.4 1.8-3 1.8-3.4 0a1.7 1.7 0 0 0-2.6-1c-1.5.9-3.3-.9-2.4-2.4a1.7 1.7 0 0 0-1-2.6c-1.8-.4-1.8-3 0-3.4a1.7 1.7 0 0 0 1-2.5c-.9-1.6.9-3.3 2.4-2.4a1.7 1.7 0 0 0 2.6-1.1z"/><circle cx="12" cy="12" r="3"/></svg>設定</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div class="top-search">
+        <input class="search" id="search" type="search" placeholder="検索  /">
+        <button class="sync-btn" id="btnSync" title="Google カレンダーへの反映・会議の取り込み・Slack の DM から inbox への取り込みをまとめてやる（1〜2分）">Claude で同期</button>
+      </div>
+      <div class="top-row">
+        <input class="title" id="projTitle" aria-label="プロジェクト名">
+        <span class="spacer"></span>
+        <button class="cal-btn" id="btnWeek" title="週カレンダーを開いて、タスクを時間に置く">カレンダーに追加</button>
+        <button class="iconbtn" id="btnCollapse" title="すべて折りたたむ">⇕</button>
+      </div>
+      <div class="vswitch" id="vswitch">
+        <button data-view="list">リスト</button>
+        <button data-view="board">Backlog</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="fnote" id="filterNote" hidden></div>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="week" id="week" hidden></div>
+  </main>
+</div>
+
+<aside class="drawer" id="drawer" aria-label="タスク詳細">
+  <div class="dr-head">
+    <button class="iconbtn" id="drClose" title="閉じる (Esc)">✕</button>
+    <span class="spacer"></span>
+    <button class="iconbtn" id="drDone">完了にする</button>
+  </div>
+  <div class="dr-body" id="drBody"></div>
+</aside>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+<div id="syncPop" class="sync-pop" hidden></div>
+<div class="dropzone" id="dropzone" hidden>ファイルを離すと取り込みます（.json / .csv）</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   inc.take / backlog — Asana のバックログをモデルにした単一ファイル版
+   保存先: 同じフォルダの tasks.json （File System Access API）
+           + localStorage ミラー（クラッシュ・未接続時の保険）
+   ========================================================================= */
+
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const uid = p => p + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-3);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const LS_DATA = 'inc.take.backlog.data';
+const LS_UI   = 'inc.take.backlog.ui';
+/* サイドバーの inbox を選んでいるときの UI.project */
+const INBOX_P = '~inbox';
+
+/* Slack リスト「task backlog_たけしま」の選択肢に合わせてある。
+   セクション名がこのラベルと一致するとき、セクションとステータスは連動する。 */
+const STATUS = [
+  ['todo',     '未着手',      ''],
+  ['ticketed', 'タスク化',    'ticketed'],
+  ['doing',    '進行中',      'doing'],
+  ['release',  'リリース待ち', 'release'],
+  ['done',     '完了',        '']
+];
+const statusByLabel = l => STATUS.find(s => s[1] === l);
+const PRIORITY = [['','—'],['high','高'],['mid','中'],['low','低']];
+
+/* Slack リストと同じ色名を使う。取り込みのときに向こうの割り当てをそのまま持ってくる。 */
+const COLORS = ['gray','brown','orange','yellow','green','cyan','blue','indigo','purple','pink','red'];
+
+/* 工数の刻み幅。ここだけ変えれば全体に効く。未設定は null。 */
+const EST_STEP = 0.25;
+/* 0.35 のような割り切れない刻みだと 0.35*3 = 1.0499999... になるので、
+   足し算のたびに小数2桁へ丸めて誤差が積もらないようにする。 */
+const round2 = n => Math.round(n * 100) / 100;
+function normEstimate(v){
+  const n = typeof v === 'number' ? v : parseFloat(v);
+  if(!isFinite(n) || n <= 0) return null;
+  /* 刻みの半分未満は 0 に落ちてしまうので、最小の1刻みに寄せる */
+  return Math.min(100, Math.max(EST_STEP, round2(Math.round(n / EST_STEP) * EST_STEP)));
+}
+const showHours = h => round2(h) + 'h';
+/* サブタスクがあるときは親の工数はサブの合計。未設定が残っていれば件数も返す。 */
+function taskHours(t){
+  if(t.subtasks.length){
+    const set = t.subtasks.filter(x => x.estimate != null);
+    return {hours: round2(set.reduce((a, x) => a + x.estimate, 0)),
+            unset: t.subtasks.length - set.length, fromSubs: true};
+  }
+  return {hours: t.estimate || 0, unset: t.estimate == null ? 1 : 0, fromSubs: false};
+}
+function hoursBadge(t){
+  const h = taskHours(t);
+  if(!h.hours && h.unset) return '';
+  const tip = h.unset ? ('未設定 ' + h.unset + ' 件あり') : (h.fromSubs ? 'サブタスクの合計' : '');
+  return '<span class="badge b-est' + (h.unset ? ' partial' : '') + '"' +
+    (tip ? ' title="' + tip + '"' : '') + '>' + showHours(h.hours) + (h.unset ? '+' : '') + '</span>';
+}
+const colorOf = v => COLORS.includes(v) ? v : '';
+const colorFg = v => colorOf(v) ? 'var(--sc-' + v + ')' : 'var(--ink3)';
+/* プロジェクトの札の色。色が未設定ならグレー */
+const projTagStyle = v => 'color:var(--sc-' + (colorOf(v) || 'gray') + ');background:var(--sc-' + (colorOf(v) || 'gray') + '-bg)';
+/* 横断ビューの区切りは実体が無いので、同じ名前のセクションが持つ色を借りる */
+function colorForSectionName(name){
+  for(const p of S.projects)
+    for(const sec of p.sections)
+      if(sec.name === name && sec.color) return sec.color;
+  return '';
+}
+const colorBg = v => colorOf(v) ? 'var(--sc-' + v + '-bg)' : 'var(--sunk)';
+const statusLabel = v => (STATUS.find(s=>s[0]===v)||STATUS[0])[1];
+const statusMod   = v => (STATUS.find(s=>s[0]===v)||STATUS[0])[2];
+const priLabel    = v => (PRIORITY.find(p=>p[0]===v)||PRIORITY[0])[1];
+
+/* ---------- 日付 ---------- */
+function todayISO(){
+  const d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+}
+function daysFromToday(iso){
+  if(!iso) return null;
+  const a = new Date(todayISO()+'T00:00:00'), b = new Date(iso+'T00:00:00');
+  if(isNaN(b)) return null;
+  return Math.round((b-a)/864e5);
+}
+function dueLabel(iso){
+  const d = daysFromToday(iso);
+  if(d===null) return '';
+  if(d===0) return '今日';
+  if(d===1) return '明日';
+  if(d===-1) return '昨日';
+  const [,m,dd] = iso.split('-');
+  return `${+m}/${+dd}`;
+}
+function dueClass(iso){
+  const d = daysFromToday(iso);
+  if(d===null) return '';
+  if(d<0) return 'over';
+  if(d===0) return 'today';
+  if(d<=7) return 'soon';
+  return '';
+}
+
+/* =========================================================================
+   State
+   ========================================================================= */
+function blankState(){
+  const pid = uid('p_');
+  return {
+    version: 1,
+    updatedAt: new Date().toISOString(),
+    projects: [{
+      id: pid, name: '個人バックログ',
+      sections: [
+        {id: uid('s_'), name: '今週'},
+        {id: uid('s_'), name: '次にやる'},
+        {id: uid('s_'), name: 'いつか / 保留'}
+      ]
+    }],
+    tasks: []
+  };
+}
+function normalize(st){
+  st = st && typeof st === 'object' ? st : {};
+  const out = {
+    version: 1,
+    updatedAt: st.updatedAt || new Date().toISOString(),
+    projects: Array.isArray(st.projects) ? st.projects : [],
+    tasks: Array.isArray(st.tasks) ? st.tasks : [],
+    /* inbox … Slack の自分宛てDMなどから拾った、まだプロジェクトに振り分けていないタスク。
+       inboxSeen … inbox.json から取り込み済みの id。振り分けたあとに二重に入らないようにする */
+    inbox: (Array.isArray(st.inbox) ? st.inbox : [])
+      .filter(x => x && x.title)
+      .map(x => ({id: x.id || uid('i_'), title: String(x.title), receivedAt: x.receivedAt || '', src: x.src || '',
+                   pid: x.pid || '', parent: x.parent || '', due: x.due || '', estimate: normEstimate(x.estimate)})),
+    inboxSeen: (Array.isArray(st.inboxSeen) ? st.inboxSeen : []).slice(-1000),
+    /* eventMoves … ボードで動かした「自分だけの予定」。{eventId: {date, start, end, setAt}}。
+       同期でカレンダーに反映されたら消える */
+    eventMoves: Object.fromEntries(Object.entries(st.eventMoves && typeof st.eventMoves === 'object' ? st.eventMoves : {})
+      .filter(([, v]) => v && /^\d{4}-\d{2}-\d{2}$/.test(v.date || '') && /^\d{2}:\d{2}$/.test(v.start || '') && /^\d{2}:\d{2}$/.test(v.end || '')))
+  };
+  out.settings = normSettings(st.settings);
+  out.projects = out.projects.map(p => ({
+    id: p.id || uid('p_'),
+    name: p.name || '無題のプロジェクト',
+    color: colorOf(p.color),
+    sections: (Array.isArray(p.sections) && p.sections.length ? p.sections : [{name:'バックログ'}])
+      .map(s => ({id: s.id || uid('s_'), name: s.name || 'セクション', color: colorOf(s.color)}))
+  }));
+  if(!out.projects.length) out.projects = blankState().projects;
+  /* どのプロジェクトにも、ステータスの5つのセクションを必ず持たせる（タスクが無くても表示するため）。
+     自分で作った任意名のセクションはそのまま残し、足りないものだけ正しい位置に差し込む */
+  for(const proj of out.projects) for(const [, label] of STATUS) ensureStatusSection(proj, label);
+  const validP = new Set(out.projects.map(p=>p.id));
+  let n = 0;
+  out.tasks = out.tasks.map(t => {
+    const pid = validP.has(t.projectId) ? t.projectId : out.projects[0].id;
+    const proj = out.projects.find(p=>p.id===pid);
+    const sid = proj.sections.some(s=>s.id===t.sectionId) ? t.sectionId : proj.sections[0].id;
+    return {
+      id: t.id || uid('t_'),
+      projectId: pid, sectionId: sid,
+      title: t.title || '',
+      notes: t.notes || '',
+      status: STATUS.some(s=>s[0]===t.status) ? t.status
+              : ({waiting:'release', blocked:'ticketed', scheduled:'ticketed'}[t.status] || 'todo'),
+      priority: PRIORITY.some(p=>p[0]===t.priority) ? t.priority : '',
+      due: t.due || '',
+      url: t.url || '',
+      estimate: normEstimate(t.estimate),
+      schedule: normSchedule(t.schedule),
+      subtasks: (Array.isArray(t.subtasks) ? t.subtasks : [])
+        .map(s => ({id: s.id || uid('k_'), title: s.title || '', done: !!s.done,
+                    due: s.due || '', estimate: normEstimate(s.estimate),
+                    schedule: normSchedule(s.schedule)})),
+      createdAt: t.createdAt || new Date().toISOString(),
+      completedAt: t.completedAt || null,
+      prevStatus: STATUS.some(x => x[0] === t.prevStatus) ? t.prevStatus : '',
+      order: typeof t.order === 'number' ? t.order : (n += 1000)
+    };
+  });
+  return out;
+}
+
+let S  = blankState();
+let UI = {project:'*', q:'', filter:'all', showDone:false, collapsed:{},
+          theme:'auto', view:'list', drafts:{}};
+let selected = null;
+let lastDeleted = null;
+
+function loadUI(){
+  try{ Object.assign(UI, JSON.parse(localStorage.getItem(LS_UI) || '{}')); }catch(e){}
+  UI.drafts = {};
+  /* 絞り込みと検索は持ち越さない。開き直したときに黙って絞られたままだと、
+     タスクが消えたようにしか見えない。 */
+  UI.filter = 'all';
+  UI.q = '';
+  if(UI.view !== 'board' && UI.view !== 'week') UI.view = 'list';
+  if(UI.theme === 'light' || UI.theme === 'dark') document.documentElement.dataset.theme = UI.theme;
+}
+function saveUI(){
+  try{ localStorage.setItem(LS_UI, JSON.stringify(UI)); }catch(e){}
+}
+
+/* =========================================================================
+   永続化 — tasks.json (File System Access) + localStorage ミラー
+   ========================================================================= */
+const Store = (() => {
+  let handle = null;
+  let mode = 'local';          // 'file' | 'local'
+  let saveTimer = null;
+  const FSA = typeof window.showSaveFilePicker === 'function';
+
+  /* IndexedDB に FileSystemFileHandle を保存 */
+  /* 決して固まらせない。IndexedDB が blocked のまま返ってこないと
+     boot が終わらず、画面が真っ白のまま何も出なくなる。 */
+  function guard(promise, ms, fallback){
+    return Promise.race([
+      promise,
+      new Promise(res => setTimeout(() => res(fallback), ms))
+    ]);
+  }
+  function idb(){
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('inc.take.backlog', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('kv');
+      r.onsuccess = () => res(r.result);
+      r.onerror   = () => rej(r.error);
+      r.onblocked = () => rej(new Error('indexedDB blocked'));
+    });
+  }
+  async function idbGet(k){
+    try{
+      const db = await guard(idb(), 2000, null);
+      if(!db) return null;
+      return await guard(new Promise((res, rej) => {
+        const q = db.transaction('kv').objectStore('kv').get(k);
+        q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+      }), 2000, null);
+    }catch(e){ return null; }
+  }
+  async function idbSet(k, v){
+    try{
+      const db = await guard(idb(), 2000, null);
+      if(!db) return;
+      await new Promise((res, rej) => {
+        const q = db.transaction('kv','readwrite').objectStore('kv').put(v, k);
+        q.onsuccess = () => res(); q.onerror = () => rej(q.error);
+      });
+    }catch(e){}
+  }
+
+  function mirror(){
+    try{ localStorage.setItem(LS_DATA, JSON.stringify(S)); }catch(e){}
+  }
+
+  /* server.py が動いていれば、保存はサーバーに任せる。
+     ブラウザの書き込み許可が要らなくなるので、接続の操作そのものが消える。 */
+  async function detectServer(){
+    try{
+      const r = await fetch('api/ping', {cache:'no-store'});
+      if(!r.ok) return false;
+      const j = await r.json();
+      return !!(j && j.ok);
+    }catch(e){ return false; }
+  }
+  async function serverSave(){
+    try{
+      const r = await fetch('api/save', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(S)
+      });
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      if(!j || !j.ok) throw new Error((j && j.error) || 'save failed');
+      return true;
+    }catch(e){
+      paint('保存できません（サーバーが止まっています）', 'warn');
+      return false;
+    }
+  }
+  async function writeFile(){
+    if(!handle) return false;
+    try{
+      const w = await handle.createWritable();
+      await w.write(JSON.stringify(S, null, 2));
+      await w.close();
+      return true;
+    }catch(e){
+      mode = 'local'; paint('書き込めません', 'warn', '再接続', connect);
+      return false;
+    }
+  }
+
+  function save(){
+    S.updatedAt = new Date().toISOString();
+    mirror();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      if(mode === 'server'){
+        if(await serverSave()) paint('tasks.json に保存済み', 'ok');
+        return;
+      }
+      if(mode === 'file' && await writeFile()) paint('tasks.json に保存済み', 'ok');
+    }, 500);
+  }
+  async function flush(){
+    clearTimeout(saveTimer);
+    mirror();
+    if(mode === 'server'){ await serverSave(); return; }
+    if(mode === 'file') await writeFile();
+  }
+
+  function paint(text, kind, btnLabel, btnFn){
+    $('#storeText').textContent = text;
+    $('#dot').className = 'dot' + (kind ? ' ' + kind : '');
+    const b = $('#storeBtn');
+    if(btnLabel){ b.hidden = false; b.textContent = btnLabel; b.onclick = btnFn; }
+    else b.hidden = true;
+  }
+
+  /* 接続してよいファイルかを必ず検査する。
+     taskboard 形式でないファイルを掴んだまま mode='file' にすると、
+     次の保存でそのファイルを空データで上書きして壊してしまう。 */
+  async function adopt(h, {read = true} = {}){
+    const LF = String.fromCharCode(10);
+    let pushLocal = false;
+    if(read){
+      let txt = '';
+      try{
+        txt = await (await h.getFile()).text();
+      }catch(e){
+        alert('ファイルを読めませんでした。' + LF + e.message);
+        return false;
+      }
+      if(txt.trim()){
+        let j = null;
+        try{ j = JSON.parse(txt); }
+        catch(e){
+          alert(h.name + ' は JSON として読めませんでした。接続しません。' + LF + e.message);
+          return false;
+        }
+        if(isSlackListFile(j)){
+          alert(h.name + ' は Slack リストの書き出しファイルです。' + LF + LF +
+                'ここで接続するとこのファイルを壊してしまうので接続しません。' + LF +
+                '取り込みたいときは、このファイルを画面にドラッグしてください。' + LF + LF +
+                '保存先に選ぶのは taskboard フォルダの tasks.json です。');
+          return false;
+        }
+        if(!isTaskboardFile(j)){
+          alert(h.name + ' は taskboard のデータファイルではありません。接続しません。' + LF + LF +
+                'taskboard フォルダの tasks.json を選んでください。');
+          return false;
+        }
+        const incoming = normalize(j);
+        /* 未接続のあいだブラウザ内で編集していた分を、黙って捨てない */
+        const localCount = Array.isArray(S.tasks) ? S.tasks.length : 0;
+        const localNewer = localCount > 0 && ts(S.updatedAt) > ts(incoming.updatedAt);
+        if(localNewer){
+          pushLocal = confirm(
+`このブラウザに、${h.name} より新しい未保存の変更があります。
+［OK］いま画面に出ている内容を残し、${h.name} に書き込む（${localCount} 件）
+［キャンセル］${h.name} の内容を読み込む（${incoming.tasks.length} 件。画面の変更は失われます）`);
+        }
+        if(!pushLocal) S = incoming;
+      }
+    }
+    handle = h;
+    await idbSet('handle', h);
+    mode = 'file';
+    paint(h.name + ' に接続', 'ok');
+    mirror();
+    if(!read || pushLocal) await writeFile();
+    return true;
+  }
+
+  /* ユーザー操作から呼ぶ（ピッカーはジェスチャ必須） */
+  async function connect(){
+    if(!FSA){
+      alert('このブラウザは tasks.json への直接保存に対応していません。\n' +
+            'Chrome / Edge で start.bat から開くか、「書き出し」でJSONを保存してください。');
+      return;
+    }
+    try{
+      const [h] = await window.showOpenFilePicker({
+        types:[{description:'JSON', accept:{'application/json':['.json']}}],
+        multiple:false
+      });
+      if(await adopt(h, {read:true})){ selected = null; renderAll(); }
+    }catch(e){ /* キャンセル */ }
+  }
+  async function createNew(){
+    if(!FSA){ exportJSON(); return; }
+    try{
+      const h = await window.showSaveFilePicker({
+        suggestedName:'tasks.json',
+        types:[{description:'JSON', accept:{'application/json':['.json']}}]
+      });
+      await adopt(h, {read:false});
+      renderAll();
+    }catch(e){}
+  }
+
+  /* 隣の tasks.json を読む。start.bat 経由の http でのみ成功し、
+     file:// では CORS で失敗するので、失敗は握りつぶして null を返す。 */
+  async function fetchFile(){
+    try{
+      const r = await fetch('tasks.json?t=' + Date.now(), {cache:'no-store'});
+      if(!r.ok) return null;
+      const j = await r.json();
+      if(j && Array.isArray(j.projects) && j.projects.length) return j;
+    }catch(e){}
+    return null;
+  }
+  const taskCount = st => (st && Array.isArray(st.tasks)) ? st.tasks.length : 0;
+  /* 更新時刻は書き手によって形式が違う（server.py は +09:00、ブラウザは Z）。
+     文字列のまま比べると桁の並びで勝敗が決まって嘘になるので、必ず時刻に直す。 */
+  const ts = v => { const n = Date.parse(v || ''); return isNaN(n) ? 0 : n; };
+
+  /* ブラウザ内のキャッシュと tasks.json のどちらを採用するか。
+     ここを間違えると、一度空で開いた履歴が中身のある tasks.json を隠してしまう。
+       - キャッシュが空          → ファイル（黙って採用）
+       - ファイルの方が新しい    → どちらを使うか確認する
+       - それ以外                → キャッシュ（未保存の編集を守る） */
+  function pick(cached, file){
+    if(!file)               return {use: cached, from: 'cache', prompted: false};
+    if(!cached)             return {use: file,   from: 'file',  prompted: false};
+    if(!taskCount(cached))  return {use: file,   from: 'file',  prompted: false};
+    if(ts(file.updatedAt) > ts(cached.updatedAt)){
+      const takeFile = confirm(
+`tasks.json の方が、このブラウザに残っている内容より新しいです。
+［OK］tasks.json を読み込む（${taskCount(file)} 件）
+［キャンセル］このブラウザの内容を使う（${taskCount(cached)} 件）`
+      );
+      return {use: takeFile ? file : cached, from: takeFile ? 'file' : 'cache', prompted: true};
+    }
+    return {use: cached, from: 'cache', prompted: false};
+  }
+
+  async function boot(){
+    /* localStorage から先に復帰（常に手元にある） */
+    let cached = null;
+    try{ cached = JSON.parse(localStorage.getItem(LS_DATA) || 'null'); }catch(e){}
+
+    /* start.bat 経由なら server.py が動いている。この場合は許可も接続も要らない。 */
+    if(await detectServer()){
+      mode = 'server';
+      /* サーバーで開いたときは、必ず tasks.json を正本にする。ブラウザに残った内容とは比べない。
+         以前はここで「どちらを使うか」を聞いていて、古いブラウザの内容を選ぶと
+         tasks.json がまるごと昔の状態に戻ってしまった（2026-10-02 に実際に起きた） */
+      const file = await fetchFile();
+      S = normalize(file || cached || blankState());
+      try{ localStorage.setItem(LS_DATA, JSON.stringify(S)); }catch(e){}
+      paint('tasks.json に自動保存', 'ok');
+      return;
+    }
+
+    const h = await idbGet('handle');
+    if(h && FSA){
+      let perm = 'prompt';
+      try{ perm = await h.queryPermission({mode:'readwrite'}); }catch(e){}
+      if(perm === 'granted'){
+        if(!await adopt(h, {read:true})){
+          /* 掴んでいたのが taskboard のファイルではなかった。
+             ここで黙って return すると「読み込み中」のまま、選び直すボタンも出ない。 */
+          await idbSet('handle', null);
+          const c0 = pick(cached, await fetchFile());
+          if(c0.use) S = normalize(c0.use);
+          paint('接続先を選び直してください', 'warn', 'tasks.json を選ぶ', connect);
+          return;
+        }
+        /* ローカルキャッシュの方が新しければ知らせる（空のキャッシュは無視する） */
+        if(cached && taskCount(cached) && ts(cached.updatedAt) > ts(S.updatedAt)){
+          const keep = confirm(
+`このブラウザに、tasks.json より新しい未保存の変更があります。
+［OK］ローカルの新しい方を使う（次の保存で tasks.json に反映）
+［キャンセル］tasks.json の内容を使う`
+          );
+          if(keep){ S = normalize(cached); save(); }
+        }
+        return;
+      }
+      /* 権限が切れている：ワンクリックで再取得。それまでは中身を出しておく */
+      const c1 = pick(cached, await fetchFile());
+      if(c1.use) S = normalize(c1.use);
+      if(c1.prompted && c1.from === 'cache') save();
+      handle = h;
+      paint('tasks.json 未接続', 'warn', '接続する', async () => {
+        try{
+          if(await h.requestPermission({mode:'readwrite'}) === 'granted'){
+            if(await adopt(h, {read:true})){ selected = null; renderAll(); }
+            else{
+              await idbSet('handle', null);
+              paint('接続先を選び直してください', 'warn', 'tasks.json を選ぶ', connect);
+            }
+          }
+        }catch(e){}
+      });
+      return;
+    }
+
+    const c2 = pick(cached, await fetchFile());
+    if(c2.use) S = normalize(c2.use);
+    if(c2.prompted && c2.from === 'cache') save();
+    paint(
+      c2.from === 'file' ? 'tasks.json を表示中（未接続）'
+        : (FSA ? 'ブラウザ内のみ' : 'ブラウザ内のみ（この環境は直接保存に非対応）'),
+      'warn',
+      FSA ? (c2.from === 'file' ? '接続して保存できるようにする' : 'tasks.json に接続') : null,
+      FSA ? connect : null
+    );
+  }
+
+  return {boot, save, flush, connect, createNew, paint,
+          get mode(){ return mode; }, get fsa(){ return FSA; }};
+})();
+
+const save = () => Store.save();
+
+/* =========================================================================
+   照会ヘルパー
+   ========================================================================= */
+const projById = id => S.projects.find(p => p.id === id);
+const taskById = id => S.tasks.find(t => t.id === id);
+function secName(pid, sid){
+  const p = projById(pid); if(!p) return '';
+  const s = p.sections.find(x => x.id === sid);
+  return s ? s.name : '';
+}
+const isDone = t => t.status === 'done';
+/* 「完了」という名前の区切りは、終わったものを置いておく場所なので中身を常に出す。
+   そこ以外に居る完了タスクだけが「完了も表示」の対象になる。 */
+const inDoneSection = t => secName(t.projectId, t.sectionId) === statusLabel('done');
+const isVisibleDespiteDone = t => !isDone(t) || UI.showDone || inDoneSection(t);
+
+function matchFilter(t){
+  if(!isVisibleDespiteDone(t)) return false;
+  if(UI.q){
+    const q = UI.q.toLowerCase();
+    if(!((t.title||'') + ' ' + (t.notes||'')).toLowerCase().includes(q)) return false;
+  }
+  const d = daysFromToday(t.due);
+  switch(UI.filter){
+    /* 完了の出し分けは先頭の showDone だけで決める。
+       ここで !isDone を重ねると、フィルタ選択中はチェックが無視される。 */
+    case 'over':  return d !== null && d < 0;
+    case 'today': return d !== null && d <= 0;
+    case 'week':  return d !== null && d <= 7;
+    case 'nodue': return !t.due;
+    default:      return true;
+  }
+}
+function visibleTasks(pid){
+  return S.tasks
+    .filter(t => (pid === '*' || t.projectId === pid) && matchFilter(t))
+    .sort((a,b) => a.order - b.order);
+}
+function counts(){
+  /* 数字はすべて「まだ終わっていない件数」に統一する。サイドバーと同じ意味。
+     完了列は参照用に出しているだけなので、ここには数えない
+     （その列の件数は列見出しに出る）。 */
+  const base = S.tasks.filter(t => !isDone(t));
+  const c = {all: base.length, over:0, today:0, week:0, nodue:0};
+  for(const t of base){
+    const d = daysFromToday(t.due);
+    if(!t.due){ c.nodue++; continue; }
+    if(d < 0) c.over++;
+    if(d <= 0) c.today++;
+    if(d <= 7) c.week++;
+  }
+  return c;
+}
+
+/* =========================================================================
+   描画 — サイドバー
+   ========================================================================= */
+function renderSide(){
+  const nav = $('#projList');
+  const total = S.tasks.filter(t => !isDone(t)).length;
+  let html = `<div class="prow${UI.project===INBOX_P?' on':''}">
+      <button class="pitem" data-p="${INBOX_P}">
+        <span class="swatch ib-swatch"></span>
+        <span class="nm">inbox</span><span class="ct${S.inbox.length?' ib-ct':''}">${S.inbox.length}</span></button></div>
+    <div class="prow${UI.project==='*'?' on':''}">
+      <button class="pitem" data-p="*">
+        <span class="swatch" style="background:var(--ink3)"></span>
+        <span class="nm">すべてのタスク</span><span class="ct">${total}</span></button></div>`;
+  for(const p of S.projects){
+    const n = S.tasks.filter(t => t.projectId === p.id && !isDone(t)).length;
+    html += `<div class="prow${UI.project===p.id?' on':''}">
+      <button class="pitem" data-p="${esc(p.id)}">
+        <span class="swatch" style="background:${colorFg(p.color)}"></span>
+        <span class="nm">${esc(p.name)}</span><span class="ct">${n}</span></button>
+      <button class="pmenu" data-act="pmenu" data-p="${esc(p.id)}"
+              title="並べ替え・削除">⋯</button></div>`;
+  }
+  nav.innerHTML = html;
+}
+
+/* =========================================================================
+   描画 — ヘッダ
+   ========================================================================= */
+function renderTop(){
+  const t = $('#projTitle');
+  const p = projById(UI.project);
+  t.value = UI.project === '*' ? 'すべてのタスク' : (p ? p.name : '');
+  t.readOnly = UI.project === '*';
+
+  const c = counts();
+  const F = [
+    ['all','すべて', c.all, false],
+    ['over','期限切れ', c.over, true],
+    ['today','今日まで', c.today, false],
+    ['week','今週', c.week, false],
+    ['nodue','期日なし', c.nodue, false]
+  ];
+  let html = F.map(([k, label, n, alert]) =>
+    `<button class="chip${UI.filter===k?' on':''}${alert&&n>0?' alert':''}" data-f="${k}">
+       ${label}<span class="n">${n}</span></button>`).join('');
+  html += `<span class="sep"></span>
+    <label class="toggle"><input type="checkbox" id="showDone"${UI.showDone?' checked':''}> 完了も表示</label>`;
+  $('#chips').innerHTML = html;
+
+  /* 絞り込みで何件隠れているかを必ず見せる。黙って消えたように見せない。 */
+  const scope = S.tasks.filter(x => UI.project === '*' || x.projectId === UI.project);
+  const shown = scope.filter(matchFilter).length;
+  const hiddenByDone = scope.filter(x => !isVisibleDespiteDone(x)).length;
+  const hidden = scope.length - shown - hiddenByDone;
+  const note = $('#filterNote');
+  if((UI.filter !== 'all' || UI.q) && hidden > 0){
+    const what = [];
+    if(UI.filter !== 'all') what.push('「' + (F.find(f => f[0] === UI.filter) || [,UI.filter])[1] + '」');
+    if(UI.q) what.push('検索「' + esc(UI.q) + '」');
+    note.innerHTML = what.join('と') + 'で絞り込み中。' + hidden +
+      ' 件が隠れています。<button id="clearFilter">絞り込みを解除</button>';
+    note.hidden = false;
+    $('#clearFilter').onclick = () => {
+      UI.filter = 'all'; UI.q = ''; $('#search').value = '';
+      saveUI(); renderTop(); renderList();
+    };
+  }else{
+    note.hidden = true; note.innerHTML = '';
+  }
+  $('#showDone').onchange = e => {
+    UI.showDone = e.target.checked; saveUI();
+    renderTop(); renderList(); renderSide();
+  };
+  $$('#vswitch button').forEach(b => b.classList.toggle('on', b.dataset.view === UI.view));
+  const inWeek = UI.view === 'week' && UI.project !== INBOX_P;
+  $('#btnWeek').classList.toggle('back', inWeek);
+  $('#btnWeek').textContent = inWeek ? 'Backlog' : 'カレンダーに追加';
+  $('#btnWeek').title = inWeek ? 'Backlog に戻る' : '週カレンダーを開いて、タスクを時間に置く';
+  /* 同期ボタンは週カレンダーを開いているときだけ、Backlog ボタンの隣に出す */
+  $('#btnSync').disabled = syncRunning();
+  $('#btnSync').textContent = syncRunning() ? '同期中…（1〜2分）' : 'Claude で同期';
+  $('#btnCollapse').hidden = UI.view !== 'list';
+  if(UI.project === INBOX_P){
+    t.value = 'inbox'; t.readOnly = true;
+    $('#chips').hidden = true; note.hidden = true;
+    $('#vswitch').hidden = true; $('#btnCollapse').hidden = true;
+    return;
+  }
+  /* 週カレンダーは別ページのように見せたいので、リスト / Backlog のタブを隠す（戻るのは右上の Backlog ボタン） */
+  $('#vswitch').hidden = UI.view === 'week';
+  /* 週ビューの左のタスクバーは「未完了・時刻未定」に固定なので、チップは効かない */
+  $('#chips').hidden = UI.view === 'week';
+  if(UI.view === 'week') note.hidden = true;
+}
+
+/* =========================================================================
+   描画 — リスト本体
+   ========================================================================= */
+/* opt.showProject … プロジェクト名を添えるか（横断ビュー用）
+   opt.showStatus  … ステータスのバッジを出すか。
+                     セクション名がステータス名そのものの場合は見出しと重複するので出さない */
+function rowHTML(t, opt){
+  const showProject = !!(opt && opt.showProject);
+  const showStatus  = !(opt && opt.showStatus === false);
+  const done = isDone(t);
+  const subs = t.subtasks.length;
+  const subsDone = t.subtasks.filter(s => s.done).length;
+  const subsLate = t.subtasks.some(s => !s.done && s.due && daysFromToday(s.due) < 0);
+  const dc = dueClass(t.due);
+  let meta = '';
+  if(showProject){
+    const p = projById(t.projectId);
+    if(p) meta += `<span class="proj-tag" style="${projTagStyle(p.color)}">${esc(p.name)}</span>`;
+  }
+  if(subs) meta += `<span class="badge b-sub${subsLate?' late':''}"`
+    + (subsLate ? ' title="期限切れのサブタスクがあります"' : '')
+    + `>${subsDone}/${subs}</span>`;
+  if(t.url) meta += `<a class="b-link" href="${esc(t.url)}" target="_blank" rel="noopener" title="出典を開く">↗</a>`;
+  if(t.status !== 'todo' && t.status !== 'done' && showStatus)
+    meta += `<span class="badge b-st b-st-${statusMod(t.status)}">${statusLabel(t.status)}</span>`;
+  if(t.priority) meta += `<span class="badge b-pri-${t.priority}">${priLabel(t.priority)}</span>`;
+  /* 工数: サブタスクがあるときは合計なので読み取りだけ。無ければその場で入力できる */
+  if(subs) meta += hoursBadge(t);
+  else meta += `<label class="row-est" title="工数（${EST_STEP}h 刻み）"><input type="number" data-act="rowest"
+    step="${EST_STEP}" min="0" max="100" value="${t.estimate == null ? '' : t.estimate}" placeholder="—"><span>h</span></label>`;
+  /* 期日: 押すとカレンダーが開く。空でも欄は出す（ここから設定できるように） */
+  meta += `<input type="date" class="row-due ${t.due && !done ? dc : ''}${t.due ? '' : ' nodue'}" data-act="rowdue"
+    value="${esc(t.due)}" title="期日（クリックでカレンダー）">`;
+
+  return `<div class="row${done?' done':''}${selected===t.id?' sel':''}" data-t="${esc(t.id)}">
+    <span class="grip" title="ドラッグで並べ替え">⋮⋮</span>
+    <button class="cb" data-act="toggle" title="完了/未完了">✓</button>
+    <input class="t-title" data-act="title" value="${esc(t.title)}" placeholder="無題のタスク">
+    <span class="meta">${meta}</span>
+    <button class="open" data-act="open">詳細</button>
+  </div>`;
+}
+
+/* 「すべてのタスク」用のまとめ方。
+   プロジェクトをまたいで同じ名前のセクションを1つに束ね、
+   未着手 → タスク化 → 進行中 → リリース待ち → 完了 の順に並べる。
+   ステータス名でないセクションは、最初に現れた順でそのあとに続ける。 */
+function sectionGroups(){
+  const rows = visibleTasks('*');
+  const rank = n => {
+    const i = STATUS.findIndex(x => x[1] === n);
+    return i < 0 ? 99 : i;
+  };
+  const seen = new Map();
+  /* ステータスの5つは、どのプロジェクトにその区切りが無くても必ず並べる。
+     未着手から完了までが常に見えていないと、ボードで移す先が無くなる。
+     （リストビューは空の区切りを畳んで出さないので邪魔にならない） */
+  for(const st of STATUS) seen.set(st[1], seen.size);
+  for(const p of S.projects)
+    for(const sec of p.sections)
+      if(!seen.has(sec.name)) seen.set(sec.name, seen.size);
+
+  return [...seen.keys()]
+    .sort((a,b) => (rank(a) - rank(b)) || (seen.get(a) - seen.get(b)))
+    .map(name => ({
+      name,
+      isStatus: !!statusByLabel(name),
+      tasks: rows.filter(t => secName(t.projectId, t.sectionId) === name)
+    }));
+}
+
+/* 横断ビューでタスクを足すときの行き先プロジェクト */
+function addProjectId(){
+  if(UI.addProject && projById(UI.addProject)) return UI.addProject;
+  return S.projects.length ? S.projects[0].id : null;
+}
+function addProjectSelect(){
+  const cur = addProjectId();
+  return '<select class="addproj" data-act="addproj" title="追加先のプロジェクト">' +
+    S.projects.map(p => '<option value="' + esc(p.id) + '"' +
+      (p.id === cur ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') +
+    '</select>';
+}
+
+/* =========================================================================
+   ボードビュー — 列はセクション
+   ========================================================================= */
+function cardHTML(t, showProject){
+  const done = isDone(t);
+  const subs = t.subtasks.length;
+  const subsDone = t.subtasks.filter(s => s.done).length;
+  const subsLate = t.subtasks.some(s => !s.done && s.due && daysFromToday(s.due) < 0);
+  let meta = '';
+  if(showProject){
+    const p = projById(t.projectId);
+    if(p) meta += '<span class="proj-tag" style="' + projTagStyle(p.color) + '">' +
+      esc(p.name) + '</span>';
+  }
+  /* 工数・期日はリストの行と同じ欄。その場で変えられる */
+  meta += subs ? hoursBadge(t)
+    : '<label class="row-est" title="工数（' + EST_STEP + 'h 刻み）"><input type="number" data-act="rowest" step="' + EST_STEP +
+      '" min="0" max="100" value="' + (t.estimate == null ? '' : t.estimate) + '" placeholder="—"><span>h</span></label>';
+  meta += '<input type="date" class="row-due ' + (t.due && !done ? dueClass(t.due) : '') + (t.due ? '' : ' nodue') +
+    '" data-act="rowdue" value="' + esc(t.due) + '" title="期日（クリックでカレンダー）">';
+  if(t.priority) meta += '<span class="badge b-pri-' + t.priority + '">' + priLabel(t.priority) + '</span>';
+  if(subs) meta += '<span class="badge b-sub' + (subsLate ? ' late' : '') + '"' +
+    (subsLate ? ' title="期限切れのサブタスクがあります"' : '') + '>' + subsDone + '/' + subs + '</span>';
+  if(t.url) meta += '<a class="b-link" href="' + esc(t.url) +
+    '" target="_blank" rel="noopener" title="参照リンクを開く">↗</a>';
+  if(t.notes) meta += '<span class="b-note" title="メモあり">≡</span>';
+
+  return '<div class="card' + (done ? ' done' : '') + (selected === t.id ? ' sel' : '') +
+    '" data-t="' + esc(t.id) + '">' +
+      '<div class="card-top">' +
+        '<button class="cb" data-act="toggle" title="完了/未完了">✓</button>' +
+        '<input class="card-title" data-act="title" value="' + esc(t.title) +
+          '" placeholder="無題のタスク" title="クリックして名前を編集">' +
+      '</div>' +
+      (meta ? '<div class="card-meta">' + meta + '</div>' : '') +
+    '</div>';
+}
+
+const colHours = list => round2(list.reduce((n, t) => n + taskHours(t).hours, 0));
+
+function renderBoard(el){
+  const pid = UI.project;
+  let cols = [];
+  let crossProject = false;
+
+  if(pid === '*'){
+    crossProject = true;
+    cols = sectionGroups().map(g => ({sname: g.name, name: g.name, tasks: g.tasks}));
+    if(!cols.length){ el.innerHTML = emptyHTML(); return; }
+  }else{
+    const p = projById(pid);
+    if(!p){ el.innerHTML = emptyHTML(); return; }
+    const rows = visibleTasks(pid);
+    cols = p.sections.map(sec => ({
+      sid: sec.id, name: sec.name,
+      tasks: rows.filter(t => t.sectionId === sec.id)
+    }));
+  }
+
+  let html = '<div class="board">';
+  for(const c of cols){
+    /* プロジェクト内は section id で、横断ビューはセクション名で列を識別する */
+    const key = c.sid ? ' data-s="' + esc(c.sid) + '"' : ' data-sname="' + esc(c.sname) + '"';
+    const draftKey = c.sid || ('name:' + c.sname);
+    const ccol = c.sid
+      ? (projById(pid).sections.find(x => x.id === c.sid) || {}).color
+      : colorForSectionName(c.sname);
+    html += '<div class="col"' + key + '>' +
+      '<div class="col-head"' + key + '>' +
+        '<span class="col-dot" style="background:' + colorFg(ccol) + '"></span>' +
+        (c.sid
+          ? '<input class="col-name" data-act="secname" value="' + esc(c.name) + '">'
+          : '<span class="col-name">' + esc(c.name) + '</span>') +
+        '<span class="col-ct">' + c.tasks.length +
+          (colHours(c.tasks) ? ' · ' + showHours(colHours(c.tasks)) : '') + '</span>' +
+        (c.sid ? '<button class="col-menu" data-act="secmenu" title="セクション操作">⋯</button>' : '') +
+      '</div>' +
+      '<div class="cards">' +
+        c.tasks.map(t => cardHTML(t, crossProject)).join('') +
+      '</div>' +
+      '<div class="col-add">' +
+        (c.sid ? '' : addProjectSelect()) +
+        '<input data-act="add"' +
+          (c.sid ? ' data-s="' + esc(c.sid) + '"' : ' data-sname="' + esc(c.sname) + '"') +
+          ' placeholder="＋ タスクを追加（Enter）" value="' + esc(UI.drafts[draftKey] || '') + '">' +
+      '</div>' +
+    '</div>';
+  }
+  if(pid !== '*')
+    html += '<div class="col newcol"><button data-act="addsec">＋ セクションを追加</button></div>';
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderList(){
+  const el = $('#list');
+  const pid = UI.project;
+
+  if(pid === INBOX_P){
+    el.hidden = false; $('#week').hidden = true;
+    el.classList.remove('board-mode');
+    renderInbox(el); return;
+  }
+  el.hidden = UI.view === 'week';
+  $('#week').hidden = UI.view !== 'week';
+  if(UI.view === 'week'){ renderWeek(); return; }
+  el.classList.toggle('board-mode', UI.view === 'board');
+  if(UI.view === 'board'){ renderBoard(el); return; }
+
+  if(pid === '*'){
+    const groups = sectionGroups();   /* 空のセクションも出す */
+    if(!groups.length){ el.innerHTML = emptyHTML(); return; }
+    let html = '';
+    for(const g of groups){
+      const ckey = 'name:' + g.name;
+      const collapsed = !!UI.collapsed[ckey];
+      const draft = UI.drafts[ckey] || '';
+      html += `<div class="sec${collapsed?' collapsed':''}" data-s="${esc(ckey)}">
+        <div class="sec-head" data-sname="${esc(g.name)}" data-s="${esc(ckey)}">
+          <button class="caret" data-act="collapse">▾</button>
+          <span class="col-dot" style="background:${colorFg(colorForSectionName(g.name))}"></span>
+          <span class="sec-name" style="pointer-events:none">${esc(g.name)}</span>
+          <span class="sec-ct">${g.tasks.length}</span>
+        </div>
+        <div class="sec-body">
+          ${g.tasks.map(t => rowHTML(t, {showProject:true, showStatus:false})).join('')}
+          <div class="add"><span class="plus">＋</span>
+            ${addProjectSelect()}
+            <input data-act="add" data-sname="${esc(g.name)}" value="${esc(draft)}"
+                   placeholder="タスクを追加（Enter）"></div>
+        </div></div>`;
+    }
+    el.innerHTML = html;
+    return;
+  }
+
+  const p = projById(pid);
+  if(!p){ el.innerHTML = emptyHTML(); return; }
+  const rows = visibleTasks(pid);
+  let html = '';
+  for(const sec of p.sections){
+    const mine = rows.filter(t => t.sectionId === sec.id);
+    const collapsed = !!UI.collapsed[sec.id];
+    const secIsStatus = !!statusByLabel(sec.name);
+    const draft = UI.drafts[sec.id] || '';
+    html += `<div class="sec${collapsed?' collapsed':''}" data-s="${esc(sec.id)}">
+      <div class="sec-head" data-s="${esc(sec.id)}">
+        <button class="caret" data-act="collapse">▾</button>
+        <span class="col-dot" style="background:${colorFg(sec.color)}"></span>
+        <input class="sec-name" data-act="secname" value="${esc(sec.name)}">
+        <span class="sec-ct">${mine.length}</span>
+        <button class="sec-menu" data-act="secmenu" title="セクション操作">⋯</button>
+      </div>
+      <div class="sec-body">
+        ${mine.map(t => rowHTML(t, {showProject:false, showStatus:!secIsStatus})).join('')}
+        <div class="add"><span class="plus">＋</span>
+          <input data-act="add" data-s="${esc(sec.id)}" value="${esc(draft)}"
+                 placeholder="タスクを追加（Enter）"></div>
+      </div></div>`;
+  }
+  html += `<button class="sec-add" data-act="addsec">＋ セクションを追加</button>`;
+  if(!rows.length && !UI.q && UI.filter === 'all') html = emptyHTML() + html;
+  el.innerHTML = html;
+}
+
+function emptyHTML(){
+  if(UI.q) return `<div class="empty"><b>「${esc(UI.q)}」に一致するタスクはありません</b>検索条件を変えてみてください。</div>`;
+  if(UI.filter !== 'all') return `<div class="empty"><b>該当なし</b>この絞り込みに入るタスクはありません。</div>`;
+  return `<div class="empty"><b>まだタスクがありません</b>
+    下の入力欄から追加するか、Slack リストの CSV をこの画面にドラッグしてください。</div>`;
+}
+
+function renderAll(){ renderSide(); renderTop(); renderList(); renderDrawer(); }
+
+/* =========================================================================
+   描画 — 詳細ドロワー
+   ========================================================================= */
+/* 選択の切り替えはリスト全体を再描画しない（タイトル編集中のフォーカスを壊さないため） */
+function select(id){
+  selected = id;
+  $$('.row, .card', $('#list')).forEach(r => r.classList.toggle('sel', r.dataset.t === id));
+  renderDrawer();
+}
+
+/* サブタスクがあるときは親の工数はサブの合計。直接は編集させない。 */
+function estFieldHTML(t){
+  const h = taskHours(t);
+  if(t.subtasks.length)
+    return '<div class="est-ro">' + (h.hours ? showHours(h.hours) : '—') +
+      '<span class="est-note">サブタスクの合計' +
+      (h.unset ? '・未設定 ' + h.unset + ' 件' : '') + '</span></div>';
+  return '<input type="number" step="' + EST_STEP + '" min="0" max="100" data-act="d-est"' +
+    ' placeholder="' + EST_STEP + ' 刻み"' +
+    ' value="' + (t.estimate == null ? '' : t.estimate) + '">';
+}
+
+function renderDrawer(){
+  const dr = $('#drawer');
+  const t = selected ? taskById(selected) : null;
+  if(!t){
+    dr.classList.remove('on'); document.body.classList.remove('drawer-open');
+    $('#drBody').innerHTML = ''; return;
+  }
+  dr.classList.add('on'); document.body.classList.add('drawer-open');
+  $('#drDone').textContent = isDone(t) ? '未完了に戻す' : '完了にする';
+
+  const p = projById(t.projectId);
+  const secOpts = (p ? p.sections : []).map(s =>
+    `<option value="${esc(s.id)}"${s.id===t.sectionId?' selected':''}>${esc(s.name)}</option>`).join('');
+  const projOpts = S.projects.map(x =>
+    `<option value="${esc(x.id)}"${x.id===t.projectId?' selected':''}>${esc(x.name)}</option>`).join('');
+  const prOpts = PRIORITY.map(([v,l]) =>
+    `<option value="${v}"${t.priority===v?' selected':''}>${l}</option>`).join('');
+
+  const subs = t.subtasks.map((s,i) =>
+    `<li class="${s.done?'on':''}" data-i="${i}">
+       <span class="grip" title="ドラッグで並べ替え">⋮⋮</span>
+       <input type="checkbox" class="sub-cb" data-sub="${i}" data-act="subdone"${s.done?' checked':''}
+              title="${s.done?'未完了に戻す':'完了にする'}">
+       <input type="text" data-sub="${i}" data-act="subtitle" value="${esc(s.title)}">
+       <button class="del" data-sub="${i}" data-act="subdel" title="削除">✕</button>
+       <div class="sub-meta">
+       <input type="number" class="sub-est" step="${EST_STEP}" min="0" max="100" data-sub="${i}"
+              data-act="subest" value="${s.estimate == null ? '' : s.estimate}"
+              placeholder="h" title="工数（${EST_STEP}h 刻み）">
+       <input type="date" class="sub-due ${s.done?'':dueClass(s.due)}" data-sub="${i}"
+              data-act="subdue" value="${esc(s.due)}" title="着手日（クリックでカレンダー）">
+       </div></li>`).join('');
+
+  const created = t.createdAt ? t.createdAt.slice(0,10) : '';
+  const completed = t.completedAt ? t.completedAt.slice(0,10) : '';
+
+  $('#drBody').innerHTML = `
+    <div class="dr-top"><button class="danger" data-act="d-del">このタスクを削除</button></div>
+    <textarea class="dr-title" data-act="d-title" rows="2">${esc(t.title)}</textarea>
+    <div class="fields">
+      <label>プロジェクト</label><select data-act="d-proj">${projOpts}</select>
+      <label>セクション</label><select data-act="d-sec">${secOpts}</select>
+      <label>優先度</label><select data-act="d-pri">${prOpts}</select>
+      <label>工数</label>${estFieldHTML(t)}
+      <label>期日</label><input type="date" data-act="d-due" value="${esc(t.due)}">
+      <label>参照リンク</label><input type="url" data-act="d-url" value="${esc(t.url)}" placeholder="Slack / ドキュメントの URL">
+    </div>
+    ${t.url ? `<div style="margin-top:8px"><a class="linkout" href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.url)}</a></div>` : ''}
+    <div class="dr-sec"><h4>メモ</h4>
+      <textarea class="notes" data-act="d-notes" placeholder="背景・次の一手・決まったこと">${esc(t.notes)}</textarea></div>
+    <div class="dr-sec"><h4>サブタスク</h4>
+      <ul class="subs">${subs}</ul>
+      <div class="sub-add">
+        <input type="text" data-act="subadd" placeholder="＋ サブタスクを追加">
+        <div class="sub-meta">
+        <input type="number" class="sub-est" step="${EST_STEP}" min="0" max="100" data-act="subadd-est"
+               placeholder="h" title="工数（${EST_STEP}h 刻み）">
+        <input type="date" class="sub-due" data-act="subadd-due" title="着手日（クリックでカレンダー）">
+        <span class="spacer"></span>
+        <button class="sub-add-go" data-act="subadd-go">追加</button>
+      </div></div></div>
+    <div class="stamp">作成 ${esc(created)}${completed ? ' ／ 完了 ' + esc(completed) : ''}</div>`;
+}
+
+/* =========================================================================
+   変更操作
+   ========================================================================= */
+function nextOrder(pid, sid){
+  const mine = S.tasks.filter(t => t.projectId === pid && t.sectionId === sid);
+  return mine.length ? Math.max(...mine.map(t => t.order)) + 1000 : 1000;
+}
+function addTask(pid, sid, title){
+  title = (title || '').trim();
+  if(!title) return null;
+  const t = {
+    id: uid('t_'), projectId: pid, sectionId: sid, title,
+    notes:'', status:'todo', priority:'', due:'', url:'', estimate: null,
+    subtasks:[], createdAt: new Date().toISOString(), completedAt: null,
+    order: nextOrder(pid, sid)
+  };
+  S.tasks.push(t);
+  syncStatusToSection(t);      /* 「進行中」の列に足したら status も進行中にする */
+  save();
+  return t;
+}
+/* ステータス変更はここに集約する。
+   いま入っているセクションがステータス名のセクション（＝Slack のボード列と同じ使い方）なら、
+   対応するセクションへ移動もする。自分で作った任意名のセクションは動かさない。 */
+function setStatus(t, v, opt){
+  const moveSection = !opt || opt.moveSection !== false;
+  if(v === 'done' && t.status !== 'done'){
+    t.prevStatus = t.status;
+    t.completedAt = new Date().toISOString();
+  }
+  if(v !== 'done') t.completedAt = null;
+  t.status = v;
+
+  if(!moveSection) return;
+  const p = projById(t.projectId); if(!p) return;
+  const cur = p.sections.find(s => s.id === t.sectionId);
+  if(!cur || !statusByLabel(cur.name)) return;      /* 任意名のセクションには触らない */
+  const dest = ensureStatusSection(p, statusLabel(v));
+  if(dest.id !== t.sectionId){
+    t.sectionId = dest.id;
+    t.order = nextOrder(t.projectId, dest.id);
+  }
+}
+
+/* ステータス名のセクションを、無ければ STATUS の並び順どおりの位置に作る。
+   取り込み時点で使われていなかった列も、そのステータスにした瞬間に生える。 */
+function ensureStatusSection(p, label){
+  const found = p.sections.find(s => s.name === label);
+  if(found) return found;
+  const rank = l => { const i = STATUS.findIndex(x => x[1] === l); return i < 0 ? 99 : i; };
+  const mine = rank(label);
+  let at = p.sections.length;
+  for(let i = 0; i < p.sections.length; i++){
+    const r = rank(p.sections[i].name);
+    if(r !== 99 && r > mine){ at = i; break; }
+  }
+  const sec = {id: uid('s_'), name: label};
+  p.sections.splice(at, 0, sec);
+  return sec;
+}
+/* セクション名がステータス名なら、そこへ移した時点でステータスも合わせる */
+function syncStatusToSection(t){
+  const p = projById(t.projectId); if(!p) return;
+  const sec = p.sections.find(s => s.id === t.sectionId); if(!sec) return;
+  const st = statusByLabel(sec.name);
+  if(st && st[0] !== t.status) setStatus(t, st[0], {moveSection:false});
+}
+function toggleDone(t){
+  if(isDone(t)){
+    const back = (t.prevStatus && t.prevStatus !== 'done') ? t.prevStatus : 'todo';
+    delete t.prevStatus;
+    setStatus(t, back);
+  }else{
+    setStatus(t, 'done');
+  }
+  save();
+}
+function deleteTask(id){
+  const i = S.tasks.findIndex(t => t.id === id);
+  if(i < 0) return;
+  lastDeleted = {task: S.tasks[i], at: Date.now()};
+  S.tasks.splice(i, 1);
+  if(selected === id) selected = null;
+  save(); renderAll();
+  toast('「' + (lastDeleted.task.title || '無題') + '」を削除しました', '元に戻す', () => {
+    S.tasks.push(lastDeleted.task); lastDeleted = null; save(); renderAll();
+  });
+}
+
+/* =========================================================================
+   トースト / モーダル
+   ========================================================================= */
+let toastTimer = null;
+function toast(msg, actionLabel, action){
+  clearTimeout(toastTimer);
+  $('#toastRoot').innerHTML =
+    `<div class="toast"><span>${esc(msg)}</span>${actionLabel?`<button id="tAct">${esc(actionLabel)}</button>`:''}</div>`;
+  if(actionLabel) $('#tAct').onclick = () => { $('#toastRoot').innerHTML = ''; action(); };
+  toastTimer = setTimeout(() => { $('#toastRoot').innerHTML = ''; }, 8000);
+}
+/* 色を選ぶ並び。current が今の色、name は input の name 属性用 */
+function colorPicker(current){
+  return '<div class="cpick">' +
+    ['', ...COLORS].map(c =>
+      '<button class="cswatch' + (c === colorOf(current) ? ' on' : '') + '" data-color="' + c +
+      '" title="' + (c || '色なし') + '" style="background:' + colorFg(c) + '"></button>').join('') +
+    '</div>';
+}
+function bindColorPicker(root, apply){
+  $$('.cswatch', root).forEach(b => {
+    b.onclick = () => {
+      $$('.cswatch', root).forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      apply(b.dataset.color);
+      save(); renderAll();
+    };
+  });
+}
+
+function closeModal(){ $('#modalRoot').innerHTML = ''; }
+function modal(title, bodyHTML, footHTML){
+  $('#modalRoot').innerHTML =
+    `<div class="veil" data-veil><div class="modal">
+       <div class="mo-head">${esc(title)}</div>
+       <div class="mo-body">${bodyHTML}</div>
+       <div class="mo-foot">${footHTML}</div></div></div>`;
+  $('[data-veil]').addEventListener('mousedown', e => { if(e.target.dataset.veil !== undefined) closeModal(); });
+}
+
+/* =========================================================================
+   取り込み / 書き出し
+   ========================================================================= */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tasks-' + todayISO() + '.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+function parseCSV(text){
+  const rows = []; let row = [], field = '', i = 0, inQ = false;
+  text = text.replace(/^﻿/, '');
+  while(i < text.length){
+    const c = text[i];
+    if(inQ){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field += '"'; i += 2; continue; }
+        inQ = false; i++; continue;
+      }
+      field += c; i++; continue;
+    }
+    if(c === '"'){ inQ = true; i++; continue; }
+    if(c === ','){ row.push(field); field = ''; i++; continue; }
+    if(c === '\r'){ i++; continue; }
+    if(c === '\n'){ row.push(field); field = ''; rows.push(row); row = []; i++; continue; }
+    field += c; i++;
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(v => v.trim() !== ''));
+}
+
+/* 任意の文字列 → ステータス / 優先度 / 日付 */
+function guessStatus(v){
+  const s = (v||'').toLowerCase();
+  if(/未着手|not started|todo|backlog/.test(s)) return 'todo';
+  if(/完了|done|complete|済|closed/.test(s)) return 'done';
+  if(/リリース待ち|release|waiting|review|pending|待ち/.test(s)) return 'release';
+  if(/進行|着手|doing|progress|作業中/.test(s)) return 'doing';
+  if(/タスク化|起票|ticket|planned/.test(s)) return 'ticketed';
+  return 'todo';
+}
+function guessPriority(v){
+  const s = (v||'').toLowerCase();
+  if(/高|high|urgent|p0|p1|至急/.test(s)) return 'high';
+  if(/中|mid|medium|normal|p2/.test(s)) return 'mid';
+  if(/低|low|p3|p4/.test(s)) return 'low';
+  return '';
+}
+function guessDate(v){
+  v = (v||'').trim();
+  if(!v) return '';
+  let m = v.match(/(\d{4})[-\/年.](\d{1,2})[-\/月.](\d{1,2})/);
+  if(m) return `${m[1]}-${String(+m[2]).padStart(2,'0')}-${String(+m[3]).padStart(2,'0')}`;
+  const d = new Date(v);
+  if(!isNaN(d)) return new Date(d.getTime() - d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+  return '';
+}
+
+const LF = String.fromCharCode(10);
+
+/* ファイルの正体を見分ける。取り違えると保存先を壊すので、ここは緩めない。 */
+function isTaskboardFile(j){
+  return !!(j && typeof j === 'object' && Array.isArray(j.projects) && Array.isArray(j.tasks));
+}
+function isSlackListFile(j){
+  return !!(j && typeof j === 'object' && Array.isArray(j.records) && Array.isArray(j.columns));
+}
+
+/* 「▼アプリ（優先度順）」のような見出し行はタスクではない */
+function isDividerTitle(t){
+  const h = String(t || '').trim().charAt(0);
+  return h === '▼' || h === '▽' || h === '■' || h === '□' || h === '-';
+}
+
+const FIELDS = [
+  ['title',   'タイトル',     ['name','title','task','タスク','件名','項目','内容','名前']],
+  ['project', 'プロジェクト', ['project','領域','カテゴリ','分類','区分','チーム']],
+  ['section', 'セクション',   ['section','group','ステータス','状態','status','進捗']],
+  ['status',  'ステータス',   ['status','state','状態','ステータス','進捗']],
+  ['priority','優先度',       ['priority','優先','重要']],
+  ['due',     '期日',         ['due','deadline','date','期限','期日','締切']],
+  ['url',     '参照リンク',   ['url','link','リンク','参照','アウトプット','slack']],
+  ['notes',   'メモ',         ['description','note','memo','詳細','説明','備考']]
+];
+
+/* ---------- Slack リストの書き出し JSON を、表の形にほどく ---------- */
+function parseSlackList(obj){
+  const cols = obj.columns || [];
+  const label = {};
+  const colorByLabel = {};        /* Slack の色名をそのまま持ってくる */
+  for(const c of cols){
+    if(c.type === 'select' && c.options && Array.isArray(c.options.choices))
+      for(const ch of c.options.choices){
+        label[ch.value] = ch.label;
+        if(colorOf(ch.color)) colorByLabel[ch.label] = ch.color;
+      }
+  }
+  const header = cols.map((c,i) => c.name || c.id || ('列' + (i+1)));
+  const at = {};
+  cols.forEach((c,i) => { at[c.id] = i; });
+
+  let titleIdx = cols.findIndex(c => c.is_primary_column);
+  if(titleIdx < 0) titleIdx = cols.findIndex(c => c.type === 'text');
+  if(titleIdx < 0) titleIdx = 0;
+  const dueIdx = cols.findIndex(c => c.type === 'todo_due_date');
+
+  const readRec = rec => {
+    const cells = new Array(cols.length).fill('');
+    let done = false;
+    for(const f of (rec.fields || [])){
+      const i = at[f.column_id];
+      if(i === undefined) continue;
+      const kind = cols[i].type;
+      if(kind === 'text'){
+        const text = String(f.text || '').trim();
+        let url = '';
+        for(const blk of (f.rich_text || []))
+          for(const sec of (blk.elements || []))
+            for(const el of (sec.elements || []))
+              if(el && el.type === 'link' && el.url && !url) url = el.url;
+        /* Slack は長いリンクの表示用テキストを省略形にするので、URL があればそちらを採る */
+        cells[i] = url || text;
+      }else if(kind === 'select'){
+        const vals = (f.select || []).map(v => label[v] || '').filter(Boolean);
+        cells[i] = vals[0] || '';
+      }else if(kind === 'todo_completed'){
+        done = !!f.checkbox;
+        cells[i] = done ? '完了' : '';
+      }else if(kind === 'todo_due_date'){
+        cells[i] = (f.date || [])[0] || '';
+      }else if(kind === 'todo_assignee'){
+        cells[i] = (f.user || []).join(', ');
+      }else{
+        cells[i] = f.value == null ? '' : String(f.value);
+      }
+    }
+    return {cells, done};
+  };
+
+  const rows = (obj.records || [])
+    .slice()
+    .sort((a,b) => (parseFloat((a.record||{}).position) || 0) - (parseFloat((b.record||{}).position) || 0))
+    .map(node => {
+      const row = readRec(node.record || {});
+      row.subtasks = (node.children || [])
+        .map(ch => {
+          const c = readRec(ch.record || {});
+          return {
+            title: c.cells[titleIdx] || '',
+            done: c.done,
+            due: dueIdx >= 0 ? (c.cells[dueIdx] || '') : ''
+          };
+        })
+        .filter(sub => sub.title.trim())
+        /* Slack は子レコードを工程順とは逆に返してくることが多いので揃える */
+        .reverse();
+      return row;
+    });
+
+  return {header, rows, titleIdx, dueIdx, cols, colorByLabel};
+}
+
+/* Slack リスト向けの初期割り当て。列の型から当てるので名前に依存しない。 */
+function guessSlackMap(parsed){
+  const {cols, titleIdx, dueIdx} = parsed;
+  const selects = cols.map((c,i) => ({c, i})).filter(x => x.c.type === 'select');
+  const looksStatus = x => {
+    const n = String(x.c.name || '');
+    if(/ステータス|状態|進捗|status/i.test(n)) return true;
+    const ch = (x.c.options && x.c.options.choices) || [];
+    return ch.some(o => /完了|進行|着手|done|progress/i.test(o.label || ''));
+  };
+  const statusCol = selects.find(looksStatus);
+  const projCol = selects.find(x => !statusCol || x.i !== statusCol.i);
+  /* アウトプットのような、主列以外のテキスト列を参照リンクに当てる */
+  const textCol = cols.map((c,i) => ({c, i}))
+    .find(x => x.c.type === 'text' && x.i !== titleIdx);
+  return {
+    title: titleIdx,
+    project: projCol ? projCol.i : -1,
+    section: -1,                       /* 既定でステータス名のセクションに入れる */
+    status: statusCol ? statusCol.i : -1,
+    priority: -1,
+    due: dueIdx,
+    url: textCol ? textCol.i : -1,
+    notes: -1
+  };
+}
+
+/* ---------- セクションの確保 ---------- */
+function ensureSection(p, name){
+  if(statusByLabel(name)) return ensureStatusSection(p, name);
+  let sec = p.sections.find(x => x.name === name);
+  if(!sec){ sec = {id: uid('s_'), name}; p.sections.push(sec); }
+  return sec;
+}
+
+/* ---------- 取り込みの本体（CSV と Slack JSON で共通） ---------- */
+function importFlow(header, rows, meta){
+  meta = meta || {};
+  const guess = meta.guess || (() => {
+    const g = {};
+    for(const [key, , hints] of FIELDS){
+      let idx = header.findIndex(h => hints.some(x => String(h).toLowerCase().includes(x)));
+      if(key === 'title' && idx < 0) idx = 0;
+      g[key] = idx;
+    }
+    return g;
+  })();
+
+  const colOpts = sel => '<option value="-1">— 取り込まない —</option>' +
+    header.map((h,i) => '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>' +
+      esc(h || ('列' + (i+1))) + '</option>').join('');
+  const projOpts = S.projects.map(p =>
+    '<option value="' + esc(p.id) + '"' + (p.id === UI.project ? ' selected' : '') + '>' +
+    esc(p.name) + '</option>').join('') +
+    '<option value="__new">＋ 新しいプロジェクトを作る</option>';
+
+  const nSub = rows.reduce((n,r) => n + ((r.subtasks || []).length), 0);
+  const preview = rows.slice(0,5)
+    .map(r => '<div>' + esc(r.cells.join('  |  ')) + '</div>').join('');
+
+  modal(meta.title || '取り込む',
+    '<p class="hint">' + rows.length + ' 件' +
+      (nSub ? '（サブタスク ' + nSub + ' 件つき）' : '') + 'を読み込みました。' +
+      '元の列を、この画面の項目に割り当ててください。<br>' +
+      'プロジェクト列を割り当てると、値ごとにプロジェクトが作られます。' +
+      'セクションを空にしておくと、ステータスと同じ名前のセクションに入ります。</p>' +
+    '<div class="map">' +
+      '<label>取り込み先</label><select id="impProj">' + projOpts + '</select>' +
+      '<label id="impNewLabel">新規名</label>' +
+      '<input id="impNew" placeholder="新しいプロジェクト名" value="' +
+        esc(meta.suggestName || '取り込み') + '">' +
+      FIELDS.map(([k, lab]) =>
+        '<label>' + lab + (k === 'title' ? ' <b style="color:var(--red)">*</b>' : '') + '</label>' +
+        '<select data-map="' + k + '">' + colOpts(guess[k]) + '</select>').join('') +
+    '</div>' +
+    '<div class="prev"><div><b>' + esc(header.join('  |  ')) + '</b></div>' + preview + '</div>',
+    '<button class="btn" onclick="document.getElementById(' + "'modalRoot'" + ').innerHTML=' + "''" + '">やめる</button>' +
+    '<button class="btn pri" id="impGo">取り込む</button>');
+
+  /* ラベルと入力は必ず一緒に出し入れする（片方だけ消すとグリッドが1マスずれる） */
+  const syncNew = () => {
+    const on = $('#impProj').value === '__new';
+    $('#impNew').hidden = !on;
+    $('#impNewLabel').hidden = !on;
+  };
+  $('#impProj').onchange = syncNew; syncNew();
+
+  $('#impGo').onclick = () => {
+    const map = {};
+    $$('[data-map]').forEach(sel => { map[sel.dataset.map] = +sel.value; });
+    if(map.title < 0){ alert('タイトルの列を選んでください。'); return; }
+
+    let fallbackId = $('#impProj').value;
+    let createdSectionId = null;
+    if(fallbackId === '__new'){
+      createdSectionId = uid('s_');
+      const np = {id: uid('p_'), name: ($('#impNew').value || '取り込み').trim(),
+                  sections: [{id: createdSectionId, name: 'バックログ'}]};
+      S.projects.push(np); fallbackId = np.id;
+    }
+
+    let added = 0, skipped = 0, firstPid = fallbackId;
+    for(const row of rows){
+      const cell = i => (i >= 0 && i < row.cells.length) ? String(row.cells[i] == null ? '' : row.cells[i]).trim() : '';
+      const title = cell(map.title);
+      if(!title || isDividerTitle(title)){ skipped++; continue; }
+
+      const tint = meta.colorByLabel || {};
+      let proj;
+      const pname = cell(map.project);
+      if(pname){
+        proj = S.projects.find(p => p.name === pname);
+        if(!proj){
+          proj = {id: uid('p_'), name: pname, color: colorOf(tint[pname]), sections: []};
+          S.projects.push(proj);
+        }else if(!proj.color && tint[pname]) proj.color = colorOf(tint[pname]);
+      }else{
+        proj = projById(fallbackId);
+      }
+
+      let status = map.status >= 0 ? guessStatus(cell(map.status)) : 'todo';
+      if(row.done === true) status = 'done';
+
+      const sname = cell(map.section);
+      const sec = sname ? ensureSection(proj, sname)
+                        : ensureStatusSection(proj, statusLabel(status));
+      if(!sec.color && tint[sec.name]) sec.color = colorOf(tint[sec.name]);
+
+      /* URL 欄に URL でない文字列（Slack のファイル ID など）が来たらメモへ回す */
+      const raw = cell(map.url);
+      const isUrl = raw.startsWith('http://') || raw.startsWith('https://');
+      const noteParts = [];
+      if(map.notes >= 0 && cell(map.notes)) noteParts.push(cell(map.notes));
+      if(raw && !isUrl) noteParts.push((header[map.url] || '参照') + ': ' + raw);
+
+      S.tasks.push({
+        id: uid('t_'), projectId: proj.id, sectionId: sec.id, title,
+        notes: noteParts.join(LF),
+        status,
+        priority: map.priority >= 0 ? guessPriority(cell(map.priority)) : '',
+        due: map.due >= 0 ? guessDate(cell(map.due)) : '',
+        url: isUrl ? raw : '',
+        subtasks: (row.subtasks || []).map(sub => ({
+          id: uid('k_'), title: sub.title.trim(),
+          done: !!sub.done, due: guessDate(sub.due || '')
+        })),
+        createdAt: new Date().toISOString(),
+        completedAt: status === 'done' ? new Date().toISOString() : null,
+        order: nextOrder(proj.id, sec.id)
+      });
+      if(added === 0) firstPid = proj.id;
+      added++;
+    }
+
+    /* 新規プロジェクトのときだけ、使われなかった既定セクションを消す。
+       既存プロジェクトの空セクションは意図して置いてあるので触らない。 */
+    if(createdSectionId){
+      const fb = projById(fallbackId);
+      if(fb && fb.sections.length > 1 && !S.tasks.some(t => t.sectionId === createdSectionId))
+        fb.sections = fb.sections.filter(sec => sec.id !== createdSectionId);
+    }
+    /* プロジェクト列で作ったプロジェクトが空のままになることはないが、念のため */
+    for(const p of S.projects) if(!p.sections.length) p.sections.push({id: uid('s_'), name: 'バックログ'});
+
+    save(); closeModal();
+    UI.project = firstPid; saveUI(); renderAll();
+    toast(added + ' 件を取り込みました' + (skipped ? '（見出し・空行 ' + skipped + ' 件は除外）' : ''));
+  };
+}
+
+function importCSVFlow(text){
+  const table = parseCSV(text);
+  if(table.length < 2){ alert('CSV に読み取れる行がありませんでした。'); return; }
+  const header = table[0].map(h => String(h).trim());
+  const rows = table.slice(1).map(r => ({cells: r}));
+  importFlow(header, rows, {title: 'CSV を取り込む', suggestName: 'Slack バックログ'});
+}
+
+function importSlackListFlow(obj, fileName){
+  const parsed = parseSlackList(obj);
+  if(!parsed.rows.length){ alert('レコードが見つかりませんでした。'); return; }
+  const m = obj.meta || {};
+  if(m.records_truncated || m.max_subtask_depth_exceeded)
+    alert('この書き出しは一部が切り詰められています。Slack 側で書き出し直すことをおすすめします。');
+  importFlow(parsed.header, parsed.rows, {
+    title: 'Slack リストを取り込む',
+    guess: guessSlackMap(parsed),
+    colorByLabel: parsed.colorByLabel,
+    suggestName: ((obj.list || {}).title || fileName || '取り込み')
+  });
+}
+
+function importJSON(data){
+  if(!confirm('現在の内容を、読み込んだ JSON で置き換えます。よろしいですか？')) return;
+  S = normalize(data);
+  selected = null; UI.project = S.projects[0].id;
+  save(); saveUI(); renderAll();
+  toast('取り込みました');
+}
+
+function handleFile(file){
+  const name = String(file.name || '').toLowerCase();
+  const r = new FileReader();
+  r.onload = () => {
+    const text = String(r.result);
+    if(name.endsWith('.csv')){ importCSVFlow(text); return; }
+    if(!name.endsWith('.json')){ alert('.csv か .json を渡してください。'); return; }
+    let j;
+    try{ j = JSON.parse(text); }
+    catch(e){ alert('JSON として読めませんでした。' + LF + e.message); return; }
+    if(isSlackListFile(j)){ importSlackListFlow(j, file.name); return; }
+    if(isTaskboardFile(j)){ importJSON(j); return; }
+    alert('この JSON は taskboard のデータでも Slack リストの書き出しでもありません。');
+  };
+  r.readAsText(file, 'utf-8');
+}
+
+/* =========================================================================
+   イベント
+   ========================================================================= */
+/* --- サイドバー --- */
+$('#projList').addEventListener('click', e => {
+  if(e.target.dataset.act === 'pmenu'){ projectMenu(e.target.dataset.p); return; }
+  const b = e.target.closest('.pitem'); if(!b) return;
+  UI.project = b.dataset.p; UI.q = ''; $('#search').value = '';
+  selected = null; saveUI(); renderAll();
+});
+
+/* プロジェクトの並べ替えと削除。削除するときは、中のタスクを必ず別プロジェクトへ移す。 */
+function projectMenu(pid){
+  const p = projById(pid); if(!p) return;
+  const n = S.tasks.filter(t => t.projectId === pid).length;
+  const i = S.projects.indexOf(p);
+  const others = S.projects.filter(x => x.id !== pid);
+  const destOpts = others.map(x =>
+    `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
+
+  modal('プロジェクト「' + p.name + '」',
+    `<p class="hint">タスク ${n} 件、セクション ${p.sections.length} 個。
+       名前は画面上部の見出しをクリックすると変えられます。</p>
+     <div class="crow"><span>色</span>${colorPicker(p.color)}</div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap">
+       <button class="btn" id="pUp"${i === 0 ? ' disabled' : ''}>↑ 上へ</button>
+       <button class="btn" id="pDown"${i === S.projects.length - 1 ? ' disabled' : ''}>↓ 下へ</button>
+     </div>` +
+    (others.length
+      ? `<div class="map" style="margin-top:18px">
+           <label>削除するとき<br>タスクの移動先</label>
+           <select id="pDest">${destOpts}</select></div>`
+      : `<p class="hint" style="margin-top:18px">最後のプロジェクトなので削除できません。</p>`),
+    `<button class="btn" onclick="document.getElementById('modalRoot').innerHTML=''">閉じる</button>` +
+    (others.length
+      ? `<button class="btn" id="pDel" style="color:var(--red);border-color:var(--red)">削除</button>`
+      : ''));
+
+  bindColorPicker($('#modalRoot'), v => { p.color = colorOf(v); });
+  const move = to => {
+    S.projects.splice(i, 1); S.projects.splice(to, 0, p);
+    save(); closeModal(); renderSide();
+  };
+  $('#pUp').onclick   = () => move(i - 1);
+  $('#pDown').onclick = () => move(i + 1);
+
+  if(!others.length) return;
+  $('#pDel').onclick = () => {
+    const dest = projById($('#pDest').value); if(!dest) return;
+    if(n && !confirm(n + ' 件のタスクを「' + dest.name + '」へ移してから削除します。よろしいですか？')) return;
+    if(!n && !confirm('「' + p.name + '」を削除します。よろしいですか？')) return;
+    for(const t of S.tasks){
+      if(t.projectId !== pid) continue;
+      t.projectId = dest.id;
+      /* 移動先の「同じステータスの列」に入れる。先頭の列に押し込むと
+         セクションとステータスの連動が働いて、ステータスまで書き換わってしまう。 */
+      const sec = ensureStatusSection(dest, statusLabel(t.status));
+      t.sectionId = sec.id;
+      t.order = nextOrder(dest.id, sec.id);
+    }
+    S.projects = S.projects.filter(x => x.id !== pid);
+    if(UI.project === pid) UI.project = dest.id;
+    selected = null;
+    save(); saveUI(); closeModal(); renderAll();
+    toast('「' + p.name + '」を削除しました');
+  };
+}
+$('#addProj').onclick = () => {
+  const name = prompt('プロジェクト名'); if(!name) return;
+  const p = {id: uid('p_'), name: name.trim(),
+             sections: [{id: uid('s_'), name: '今週'}, {id: uid('s_'), name: '次にやる'}]};
+  S.projects.push(p); UI.project = p.id; save(); saveUI(); renderAll();
+};
+$('#storeBtn').onclick = () => Store.connect();
+
+$('#btnCollapse').onclick = () => {
+  const p = projById(UI.project); if(!p) return;
+  const anyOpen = p.sections.some(s => !UI.collapsed[s.id]);
+  p.sections.forEach(s => UI.collapsed[s.id] = anyOpen);
+  saveUI(); renderList();
+};
+
+/* --- ヘッダ --- */
+$('#projTitle').addEventListener('input', e => {
+  const p = projById(UI.project); if(!p) return;
+  p.name = e.target.value; save(); renderSide();
+});
+/* 週カレンダーはタブから外して、目立つボタンで開く。inbox からでも開ける（inbox の項目も置けるため） */
+/* 週カレンダーを開いている間は、同じボタンが「Backlog」（ハタラオレンジ）になり、押すと Backlog へ戻る */
+$('#btnWeek').addEventListener('click', () => {
+  if(UI.view === 'week' && UI.project !== INBOX_P){
+    UI.view = 'board'; saveUI(); renderAll(); return;
+  }
+  if(UI.project === INBOX_P) UI.project = '*';
+  UI.view = 'week'; saveUI(); renderAll(); loadCalendar();
+});
+$('#vswitch').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  UI.view = b.dataset.view; saveUI(); renderTop(); renderList();
+  if(UI.view === 'week') loadCalendar();
+});
+$('#search').addEventListener('input', e => { UI.q = e.target.value.trim(); renderList(); });
+$('#chips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if(!b) return;
+  UI.filter = b.dataset.f; saveUI(); renderTop(); renderList();
+});
+
+/* --- リスト --- */
+const list = $('#list');
+
+list.addEventListener('click', e => {
+  const act = e.target.dataset.act;
+  const item = e.target.closest('.row, .card');
+  const holder = e.target.closest('[data-s]');     /* .sec / .sec-head / .col / .col-head */
+
+  if(act === 'collapse' && holder){
+    const id = holder.dataset.s;
+    UI.collapsed[id] = !UI.collapsed[id]; saveUI(); renderList(); return;
+  }
+  if(act === 'secmenu' && holder){ sectionMenu(holder.dataset.s); return; }
+  if(act === 'addsec'){
+    const p = projById(UI.project); if(!p) return;
+    const name = prompt('セクション名', '新しいセクション'); if(!name) return;
+    p.sections.push({id: uid('s_'), name: name.trim()});
+    save(); renderList(); return;
+  }
+  if(!item) return;
+  const t = taskById(item.dataset.t); if(!t) return;
+
+  if(act === 'toggle'){ toggleDone(t); renderAll(); return; }
+  if(e.target.tagName === 'A') return;
+  select(t.id);                       /* タイトル欄クリックでも詳細を開く（編集は継続できる） */
+});
+
+/* タイトル欄にフォーカスが入ったら、その行／カードを選択して詳細を開く */
+list.addEventListener('focusin', e => {
+  if(e.target.dataset.act !== 'title') return;
+  const host = e.target.closest('.row, .card');
+  if(host && host.dataset.t !== selected) select(host.dataset.t);
+});
+
+list.addEventListener('input', e => {
+  const act = e.target.dataset.act;
+  if(act === 'title'){
+    const host = e.target.closest('.row, .card'); if(!host) return;
+    const t = taskById(host.dataset.t);
+    if(t){
+      t.title = e.target.value; save();
+      const dt = $('[data-act="d-title"]');          /* 開いている詳細のタイトルも追従 */
+      if(selected === t.id && dt && document.activeElement !== dt) dt.value = t.title;
+    }
+    return;
+  }
+  if(act === 'secname'){
+    const p = projById(UI.project); if(!p) return;
+    const holder = e.target.closest('[data-s]'); if(!holder) return;
+    const sec = p.sections.find(x => x.id === holder.dataset.s);
+    if(sec){ sec.name = e.target.value; save(); }
+    return;
+  }
+  if(act === 'add'){
+    const k = e.target.dataset.s || ('name:' + e.target.dataset.sname);
+    UI.drafts[k] = e.target.value;
+  }
+});
+
+/* リストの行と Backlog のカードの工数・期日。押しても詳細は開かない（その場で直すための欄なので） */
+list.addEventListener('click', e => {
+  const act = e.target.dataset && e.target.dataset.act;
+  if(act !== 'rowest' && act !== 'rowdue') return;
+  e.stopImmediatePropagation();
+  if(act === 'rowdue' && e.target.showPicker){ try{ e.target.showPicker(); }catch(err){} }
+}, true);
+list.addEventListener('change', e => {
+  const act = e.target.dataset && e.target.dataset.act;
+  if(act !== 'rowest' && act !== 'rowdue') return;
+  const row = e.target.closest('.row, .card'); const t = row && taskById(row.dataset.t); if(!t) return;
+  if(act === 'rowest'){
+    t.estimate = normEstimate(e.target.value);
+    e.target.value = t.estimate == null ? '' : t.estimate;
+  }else{
+    t.due = e.target.value || '';
+  }
+  save(); renderList(); renderTop(); renderSide();
+  if(selected === t.id) renderDrawer();
+});
+list.addEventListener('change', e => {
+  if(e.target.dataset.act !== 'addproj') return;
+  UI.addProject = e.target.value; saveUI();
+  /* 追加欄はどの区切りにも出るので、全部そろえる（再描画は入力を消すのでしない） */
+  $$('[data-act="addproj"]', list).forEach(sel => { sel.value = UI.addProject; });
+});
+
+list.addEventListener('keydown', e => {
+  const act = e.target.dataset.act;
+  if(act === 'add' && e.key === 'Enter'){
+    const sid = e.target.dataset.s;
+    const sname = e.target.dataset.sname;
+    let pid, sectionId, draftKey, sel;
+    if(sname){
+      /* 横断ビュー。行き先のプロジェクトは追加欄の選択に従う */
+      pid = addProjectId();
+      if(!pid) return;
+      sectionId = ensureSection(projById(pid), sname).id;
+      draftKey = 'name:' + sname;
+      sel = `[data-act="add"][data-sname="${CSS.escape(sname)}"]`;
+    }else{
+      pid = UI.project; sectionId = sid;
+      draftKey = sid;
+      sel = `[data-act="add"][data-s="${CSS.escape(sid)}"]`;
+    }
+    const t = addTask(pid, sectionId, e.target.value);
+    e.target.value = ''; UI.drafts[draftKey] = '';
+    if(t){ renderList(); renderSide(); renderTop();
+           const again = list.querySelector(sel);
+           if(again) again.focus(); }
+    return;
+  }
+  if((act === 'title' || act === 'secname') && e.key === 'Enter'){ e.preventDefault(); e.target.blur(); }
+});
+
+list.addEventListener('blur', e => {
+  if(e.target.dataset && (e.target.dataset.act === 'title' || e.target.dataset.act === 'secname')){
+    renderList(); renderSide();
+  }
+}, true);
+
+/* --- セクション操作メニュー --- */
+function sectionMenu(sid){
+  const p = projById(UI.project); if(!p) return;
+  const s = p.sections.find(x => x.id === sid); if(!s) return;
+  const n = S.tasks.filter(t => t.sectionId === sid).length;
+  const i = p.sections.indexOf(s);
+  modal('セクション「' + s.name + '」',
+    `<p class="hint">このセクションには ${n} 件のタスクがあります。</p>
+     <div class="crow"><span>色</span>${colorPicker(s.color)}</div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap">
+       <button class="btn" id="secUp"${i===0?' disabled':''}>↑ 上へ</button>
+       <button class="btn" id="secDown"${i===p.sections.length-1?' disabled':''}>↓ 下へ</button>
+       <button class="btn" id="secAdd">＋ この下にセクションを追加</button>
+     </div>`,
+    `<button class="btn" onclick="document.getElementById('modalRoot').innerHTML=''">閉じる</button>
+     <button class="btn" id="secDel" style="color:var(--red);border-color:var(--red)">削除</button>`);
+  bindColorPicker($('#modalRoot'), v => { s.color = colorOf(v); });
+  $('#secUp').onclick   = () => { p.sections.splice(i,1); p.sections.splice(i-1,0,s); save(); closeModal(); renderList(); };
+  $('#secDown').onclick = () => { p.sections.splice(i,1); p.sections.splice(i+1,0,s); save(); closeModal(); renderList(); };
+  $('#secAdd').onclick  = () => {
+    const name = prompt('セクション名', '新しいセクション'); if(!name) return;
+    p.sections.splice(i+1, 0, {id: uid('s_'), name: name.trim()});
+    save(); closeModal(); renderList();
+  };
+  $('#secDel').onclick = () => {
+    if(p.sections.length === 1){ alert('最後のセクションは削除できません。'); return; }
+    if(n && !confirm(n + ' 件のタスクを、上のセクションに移してから削除します。よろしいですか？')) return;
+    const dest = p.sections[i === 0 ? 1 : i-1];
+    S.tasks.forEach(t => { if(t.sectionId === sid) t.sectionId = dest.id; });
+    p.sections.splice(i, 1);
+    save(); closeModal(); renderList();
+  };
+}
+
+/* --- ドラッグ＆ドロップ並べ替え（リストの行とボードのカード、どちらも） --- */
+let dragId = null;
+const dragItem = e => e.target.closest('.row, .card');
+const clearDropMarks = () => {
+  $$('.row, .card').forEach(r => r.classList.remove('drop-before','drop-after'));
+  $$('.sec-head, .col').forEach(h => h.classList.remove('drop'));
+};
+
+/* draggable は押した瞬間だけ立てる。常に true にしておくと、
+   中のタイトル入力欄にカーソルを置けなくなる（ドラッグが始まってしまう）。
+   行は掴み手から、カードは入力欄以外のどこからでも掴める。 */
+let armed = null;
+const disarm = () => { if(armed){ armed.draggable = false; armed = null; } };
+list.addEventListener('mousedown', e => {
+  disarm();
+  if(e.target.closest('input, textarea, select, button, a')) return;
+  const grip = e.target.closest('.grip');
+  const target = grip ? grip.closest('.row') : e.target.closest('.card');
+  if(target){ target.draggable = true; armed = target; }
+});
+list.addEventListener('mouseup', disarm);
+list.addEventListener('dragstart', e => {
+  const item = dragItem(e); if(!item) return;
+  dragId = item.dataset.t;
+  item.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  try{ e.dataTransfer.setData('text/plain', dragId); }catch(err){}
+});
+list.addEventListener('dragend', () => {
+  dragId = null;
+  armed = null;
+  $$('.row, .card').forEach(r => {
+    r.draggable = false;
+    r.classList.remove('dragging');
+  });
+  clearDropMarks();
+});
+list.addEventListener('dragover', e => {
+  if(!dragId) return;
+  e.preventDefault();
+  clearDropMarks();
+  const item = dragItem(e);
+  if(item && item.dataset.t !== dragId){
+    const r = item.getBoundingClientRect();
+    item.classList.add(e.clientY < r.top + r.height/2 ? 'drop-before' : 'drop-after');
+    return;
+  }
+  const col = e.target.closest('.col');
+  if(col && col.dataset.s){ col.classList.add('drop'); return; }
+  const head = e.target.closest('.sec-head');
+  if(head && head.dataset.s) head.classList.add('drop');
+});
+list.addEventListener('drop', e => {
+  if(!dragId) return;
+  e.preventDefault();
+  const moving = taskById(dragId); if(!moving) return;
+
+  const item = dragItem(e);
+  /* つかんだものを同じ場所に落としただけなら何もしない。
+     ボードでは自分のカードも列の内側なので、これが無いと列末尾へ飛ばされる。 */
+  if(item && item.dataset.t === dragId) return;
+
+  if(item && item.dataset.t !== dragId){
+    const target = taskById(item.dataset.t);
+    if(!target) return;
+    const r = item.getBoundingClientRect();
+    const before = e.clientY < r.top + r.height/2;
+    let sibs;
+    if(UI.project === '*'){
+      /* 横断ビューではプロジェクトを移さない。区切りの名前だけ合わせる。
+         プロジェクトの付け替えは詳細パネルからやる。 */
+      const nm = secName(target.projectId, target.sectionId);
+      moving.sectionId = ensureSection(projById(moving.projectId), nm).id;
+      sibs = S.tasks
+        .filter(t => t.id !== moving.id && secName(t.projectId, t.sectionId) === nm)
+        .sort((a,b) => a.order - b.order);
+    }else{
+      moving.projectId = target.projectId;
+      moving.sectionId = target.sectionId;
+      sibs = S.tasks
+        .filter(t => t.sectionId === target.sectionId && t.projectId === target.projectId && t.id !== moving.id)
+        .sort((a,b) => a.order - b.order);
+    }
+    const idx = sibs.indexOf(target);
+    const prev = before ? (idx > 0 ? sibs[idx-1].order : target.order - 2000) : target.order;
+    const next = before ? target.order : (idx < sibs.length-1 ? sibs[idx+1].order : target.order + 2000);
+    moving.order = (prev + next) / 2;
+    syncStatusToSection(moving);
+  }else{
+    /* 列の余白へのドロップ。ボードは末尾、リストの見出しは先頭に入れる。
+       横断ビューの区切りは data-sname で識別する。data-s には折りたたみ用の
+       キー（name:...）が入っていて実在するセクション id ではないので、先に見る。 */
+    const col = e.target.closest('.col');
+    const head = e.target.closest('.sec-head');
+    const toEnd = !!col;
+    const sname = (col && col.dataset.sname) || (head && head.dataset.sname);
+    const sid = sname ? null : ((col && col.dataset.s) || (head && head.dataset.s));
+
+    if(sname){
+      const inGroup = S.tasks.filter(t => t.id !== moving.id &&
+                                     secName(t.projectId, t.sectionId) === sname);
+      moving.sectionId = ensureSection(projById(moving.projectId), sname).id;
+      moving.order = inGroup.length
+        ? (toEnd ? Math.max(...inGroup.map(t => t.order)) + 1000
+                 : Math.min(...inGroup.map(t => t.order)) - 1000)
+        : 1000;
+    }else if(sid){
+      if(UI.project !== '*') moving.projectId = UI.project;
+      moving.sectionId = sid;
+      if(toEnd){
+        moving.order = nextOrder(moving.projectId, sid);
+      }else{
+        const sibs = S.tasks.filter(t => t.sectionId === sid && t.id !== moving.id);
+        moving.order = sibs.length ? Math.min(...sibs.map(t => t.order)) - 1000 : 1000;
+      }
+    }else return;
+    syncStatusToSection(moving);
+  }
+  save(); renderAll();
+});
+
+/* --- ドロワー --- */
+$('#drClose').onclick = () => select(null);
+/* 詳細を開いたまま、詳細以外のところを押したら閉じる。
+   ただしタスク（行・カード・週カレンダーの項目）を押したときは、そのタスクの詳細に切り替えるので閉じない。
+   ポップアップ類（設定・確認・通知）の上で押したときも閉じない */
+document.addEventListener('mousedown', e => {
+  if(!selected) return;
+  if(e.target.closest('#drawer, .row, .card, .wk-item, .wk-blk.task, #modalRoot, #toastRoot, #syncPop')) return;
+  select(null);
+  if(UI.view === 'week') renderWeek();
+});
+$('#drDone').onclick = () => {
+  const t = taskById(selected); if(!t) return;
+  toggleDone(t); renderAll();
+};
+
+$('#drBody').addEventListener('input', e => {
+  const t = taskById(selected); if(!t) return;
+  const act = e.target.dataset.act;
+  const v = e.target.value;
+  const sub = e.target.dataset.sub;
+
+  switch(act){
+    case 'd-title':  t.title = v; save(); renderList(); return;
+    case 'd-notes':  t.notes = v; save(); return;
+    case 'd-due':    t.due = v; save(); renderList(); renderTop(); return;
+    case 'd-url':    t.url = v; save(); renderList(); return;
+    case 'subtitle': t.subtasks[+sub].title = v; save(); renderList(); return;
+    case 'subest': {
+      t.subtasks[+sub].estimate = normEstimate(v);
+      save(); renderList(); return;
+    }
+    case 'd-est': {
+      t.estimate = normEstimate(v);
+      save(); renderList(); return;
+    }
+    case 'subdue': {
+      const st = t.subtasks[+sub];
+      st.due = v; save();
+      e.target.className = 'sub-due ' + (st.done ? '' : dueClass(v));
+      renderList(); return;
+    }
+  }
+});
+$('#drBody').addEventListener('change', e => {
+  const t = taskById(selected); if(!t) return;
+  const act = e.target.dataset.act;
+  const v = e.target.value;
+  const sub = e.target.dataset.sub;
+
+  if(act === 'd-proj'){
+    t.projectId = v;
+    const dest = projById(v);
+    const sec = ensureStatusSection(dest, statusLabel(t.status));
+    t.sectionId = sec.id;
+    t.order = nextOrder(t.projectId, t.sectionId);
+    save(); renderAll(); return;
+  }
+  if(act === 'd-sec'){
+    t.sectionId = v; t.order = nextOrder(t.projectId, v);
+    syncStatusToSection(t);
+    save(); renderAll(); return;
+  }
+  if(act === 'd-status'){ setStatus(t, v); save(); renderAll(); return; }
+  if(act === 'd-pri'){ t.priority = v; save(); renderList(); return; }
+  if(act === 'subdone'){
+    t.subtasks[+sub].done = e.target.checked;
+    save(); renderList(); renderDrawer(); return;
+  }
+});
+$('#drBody').addEventListener('click', e => {
+  const t = taskById(selected); if(!t) return;
+  const act = e.target.dataset.act;
+  if(act === 'subdel'){
+    t.subtasks.splice(+e.target.dataset.sub, 1);
+    save(); renderList(); renderDrawer(); return;
+  }
+  if(act === 'd-del'){
+    if(confirm('このタスクを削除しますか？')) deleteTask(t.id);
+  }
+});
+/* --- サブタスクの並べ替え --- */
+let subDrag = null;
+const subsRoot = () => $('.subs', $('#drBody'));
+const clearSubMarks = () =>
+  $$('.subs li').forEach(li => li.classList.remove('drop-before','drop-after'));
+
+/* 行の中が入力欄なので、掴み手を押したときだけ draggable を立てる */
+$('#drBody').addEventListener('mousedown', e => {
+  $$('.subs li').forEach(li => { li.draggable = false; });
+  const g = e.target.closest('.subs .grip');
+  if(g) g.closest('li').draggable = true;
+});
+$('#drBody').addEventListener('mouseup', () => {
+  if(subDrag === null) $$('.subs li').forEach(li => { li.draggable = false; });
+});
+$('#drBody').addEventListener('dragstart', e => {
+  const li = e.target.closest('.subs li'); if(!li) return;
+  subDrag = +li.dataset.i;
+  li.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  try{ e.dataTransfer.setData('text/plain', 'sub'); }catch(err){}
+});
+$('#drBody').addEventListener('dragend', () => {
+  subDrag = null;
+  $$('.subs li').forEach(li => { li.draggable = false; li.classList.remove('dragging'); });
+  clearSubMarks();
+});
+$('#drBody').addEventListener('dragover', e => {
+  if(subDrag === null) return;
+  e.preventDefault();
+  clearSubMarks();
+  const li = e.target.closest('.subs li');
+  if(li && +li.dataset.i !== subDrag){
+    const r = li.getBoundingClientRect();
+    li.classList.add(e.clientY < r.top + r.height/2 ? 'drop-before' : 'drop-after');
+  }
+});
+$('#drBody').addEventListener('drop', e => {
+  if(subDrag === null) return;
+  e.preventDefault();
+  const t = taskById(selected); if(!t) return;
+  const from = subDrag;
+  subDrag = null;
+
+  const li = e.target.closest('.subs li');
+  let to;
+  if(li){
+    const idx = +li.dataset.i;
+    const r = li.getBoundingClientRect();
+    to = (e.clientY < r.top + r.height/2) ? idx : idx + 1;
+  }else if(e.target.closest('.subs') || e.target.closest('.dr-sec')){
+    to = t.subtasks.length;          /* 一覧の余白に落としたら末尾へ */
+  }else return;
+
+  const [moved] = t.subtasks.splice(from, 1);
+  if(to > from) to--;
+  t.subtasks.splice(to, 0, moved);
+  save(); renderList(); renderDrawer();
+});
+
+/* サブタスクの追加欄。タイトル・工数・期日をまとめて入れてから足せる */
+function addSubFromForm(t){
+  const ti = $('[data-act="subadd"]'), es = $('[data-act="subadd-est"]'), du = $('[data-act="subadd-due"]');
+  const v = ti.value.trim();
+  if(!v){ ti.focus(); return; }
+  t.subtasks.push({id: uid('k_'), title: v, done: false, due: du.value || '',
+                   estimate: normEstimate(es.value), schedule: null});
+  save(); renderList(); renderDrawer();
+  const again = $('[data-act="subadd"]'); if(again) again.focus();
+}
+/* 日付欄はどこを押してもカレンダーを開く（右端の小さなアイコンを狙わなくてよいように） */
+$('#drBody').addEventListener('click', e => {
+  if(e.target.type === 'date' && e.target.showPicker){ try{ e.target.showPicker(); }catch(err){} }
+  if(e.target.dataset.act === 'subadd-go'){ const t = taskById(selected); if(t) addSubFromForm(t); }
+});
+
+$('#drBody').addEventListener('keydown', e => {
+  const t = taskById(selected); if(!t) return;
+  if(/^subadd/.test(e.target.dataset.act || '') && e.key === 'Enter' && !e.isComposing){
+    e.preventDefault(); addSubFromForm(t);
+  }
+  if(e.target.dataset.act === 'd-title' && e.key === 'Enter'){ e.preventDefault(); e.target.blur(); }
+});
+
+/* --- グローバルキー --- */
+document.addEventListener('keydown', e => {
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
+  if(e.key === 'Escape'){
+    if($('#modalRoot').innerHTML){ closeModal(); return; }
+    if(selected){ select(null); return; }
+  }
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){
+    e.preventDefault(); Store.flush().then(() => toast('保存しました')); return;
+  }
+  if(typing) return;
+  if(e.key === '/'){ e.preventDefault(); $('#search').focus(); return; }
+  if(e.key === 'n'){
+    const first = list.querySelector('[data-act="add"]');
+    if(first){ e.preventDefault(); first.focus(); }
+  }
+});
+
+/* --- ファイルのドロップ --- */
+let dragDepth = 0;
+window.addEventListener('dragenter', e => {
+  if(!e.dataTransfer || !Array.from(e.dataTransfer.types).includes('Files')) return;
+  dragDepth++; $('#dropzone').hidden = false;
+});
+window.addEventListener('dragleave', () => { if(--dragDepth <= 0){ dragDepth = 0; $('#dropzone').hidden = true; } });
+window.addEventListener('dragover', e => {
+  if(e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) e.preventDefault();
+});
+window.addEventListener('drop', e => {
+  if(!e.dataTransfer || !e.dataTransfer.files.length) return;
+  e.preventDefault(); dragDepth = 0; $('#dropzone').hidden = true;
+  handleFile(e.dataTransfer.files[0]);
+});
+
+/* =========================================================================
+   週ビュー — 左にタスクバー、右に週カレンダー（Sunsama 型）。日曜始まり
+   カレンダーに置く単位は「最小のタスク」。サブタスクがあるタスクはサブタスクを置き、
+   親は置かない。時刻は置いたもの（タスク or サブタスク）の schedule {date, start, setAt} に持つ。
+   長さは工数から出す。
+   Google カレンダーへの反映は Claude の同期ルーティン（taskboard-sync）の仕事で、
+   結果は calendar.json に置かれる。この画面は calendar.json を読むだけで書かない。
+   書き手を1人ずつに分けて、tasks.json と calendar.json が上書きし合わないようにするため。
+   ========================================================================= */
+/* 1時間 88px（15分 = 22px）。15分の会議でも文字が読めて、隣と重なって見えないように */
+let WK_START_H = 8, WK_END_H = 21;   /* 設定の「カレンダーの表示時間帯」で上書きされる */
+const WK_PX_H = 88, WK_SNAP = 15;
+const DOW = ['日','月','火','水','木','金','土'];
+/* 「この週にやる」に出すステータス。タスク化（＝着手待ち）より後ろ */
+const WK_ACTIVE = new Set(['ticketed', 'doing', 'release']);
+let CAL = null;           // calendar.json の中身。無ければ null
+let wkOffset = 0;         // 0 = 今週。持ち越さない
+let wkDrag = null;        // {id, grab} grab = 掴んだ位置がブロック上端から何分か
+let wkBacklogOpen = false;
+
+const pad2 = n => String(n).padStart(2, '0');
+const isoOf = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+const toMin = hm => { const [h, m] = String(hm).split(':').map(Number); return h * 60 + m; };
+const toHM = m => pad2(Math.floor(m / 60)) + ':' + pad2(m % 60);
+const mdOf = iso => Number(iso.slice(5, 7)) + '/' + Number(iso.slice(8, 10));
+
+function normSchedule(v){
+  if(!v || typeof v !== 'object') return null;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(v.date || '') || !/^\d{2}:\d{2}$/.test(v.start || '')) return null;
+  return {date: v.date, start: v.start, setAt: v.setAt || new Date().toISOString()};
+}
+function weekDays(){
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - d.getDay() + wkOffset * 7);
+  return Array.from({length: 7}, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return x; });
+}
+
+/* --- 置く単位（ユニット）: {id, t, s}。s があればサブタスク --- */
+function allUnits(){
+  const out = [];
+  for(const t of S.tasks){
+    out.push({id: t.id, t, s: null});
+    for(const k of t.subtasks) out.push({id: k.id, t, s: k});
+  }
+  return out;
+}
+function unitById(id){
+  for(const t of S.tasks){
+    if(t.id === id) return {id, t, s: null};
+    const k = t.subtasks.find(x => x.id === id);
+    if(k) return {id, t, s: k};
+  }
+  return null;
+}
+const uObj = u => u.s || u.t;                         // schedule を持つ方
+const uDone = u => isDone(u.t) || (u.s ? u.s.done : false);
+const uTitle = u => (u.s ? u.s.title : u.t.title) || '（無題）';
+/* 工数が未設定なら 1h として置く。0h のブロックは掴めないため */
+/* 工数が空のときに置く長さ（時間）。置いた時点でこの値がタスクの工数にも入る */
+const WK_DEFAULT_H = 0.5;
+const uMins = u => Math.round(((u.s ? u.s.estimate : taskHours(u.t).hours) || WK_DEFAULT_H) * 60);
+const uEnd = u => toHM(Math.min(toMin(uObj(u).schedule.start) + uMins(u), 24 * 60 - 1));
+const linkOf = id => (CAL && CAL.links && CAL.links[id]) || null;
+
+/* カレンダーに反映済みか。'' は時刻も予定も無いもの */
+function syncState(u){
+  const L = linkOf(u.id), s = uObj(u).schedule;
+  if(!s) return (L && !L.gone) ? 'pending' : '';
+  if(!L || L.gone) return 'pending';
+  return (L.date === s.date && L.start === s.start && L.end === uEnd(u)) ? 'synced' : 'pending';
+}
+/* Google カレンダーの予定の色（colorId → 色）。色を付けていない予定はグレーのまま */
+const GCAL_COLORS = {'1': '#7986cb', '2': '#33b679', '3': '#8e24aa', '4': '#e67c73', '5': '#f6bf26', '6': '#f4511e',
+                     '7': '#039be5', '8': '#616161', '9': '#3f51b5', '10': '#0b8043', '11': '#d50000'};
+const meetStyle = e => { const c = GCAL_COLORS[e.colorId]; return c
+  ? 'background:color-mix(in srgb, ' + c + ' 30%, var(--panel));border-color:color-mix(in srgb, ' + c + ' 60%, var(--panel));' +
+    'border-left:3px solid ' + c + ';color:var(--ink);' : ''; };
+function evTimes(e){
+  const mv = e.id && S.eventMoves && S.eventMoves[e.id];
+  if(mv) return {date: mv.date, s: toMin(mv.start), e: toMin(mv.end), moved: true};
+  const s = new Date(e.start), en = new Date(e.end);
+  return {date: isoOf(s), s: s.getHours() * 60 + s.getMinutes(),
+          e: isoOf(en) === isoOf(s) ? en.getHours() * 60 + en.getMinutes() : 24 * 60, moved: false};
+}
+/* 同期で反映された（カレンダーの時刻が動かした先と同じになった）ものは消す。
+   同期の方が新しいのに時刻が違うものも消す（カレンダー側でさらに動かされた） */
+function adoptEventMoves(){
+  if(!CAL || !Array.isArray(CAL.events) || !S.eventMoves) return false;
+  let changed = false;
+  for(const [id, mv] of Object.entries(S.eventMoves)){
+    const e = CAL.events.find(x => x.id === id);
+    if(!e) continue;
+    const s = new Date(e.start);
+    const same = isoOf(s) === mv.date && toHM(s.getHours() * 60 + s.getMinutes()) === mv.start;
+    if(same || Date.parse(CAL.syncedAt) > Date.parse(mv.setAt)){ delete S.eventMoves[id]; changed = true; }
+  }
+  return changed;
+}
+function pendingCount(){
+  const us = allUnits();
+  const ids = new Set(us.map(u => u.id));
+  let n = us.filter(u => syncState(u) === 'pending').length;
+  /* 消したタスクの予定もカレンダーから外す必要がある */
+  if(CAL && CAL.links) n += Object.keys(CAL.links).filter(id => !ids.has(id) && !CAL.links[id].gone).length;
+  n += Object.keys(S.eventMoves || {}).length;   /* 動かした自分の予定 */
+  return n;
+}
+
+/* カレンダー側で動かした・消した予定を取り込む。
+   同期の方が新しい（syncedAt > setAt）ときだけ。画面で動かして未反映の分は上書きしない。 */
+function adoptCalendar(){
+  if(!CAL || !CAL.links) return false;
+  let changed = false;
+  for(const u of allUnits()){
+    const L = CAL.links[u.id], o = uObj(u), s = o.schedule;
+    if(!L || !s || !(Date.parse(L.syncedAt) > Date.parse(s.setAt))) continue;
+    if(L.gone){ o.schedule = null; changed = true; continue; }
+    if(L.date !== s.date || L.start !== s.start){
+      o.schedule = {date: L.date, start: L.start, setAt: L.syncedAt}; changed = true;
+    }
+  }
+  return changed;
+}
+async function loadCalendar(){
+  try{
+    const r = await fetch('calendar.json?ts=' + Date.now(), {cache: 'no-store'});
+    if(!r.ok) return;
+    CAL = await r.json();
+  }catch(e){ return; }
+  const a1 = adoptCalendar(), a2 = adoptEventMoves();
+  if(a1 || a2) save();
+  if(UI.view === 'week') renderWeek();
+}
+window.addEventListener('focus', () => { loadInbox(); if(UI.view === 'week') loadCalendar(); });
+
+/* --- 「Claude に同期を頼む」ボタン ---
+   server.py が裏で Claude Code（コマンド版）に taskboard-sync を頼む。終わるまで数十秒〜数分。
+   その間は数秒おきに様子を見て、終わったら calendar.json と inbox.json を読み直す。 */
+let syncInfo = null;        // server.py の /api/sync の返事
+let syncTimer = null;
+const syncRunning = () => !!(syncInfo && syncInfo.state === 'running');
+async function startSync(){
+  try{
+    /* 週カレンダーで今週・来週以外を見ていたら、その週も取り込んでもらう */
+    let body = null;
+    if(UI.view === 'week' && (wkOffset < 0 || wkOffset > 1)){
+      const d = weekDays().map(isoOf);
+      body = JSON.stringify({from: d[0], to: d[6]});
+    }
+    const r = await fetch('/api/sync', body ? {method: 'POST', headers: {'Content-Type': 'application/json'}, body}
+                                            : {method: 'POST'});
+    syncInfo = await r.json();
+  }catch(e){
+    toast('同期を始められませんでした。サーバーが動いているか確認してください');
+    return;
+  }
+  if(syncInfo.ok === false && syncInfo.state !== 'running'){ toast(syncInfo.error || '同期を始められませんでした'); return; }
+  $('#syncPop').hidden = true;
+  renderTop();
+  if(UI.view === 'week') renderWeek();
+  pollSync();
+}
+function pollSync(){
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try{ syncInfo = await (await fetch('/api/sync?ts=' + Date.now(), {cache: 'no-store'})).json(); }catch(e){}
+    if(syncRunning()){ pollSync(); return; }
+    await loadCalendar(); await loadInbox();
+    renderTop();
+    if(UI.view === 'week') renderWeek();
+    showSyncPop();
+  }, 4000);
+}
+/* 開いたときに裏で同期中なら、終わるのを待つ */
+(async () => {
+  try{ syncInfo = await (await fetch('/api/sync?ts=' + Date.now(), {cache: 'no-store'})).json(); }catch(e){ return; }
+  if(syncRunning()){ renderTop(); pollSync(); }
+})();
+$('#btnSync').addEventListener('click', () => { if(!syncRunning()) startSync(); });
+/* 同期の結果は「成功か、失敗ならその理由」だけ出す。
+   成功＝プロセスが正常終了し、報告の「エラー：」行が「なし」。それ以外は失敗として理由を出す */
+function syncOutcome(){
+  if(!syncInfo || (!syncInfo.summary && syncInfo.state !== 'error')) return null;
+  const text = syncInfo.summary || '';
+  const lines = text.split('\n').map(x => x.trim()).filter(Boolean);
+  const line = lines.find(x => /^エラー[：:]/.test(x));
+  const reason = line ? line.replace(/^エラー[：:]\s*/, '') : '';
+  if(syncInfo.state === 'done' && (reason === 'なし' || (!line && lines.length))) return {ok: true};
+  return {ok: false, reason: reason && reason !== 'なし' ? reason : (lines[lines.length - 1] || '原因不明')};
+}
+let syncPopTimer = null;
+function showSyncPop(){
+  const pop = $('#syncPop'), o = syncOutcome();
+  clearTimeout(syncPopTimer);
+  if(!o){ pop.hidden = true; return; }
+  pop.className = 'sync-pop ' + (o.ok ? 'ok' : 'err');
+  pop.innerHTML = '<span class="sync-pop-i">' + (o.ok ? '✓' : '!') + '</span>' +
+    '<span>' + (o.ok ? '正常に完了しました' : 'エラー：' + esc(o.reason)) + '</span>' +
+    '<button title="閉じる">✕</button>';
+  pop.hidden = false;
+  pop.querySelector('button').onclick = () => { pop.hidden = true; };
+  if(o.ok) syncPopTimer = setTimeout(() => { pop.hidden = true; }, 6000);
+}
+
+function setSchedule(u, date, start){
+  uObj(u).schedule = date ? {date, start, setAt: new Date().toISOString()} : null;
+  if(date) fillDefaultEstimate(u);
+  save(); renderWeek(); renderSide(); renderList();
+}
+/* 工数が空なら既定の30分を入れる。サブタスクがあるタスクの工数は合計なので触らない */
+function fillDefaultEstimate(u){
+  if(u.s){ if(u.s.estimate == null) u.s.estimate = WK_DEFAULT_H; }
+  else if(!u.t.subtasks.length && u.t.estimate == null) u.t.estimate = WK_DEFAULT_H;
+}
+/* カレンダー上で長さを変えたら、その長さをタスクの工数にする */
+function setDuration(u, mins){
+  const h = normEstimate(mins / 60);
+  if(u.s) u.s.estimate = h; else u.t.estimate = h;
+  const sc = uObj(u).schedule;
+  if(sc) sc.setAt = new Date().toISOString();     /* 画面側の変更として次の同期でカレンダーへ */
+  save(); renderWeek(); renderSide(); renderList();
+  if(selected === u.t.id) renderDrawer();
+}
+
+/* 重なった予定を横に並べる */
+function layoutDay(items){
+  items.sort((a, b) => a.s - b.s || b.e - a.e);
+  let cluster = [], end = -1;
+  const flush = () => {
+    const lanes = [];
+    for(const it of cluster){
+      let i = lanes.findIndex(x => x <= it.s);
+      if(i < 0){ i = lanes.length; lanes.push(0); }
+      lanes[i] = it.e; it.lane = i;
+    }
+    cluster.forEach(it => it.lanes = lanes.length);
+    cluster = [];
+  };
+  for(const it of items){
+    if(cluster.length && it.s >= end){ flush(); end = -1; }
+    cluster.push(it); end = Math.max(end, it.e);
+  }
+  if(cluster.length) flush();
+  return items;
+}
+const yOf = m => (m - WK_START_H * 60) / 60 * WK_PX_H;
+
+/* inbox の項目。カレンダーに置いた時点で普通のタスク（またはサブタスク）になる */
+const INBOX_FALLBACK = 'その他';
+function wkInboxHTML(x){
+  const p = projById(x.pid), parent = x.parent ? taskById(x.parent) : null;
+  let meta = '<span class="wk-ib-tag">inbox</span>';
+  meta += parent ? '<span class="wk-parent">' + esc(parent.title) + '</span>'
+    : '<span>' + esc(p ? p.name : INBOX_FALLBACK + 'に入る') + '</span>';
+  meta += '<span>' + (x.estimate ? showHours(x.estimate) : '30分（未設定）') + '</span>';
+  if(x.due) meta += '<span class="' + dueClass(x.due) + '">' + dueLabel(x.due) + '</span>';
+  return '<div class="wk-item ib" draggable="true" data-wt="' + esc(x.id) + '"' +
+    ' style="height:' + barPx(Math.round((x.estimate || WK_DEFAULT_H) * 60)) + 'px" title="' + esc(x.title) + '">' +
+    '<div class="wk-item-t">' + esc(x.title) + '</div><div class="wk-item-m">' + meta + '</div></div>';
+}
+/* inbox の項目を、その日時に置いたタスクにする。
+   プロジェクト未設定なら「その他」へ。ステータスはタスク化（＝この週にやる側）。期日が空なら置いた日 */
+function inboxToSchedule(x, date, start){
+  let p = projById(x.pid) || S.projects.find(y => y.name === INBOX_FALLBACK);
+  if(!p){
+    p = {id: uid('p_'), name: INBOX_FALLBACK, color: '', sections: [{id: uid('s_'), name: STATUS[0][1]}]};
+    S.projects.push(p);
+  }
+  const schedule = {date, start, setAt: new Date().toISOString()};
+  const parent = x.parent ? taskById(x.parent) : null;
+  inboxTake(x.id);
+  if(parent){
+    parent.subtasks.push({id: uid('k_'), title: x.title, done: false, due: x.due || date,
+                          estimate: normEstimate(x.estimate) || WK_DEFAULT_H, schedule});
+  }else{
+    const sec = ensureStatusSection(p, STATUS[1][1]);
+    const t = addTask(p.id, sec.id, x.title);
+    if(t){ t.due = x.due || date; t.estimate = normEstimate(x.estimate) || WK_DEFAULT_H; t.schedule = schedule; }
+  }
+  save(); renderWeek(); renderSide();
+  toast('「' + x.title + '」を ' + (parent ? parent.title : p.name) + ' に入れて置きました');
+}
+const inboxItem = id => S.inbox.find(x => x.id === id);
+const dragMins = id => { if(wkDrag && wkDrag.ev) return wkDrag.dur; const x = inboxItem(id); return x ? Math.round((x.estimate || WK_DEFAULT_H) * 60) : uMins(unitById(id)); };
+
+function wkItemHTML(u){
+  const p = projById(u.t.projectId);
+  const est = u.s ? u.s.estimate : taskHours(u.t).hours;
+  const due = u.s ? (u.s.due || u.t.due) : u.t.due;
+  let meta = '';
+  if(u.s) meta += '<span class="wk-parent">' + esc(u.t.title) + '</span>';
+  if(UI.project === '*' && p) meta += '<span style="color:' + colorFg(p.color) + '">' + esc(p.name) + '</span>';
+  meta += '<span>' + (est ? showHours(est) : '30分（未設定）') + '</span>';
+  if(due) meta += '<span class="' + dueClass(due) + '">' + dueLabel(due) + '</span>';
+  return '<div class="wk-item' + (u.s ? ' sub' : '') + (selected === u.t.id ? ' sel' : '') +
+    '" draggable="true" data-wt="' + esc(u.id) + '" style="height:' + barPx(uMins(u)) + 'px"' +
+    ' title="' + esc(uTitle(u) + (u.s ? '（' + u.t.title + '）' : '')) + '">' +
+    '<div class="wk-item-t">' + esc(uTitle(u)) + '</div><div class="wk-item-m">' + meta + '</div></div>';
+}
+
+/* 左のバーの項目の高さ。カレンダーのブロックと同じ縮尺（1時間 = WK_PX_H） */
+const barPx = mins => Math.max(Math.round(mins / 60 * WK_PX_H) - 2, 40);
+
+/* 左のタスクバーに出す単位。サブタスクがあるタスクは、未完了のサブタスクだけ（完了は出さない） */
+function barUnits(){
+  const q = (UI.q || '').toLowerCase();
+  const out = [];
+  for(const t of S.tasks){
+    if(isDone(t) || (UI.project !== '*' && t.projectId !== UI.project)) continue;
+    const hit = !q || (t.title + ' ' + t.notes + ' ' + t.subtasks.map(k => k.title).join(' ')).toLowerCase().includes(q);
+    if(!hit) continue;
+    if(t.subtasks.length){
+      for(const k of t.subtasks) if(!k.done && !k.schedule) out.push({id: k.id, t, s: k});
+    }else if(!t.schedule){
+      out.push({id: t.id, t, s: null});
+    }
+  }
+  const dueOf = u => (u.s && u.s.due) || u.t.due || '9999';
+  const subIdx = u => u.s ? u.t.subtasks.indexOf(u.s) : -1;
+  return out.sort((a, b) => dueOf(a).localeCompare(dueOf(b)) || a.t.order - b.t.order || subIdx(a) - subIdx(b));
+}
+
+function renderWeek(){
+  const el = $('#week');
+  const days = weekDays();
+  const isos = days.map(isoOf);
+  const today = todayISO();
+
+  const pool = barUnits();
+  const thisWeek = pool.filter(u => WK_ACTIVE.has(u.t.status));
+  const rest = pool.filter(u => !WK_ACTIVE.has(u.t.status));
+  const hrs = list => showHours(list.reduce((a, u) => a + uMins(u) / 60, 0));
+
+  const q = (UI.q || '').toLowerCase();
+  const ibs = S.inbox.filter(x => !q || x.title.toLowerCase().includes(q));
+  let bar = '<div class="wk-bar" data-wbar="1">' +
+    (ibs.length
+      ? '<div class="wk-bar-h">inbox<span>' + ibs.length + '件</span></div>' +
+        '<div class="wk-items">' + ibs.map(wkInboxHTML).join('') + '</div>' +
+        '<div class="wk-sep"></div>'
+      : '') +
+    '<div class="wk-bar-h">この週にやる<span>' + thisWeek.length + '件 · ' + hrs(thisWeek) + '</span></div>' +
+    '<div class="wk-items">' + thisWeek.map(wkItemHTML).join('') + '</div>' +
+    '<button class="wk-more" data-wk="backlog">' + (wkBacklogOpen ? '▾' : '▸') +
+      ' 未着手 ' + rest.length + '件</button>' +
+    (wkBacklogOpen ? '<div class="wk-items">' + rest.map(wkItemHTML).join('') + '</div>' : '') +
+    '<div class="wk-hint">右へドラッグで時刻を決める。ここへ戻すと時刻を外す。' +
+      '「この週にやる」はタスク化・進行中・リリース待ちのもの。サブタスクがあるタスクはサブタスク単位で出る。</div>' +
+    '</div>';
+
+  /* 右の週カレンダー */
+  const evs = (CAL && Array.isArray(CAL.events)) ? CAL.events : [];
+  let head = '<div class="wk-head"><div></div>', allday = '<div class="wk-allday"><div></div>', cols = '';
+  const H = (WK_END_H - WK_START_H) * WK_PX_H;
+  let hours = '<div class="wk-hours" style="height:' + H + 'px">';
+  /* 終わりの時刻（例 21:00）も下端に出す。出さないと 20:00 で終わっているように見える */
+  for(let h = WK_START_H + 1; h <= WK_END_H; h++) hours += '<span style="top:' + yOf(h * 60) + 'px' +
+    (h === WK_END_H ? ';transform:translateY(-100%)' : '') + '">' + h + ':00</span>';
+  hours += '</div>';
+  const grid = 'repeating-linear-gradient(to bottom, transparent 0, transparent ' + (WK_PX_H - 1) +
+    'px, var(--line2) ' + (WK_PX_H - 1) + 'px, var(--line2) ' + WK_PX_H + 'px)';
+  const placed = allUnits().filter(u => uObj(u).schedule);
+
+  days.forEach((d, i) => {
+    const iso = isos[i];
+    const off = d.getDay() === 0 || d.getDay() === 6;
+    head += '<div class="' + (iso === today ? 'today' : '') + (off ? ' off' : '') + '">' +
+      mdOf(iso) + ' ' + DOW[d.getDay()] + '</div>';
+    /* 終日の end は翌日（排他的）で来る */
+    allday += '<div>' + evs.filter(e => {
+        if(!e.allDay) return false;
+        const s = e.start.slice(0, 10), en = (e.end || '').slice(0, 10);
+        return en > s ? (s <= iso && iso < en) : s === iso;
+      })
+      .map(e => '<span class="wk-chip" title="' + esc(e.title) + '">' + esc(e.title) + '</span>').join('') + '</div>';
+
+    const items = [];
+    for(const e of evs){
+      if(e.allDay) continue;
+      const t = evTimes(e);
+      if(t.date !== iso) continue;
+      items.push({s: t.s, e: t.e, meet: e, moved: t.moved});
+    }
+    for(const u of placed){
+      const sc = uObj(u).schedule;
+      if(sc.date !== iso || uDone(u)) continue;
+      const s = toMin(sc.start);
+      items.push({s, e: s + uMins(u), unit: u});
+    }
+    let blocks = '';
+    for(const it of layoutDay(items)){
+      const s = Math.max(it.s, WK_START_H * 60), e = Math.min(Math.max(it.e, it.s + 15), WK_END_H * 60);
+      if(e <= WK_START_H * 60 || s >= WK_END_H * 60) continue;
+      const pos = 'top:' + yOf(s) + 'px;height:' + Math.max(yOf(e) - yOf(s) - 2, 14) + 'px;' +
+        'left:calc(' + (it.lane * 100 / it.lanes) + '% + 2px);width:calc(' + (100 / it.lanes) + '% - 4px)';
+      const time = toHM(it.s) + '–' + toHM(Math.min(it.e, 24 * 60 - 1));
+      if(it.meet){
+        const mv = it.meet.movable && it.meet.id;
+        blocks += '<div class="wk-blk meet' + (it.e - it.s < 30 ? ' short' : '') + (mv ? ' mv' : '') + (it.moved ? ' pending' : '') + '"' +
+          (mv ? ' draggable="true" data-ev="' + esc(it.meet.id) + '"' : '') + ' style="' + pos + ';' + meetStyle(it.meet) + '" title="' +
+          esc(it.meet.title + ' ' + time + (mv ? '（ドラッグで動かせる）' : '') + (it.moved ? '（カレンダー未反映）' : '')) + '">' +
+          esc(it.meet.title) + '<small>' + time + '</small></div>';
+      }else{
+        const u = it.unit, st = syncState(u);
+        const label = u.s ? uTitle(u) + '（' + u.t.title + '）' : uTitle(u);
+        blocks += '<div class="wk-blk task' + (it.e - it.s < 30 ? ' short' : '') + (st === 'pending' ? ' pending' : '') + (uDone(u) ? ' done' : '') +
+          (selected === u.t.id ? ' sel' : '') + '" draggable="true" data-wt="' + esc(u.id) + '" style="' + pos + '"' +
+          ' title="' + esc(label + ' ' + time + (st === 'pending' ? '（カレンダー未反映）' : '')) + '">' +
+          esc(uTitle(u)) + '<small>' + time + '</small>' +
+          /* サブタスクがあるタスクは工数が合計なので、長さは変えられない */
+          (u.s || !u.t.subtasks.length ? '<span class="wk-rs" data-rs="' + esc(u.id) + '" title="ドラッグで長さ（工数）を変える"></span>' : '') +
+          '</div>';
+      }
+    }
+    if(iso === today){
+      const now = new Date(), m = now.getHours() * 60 + now.getMinutes();
+      if(m > WK_START_H * 60 && m < WK_END_H * 60) blocks += '<div class="wk-now" style="top:' + yOf(m) + 'px"></div>';
+    }
+    cols += '<div class="wk-day' + (iso === today ? ' today' : '') + '" data-date="' + iso + '" style="height:' + H +
+      'px;background-image:' + grid + '">' + blocks + '</div>';
+  });
+  head += '</div>'; allday += '</div>';
+
+  /* 同期の状態。会議は Claude が取り込んだ範囲しか見えない */
+  const pend = pendingCount();
+  let sync = CAL && CAL.syncedAt
+    ? 'カレンダー取り込み ' + new Date(CAL.syncedAt).toLocaleString('ja-JP', {month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})
+    : 'カレンダー未取り込み';
+  const rngs = CAL ? (CAL.ranges || (CAL.range ? [CAL.range] : [])) : [];
+  if(CAL && rngs.length && !rngs.some(r => r.from <= isos[0] && isos[6] <= r.to))
+    sync += '（この週の会議は未取り込み。「Claude で同期」で取り込めます）';
+  if(pend) sync += ' · <b>未反映 ' + pend + '件</b>';
+
+  el.innerHTML =
+    '<div class="wk-top">' +
+      '<button data-wk="prev" title="前の週">‹</button><button data-wk="now">今週</button>' +
+      '<button data-wk="next" title="次の週">›</button>' +
+      '<span class="wk-range">' + mdOf(isos[0]) + ' – ' + mdOf(isos[6]) + '</span>' +
+      '<span class="spacer"></span><span class="wk-sync">' + sync + '</span>' +
+    '</div>' +
+    '<div class="wk-wrap">' + bar +
+      '<div><div class="wk-cal">' + head + allday + '<div class="wk-grid">' + hours + cols + '</div></div>' +
+      '<div class="wk-legend"><span><i style="background:var(--violet-bg);border:1px solid var(--violet)"></i>タスク</span>' +
+      '<span><i style="background:var(--violet-bg);border:1px dashed var(--violet)"></i>カレンダー未反映</span>' +
+      '<span><i style="background:var(--sunk);border:1px solid var(--line)"></i>会議（Google カレンダー）</span></div></div>' +
+    '</div>';
+}
+
+/* --- 週ビューの操作 --- */
+const week = $('#week');
+function wkClearDrop(){
+  $$('.wk-ghost', week).forEach(g => g.remove());
+  $$('.drop', week).forEach(x => x.classList.remove('drop'));
+}
+/* その日の埋まっている時間（分）。会議と、置いてあるタスク（動かしている本人と完了済みは除く）。
+   6時間以上の予定（勤務時間の枠など）は背景とみなして数えない。それも避けると1日中置けなくなるため */
+const WK_LONG_EVENT = 6 * 60;
+function busyOn(date, exceptId){
+  const out = [];
+  for(const e of (CAL && Array.isArray(CAL.events)) ? CAL.events : []){
+    if(e.allDay) continue;
+    const s = new Date(e.start), en = new Date(e.end);
+    if(isoOf(s) !== date) continue;
+    const a = s.getHours() * 60 + s.getMinutes();
+    const b = isoOf(en) === date ? en.getHours() * 60 + en.getMinutes() : 24 * 60;
+    if(b - a >= WK_LONG_EVENT) continue;
+    out.push([a, b]);
+  }
+  for(const u of allUnits()){
+    const sc = uObj(u).schedule;
+    if(!sc || sc.date !== date || u.id === exceptId || uDone(u)) continue;
+    const a = toMin(sc.start);
+    out.push([a, a + uMins(u)]);
+  }
+  return out;
+}
+/* 置きたい時刻に一番近い、15分刻みで何とも重ならない時刻。同じ近さなら後ろを選ぶ。
+   どこにも空きが無ければ、置きたい時刻のまま */
+function freeStart(want, dur, busy){
+  const lo = WK_START_H * 60, hi = WK_END_H * 60 - dur;
+  const ok = s => busy.every(([a, b]) => s + dur <= a || s >= b);
+  if(ok(want)) return want;
+  for(let d = WK_SNAP; d <= hi - lo; d += WK_SNAP){
+    if(want + d <= hi && ok(want + d)) return want + d;
+    if(want - d >= lo && ok(want - d)) return want - d;
+  }
+  return want;
+}
+function wkDropStart(day, e){
+  const dur = Math.min(dragMins(wkDrag.id), (WK_END_H - WK_START_H) * 60);
+  const r = day.getBoundingClientRect();
+  let m = WK_START_H * 60 + (e.clientY - r.top) / WK_PX_H * 60 - wkDrag.grab;
+  m = Math.round(m / WK_SNAP) * WK_SNAP;
+  m = Math.max(WK_START_H * 60, Math.min(m, WK_END_H * 60 - dur));
+  return {start: m, dur};   /* 重なっても、置いた位置そのまま（自動でずらさない） */
+}
+week.addEventListener('click', e => {
+  const b = e.target.closest('[data-wk]');
+  if(b){
+    const a = b.dataset.wk;
+    if(a === 'prev') wkOffset--;
+    else if(a === 'next') wkOffset++;
+    else if(a === 'now') wkOffset = 0;
+    else if(a === 'backlog') wkBacklogOpen = !wkBacklogOpen;
+    else if(a === 'sync'){ startSync(); return; }
+    renderWeek(); return;
+  }
+  if(e.target.closest('[data-rs]')) return;   /* 長さを変えた直後のクリックで詳細を開かない */
+  const it = e.target.closest('[data-wt]');
+  const u = it && unitById(it.dataset.wt);
+  if(u){ select(u.t.id); renderWeek(); }      /* サブタスクでも親の詳細を開く */
+});
+let wkResize = null;   // {u, blk, day, start, mins, max}
+week.addEventListener('mousedown', e => {
+  const h = e.target.closest('[data-rs]'); if(!h) return;
+  e.preventDefault(); e.stopPropagation();
+  const u = unitById(h.dataset.rs); if(!u || !uObj(u).schedule) return;
+  const blk = h.closest('.wk-blk'), day = h.closest('.wk-day');
+  blk.draggable = false;                       /* 長さを変えている間は、移動のドラッグを止める */
+  const start = toMin(uObj(u).schedule.start);
+  /* 次の予定の手前まで、かつ表示時間帯の終わりまで伸ばせる */
+  const next = busyOn(day.dataset.date, u.id).map(([a]) => a).filter(a => a > start);
+  const max = WK_END_H * 60 - start;   /* 重ねてよいので、表示時間帯の終わりまで伸ばせる */
+  wkResize = {u, blk, day, start, mins: uMins(u), max: Math.max(WK_SNAP, max)};
+  blk.classList.add('resizing');
+});
+document.addEventListener('mousemove', e => {
+  if(!wkResize) return;
+  const {blk, day, start, max} = wkResize;
+  const r = day.getBoundingClientRect();
+  const endY = WK_START_H * 60 + (e.clientY - r.top) / WK_PX_H * 60;
+  let mins = Math.round((endY - start) / WK_SNAP) * WK_SNAP;
+  mins = Math.max(WK_SNAP, Math.min(mins, max));
+  wkResize.mins = mins;
+  blk.style.height = Math.max(yOf(start + mins) - yOf(start) - 2, 14) + 'px';
+  const sm = blk.querySelector('small');
+  if(sm) sm.textContent = toHM(start) + '–' + toHM(start + mins) + '（' + showHours(round2(mins / 60)) + '）';
+});
+document.addEventListener('mouseup', () => {
+  if(!wkResize) return;
+  const {u, mins} = wkResize;
+  wkResize = null;
+  if(mins !== uMins(u)) setDuration(u, mins); else renderWeek();
+});
+week.addEventListener('dragstart', e => {
+  const ev = e.target.closest('[data-ev]');
+  if(ev){
+    const m = CAL.events.find(x => x.id === ev.dataset.ev); if(!m) return;
+    const t = evTimes(m);
+    wkDrag = {ev: m.id, dur: t.e - t.s, grab: (e.clientY - ev.getBoundingClientRect().top) / WK_PX_H * 60};
+    ev.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try{ e.dataTransfer.setData('text/plain', m.id); }catch(err){}
+    return;
+  }
+  const it = e.target.closest('[data-wt]'); if(!it) return;
+  const blk = it.classList.contains('wk-blk');
+  wkDrag = {id: it.dataset.wt,
+            grab: blk ? (e.clientY - it.getBoundingClientRect().top) / WK_PX_H * 60 : 0};
+  it.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  try{ e.dataTransfer.setData('text/plain', wkDrag.id); }catch(err){}
+});
+week.addEventListener('dragend', () => {
+  wkDrag = null; wkClearDrop();
+  $$('.dragging', week).forEach(x => x.classList.remove('dragging'));
+});
+/* ドラッグしたまま画面の上端・下端に近づけると、カレンダーが自動でスクロールする
+   （ドラッグ中はマウスホイールが効かないため）。端に近いほど速い */
+const WK_EDGE = 70;
+function wkAutoScroll(e){
+  const r = week.getBoundingClientRect();
+  const top = r.top + 90;                 /* 上に貼りついている週の切り替えと日付の行の下から数える */
+  let v = 0;
+  if(e.clientY < top + WK_EDGE) v = -Math.ceil((top + WK_EDGE - e.clientY) / 4);
+  else if(e.clientY > r.bottom - WK_EDGE) v = Math.ceil((e.clientY - (r.bottom - WK_EDGE)) / 4);
+  if(v) week.scrollTop += Math.max(-30, Math.min(30, v));
+}
+week.addEventListener('dragover', e => {
+  if(!wkDrag) return;
+  wkAutoScroll(e);
+  const day = e.target.closest('.wk-day'), bar = e.target.closest('[data-wbar]');
+  if(!day && !bar) return;
+  e.preventDefault();
+  wkClearDrop();
+  if(bar){ bar.classList.add('drop'); return; }
+  const {start, dur} = wkDropStart(day, e);
+  const g = document.createElement('div');
+  g.className = 'wk-ghost';
+  g.style.top = yOf(start) + 'px';
+  g.style.height = Math.max(yOf(start + dur) - yOf(start) - 2, 14) + 'px';
+  g.textContent = toHM(start) + '–' + toHM(start + dur);
+  day.appendChild(g);
+});
+week.addEventListener('drop', e => {
+  if(!wkDrag) return;
+  const u = unitById(wkDrag.id), ib = inboxItem(wkDrag.id);
+  const day = e.target.closest('.wk-day'), bar = e.target.closest('[data-wbar]');
+  e.preventDefault();
+  if(wkDrag.ev){
+    if(day){
+      const {start, dur} = wkDropStart(day, e);
+      S.eventMoves[wkDrag.ev] = {date: day.dataset.date, start: toHM(start), end: toHM(Math.min(start + dur, 24 * 60 - 1)),
+                                 setAt: new Date().toISOString()};
+      save(); renderWeek();
+    }
+    wkDrag = null; wkClearDrop(); return;
+  }
+  if(ib && day) inboxToSchedule(ib, day.dataset.date, toHM(wkDropStart(day, e).start));
+  else if(u && day) setSchedule(u, day.dataset.date, toHM(wkDropStart(day, e).start));
+  else if(u && bar && uObj(u).schedule) setSchedule(u, null);
+  wkDrag = null; wkClearDrop();
+});
+
+/* =========================================================================
+   inbox — 思いついたタスクの仮置き場
+   Slack の自分宛てDMに「タスク」で始まるメッセージを送ると、Claude（taskboard-sync）が
+   inbox.json に書く。この画面は inbox.json を読んで S.inbox に取り込むだけで、書かない。
+   プロジェクトを選ぶと、そのプロジェクトの「未着手」に普通のタスクとして移る。
+   ========================================================================= */
+async function loadInbox(){
+  let doc;
+  try{
+    const r = await fetch('inbox.json?ts=' + Date.now(), {cache: 'no-store'});
+    if(!r.ok) return;
+    doc = await r.json();
+  }catch(e){ return; }
+  const seen = new Set(S.inboxSeen);
+  let n = 0;
+  for(const it of (doc && Array.isArray(doc.items) ? doc.items : [])){
+    if(!it || !it.id || !it.title || seen.has(it.id)) continue;
+    S.inbox.push({id: it.id, title: String(it.title), receivedAt: it.receivedAt || '', src: it.src || 'slack'});
+    S.inboxSeen.push(it.id); seen.add(it.id); n++;
+  }
+  if(!n) return;
+  S.inboxSeen = S.inboxSeen.slice(-1000);
+  save(); renderSide();
+  if(UI.project === INBOX_P) renderList();
+  toast('inbox に ' + n + ' 件入りました');
+}
+
+/* 振り分け先（プロジェクト・親タスク）と期日・工数は、移すまで inbox の項目に持っておく。
+   選びかけで画面を閉じても消えないようにするため */
+function renderInbox(el){
+  const when = iso => {
+    if(!iso) return '';
+    const d = new Date(iso);
+    return isNaN(d) ? '' : (d.getMonth() + 1) + '/' + d.getDate() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  };
+  const rows = S.inbox.map(x => {
+    const id = esc(x.id);
+    const projOpts = '<option value="">プロジェクト</option>' + S.projects.map(p =>
+      '<option value="' + esc(p.id) + '"' + (x.pid === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('');
+    const parents = x.pid ? S.tasks.filter(t => t.projectId === x.pid && !isDone(t))
+      .sort((a, b) => a.order - b.order) : [];
+    const parentOpts = '<option value="">親タスクなし</option>' + parents.map(t =>
+      '<option value="' + esc(t.id) + '"' + (x.parent === t.id ? ' selected' : '') + '>' + esc(t.title || '（無題）') + '</option>').join('');
+    return '<div class="ib-row" data-ib="' + id + '">' +
+      '<div class="ib-line">' +
+        '<input class="ib-title" data-ibt="' + id + '" value="' + esc(x.title) + '">' +
+        '<span class="ib-when">' + when(x.receivedAt) + (x.src === 'slack' ? ' · Slack' : '') + '</span>' +
+        '<button class="ib-del" data-ibdel="' + id + '" title="消す">✕</button>' +
+      '</div>' +
+      '<div class="ib-line ib-ctl">' +
+        '<select class="ib-sel" data-ibf="pid" data-id="' + id + '">' + projOpts + '</select>' +
+        '<select class="ib-sel ib-parent" data-ibf="parent" data-id="' + id + '"' + (x.pid ? '' : ' disabled') + '>' + parentOpts + '</select>' +
+        '<label class="ib-f">期日<input type="date" data-ibf="due" data-id="' + id + '" value="' + esc(x.due || '') + '"></label>' +
+        '<label class="ib-f">工数<input type="number" min="0" step="' + EST_STEP + '" data-ibf="estimate" data-id="' + id + '"' +
+          ' value="' + (x.estimate != null ? x.estimate : '') + '" placeholder="h"></label>' +
+        '<button class="ib-go" data-ibgo="' + id + '"' + (x.pid ? '' : ' disabled') + '>' +
+          (x.parent ? 'サブタスクにする' : '移す') + '</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  el.innerHTML = '<div class="ib">' +
+    '<div class="ib-add"><input id="ibAdd" placeholder="＋ inbox に追加（Enter）"></div>' +
+    (rows || '<div class="empty"><b>inbox は空です</b>Slack の自分宛てDMで、1行目を「タスク」にして送ると、同期のときここに入ります。</div>') +
+    '<div class="ib-hint">プロジェクトを選んで「移す」と、そのプロジェクトの「未着手」に入ります。' +
+      '親タスクも選ぶと、そのタスクのサブタスクになります。期日と工数は空のままでも移せます。' +
+      'DMは「タスク」の次の行から1行1件です。</div>' +
+    '</div>';
+}
+
+function inboxTake(id){
+  const i = S.inbox.findIndex(x => x.id === id);
+  return i < 0 ? null : S.inbox.splice(i, 1)[0];
+}
+function inboxMove(id){
+  const x = S.inbox.find(y => y.id === id); if(!x) return;
+  const p = projById(x.pid); if(!p) return;
+  const parent = x.parent ? taskById(x.parent) : null;
+  inboxTake(id);
+  if(parent){
+    parent.subtasks.push({id: uid('k_'), title: x.title, done: false, due: x.due || '',
+                          estimate: normEstimate(x.estimate), schedule: null});
+    save();
+    toast('「' + x.title + '」を「' + parent.title + '」のサブタスクに');
+  }else{
+    const sec = ensureStatusSection(p, STATUS[0][1]);
+    const t = addTask(p.id, sec.id, x.title);
+    if(t){ t.due = x.due || ''; t.estimate = normEstimate(x.estimate); save(); }
+    toast('「' + x.title + '」を ' + p.name + ' へ');
+  }
+  renderSide(); renderList();
+}
+list.addEventListener('change', e => {
+  const f = e.target.dataset && e.target.dataset.ibf; if(!f) return;
+  const x = S.inbox.find(y => y.id === e.target.dataset.id); if(!x) return;
+  const v = e.target.value;
+  if(f === 'pid'){ x.pid = v; x.parent = ''; }
+  else if(f === 'parent') x.parent = v;
+  else if(f === 'due') x.due = v;
+  else if(f === 'estimate'){ x.estimate = normEstimate(v); e.target.value = x.estimate != null ? x.estimate : ''; }
+  save();
+  if(f === 'pid' || f === 'parent') renderList();     /* 親タスクの候補とボタンの文言が変わる */
+});
+list.addEventListener('click', e => {
+  const go = e.target.dataset && e.target.dataset.ibgo;
+  if(go){ inboxMove(go); return; }
+  const id = e.target.dataset && e.target.dataset.ibdel; if(!id) return;
+  const at = S.inbox.findIndex(x => x.id === id);
+  const x = inboxTake(id); if(!x) return;
+  save(); renderSide(); renderList();
+  toast('「' + x.title + '」を消しました', '元に戻す', () => {
+    S.inbox.splice(Math.min(at, S.inbox.length), 0, x); save(); renderSide(); renderList();
+  });
+});
+list.addEventListener('keydown', e => {
+  if(e.key !== 'Enter' || e.isComposing) return;
+  if(e.target.id === 'ibAdd'){
+    const v = e.target.value.trim(); if(!v) return;
+    S.inbox.push({id: uid('i_'), title: v, receivedAt: new Date().toISOString(), src: 'manual'});
+    save(); renderSide(); renderList();
+    const a = $('#ibAdd'); if(a) a.focus();
+  }else if(e.target.dataset && e.target.dataset.ibt){ e.target.blur(); }
+});
+list.addEventListener('focusout', e => {
+  const id = e.target.dataset && e.target.dataset.ibt; if(!id) return;
+  const x = S.inbox.find(y => y.id === id); const v = e.target.value.trim();
+  if(x && v && v !== x.title){ x.title = v; save(); }
+});
+
+/* =========================================================================
+   設定 — 名前・アイコン・テーマ・カレンダーの時間帯
+   tasks.json の settings に持つ。どのブラウザで開いても同じ見た目になるように
+   ========================================================================= */
+const ICON_BGS = [
+  ['#6db52d', 'ハタラグリーン'], ['#f29419', 'ハタラオレンジ'], ['#2A6F97', '青'],
+  ['#5B4A8A', '紫'], ['#5F5E5A', 'グレー'], ['', 'なし']
+];
+/* ボタンの色の候補。どれも白い文字が読める濃さにしてある */
+const BTN_COLORS = [
+  ['#6db52d', 'ハタラグリーン'], ['#f29419', 'ハタラオレンジ'], ['#2A6F97', '青'], ['#16897A', 'ティール'],
+  ['#5B4A8A', '紫'], ['#C0503C', '赤'], ['#5F5E5A', 'グレー']
+];
+const ICON_EMOJIS = ['📋', '✅', '🗂️', '🌱', '🔥', '⚡', '🎯', '🚀', '☕', '🐣'];
+function normSettings(v){
+  v = v && typeof v === 'object' ? v : {};
+  const ic = v.icon && typeof v.icon === 'object' ? v.icon : {};
+  const h = (x, d) => Number.isInteger(x) && x >= 0 && x <= 24 ? x : d;
+  let cs = h(v.calStart, 8), ce = h(v.calEnd, 21);
+  if(ce - cs < 4){ cs = 8; ce = 21; }
+  return {
+    name: String(v.name || 'task backlog').slice(0, 20),
+    icon: {
+      type: ic.type === 'image' && ic.image ? 'image' : 'emoji',
+      emoji: String(ic.emoji || '📋'),
+      image: typeof ic.image === 'string' && ic.image.startsWith('data:image/') ? ic.image : '',
+      bg: typeof ic.bg === 'string' ? ic.bg : '#6db52d'
+    },
+    theme: ['auto', 'light', 'dark'].includes(v.theme) ? v.theme : (UI && UI.theme) || 'auto',
+    mainColor: BTN_COLORS.some(c => c[0] === v.mainColor) ? v.mainColor : '#6db52d',
+    subColor: BTN_COLORS.some(c => c[0] === v.subColor) ? v.subColor : '#f29419',
+    calStart: cs, calEnd: ce
+  };
+}
+function iconHTML(ic, size){
+  const st = 'width:' + size + 'px;height:' + size + 'px;background:' + (ic.bg || 'transparent') +
+    ';font-size:' + Math.round(size * .62) + 'px';
+  return ic.type === 'image'
+    ? '<span class="ico" style="' + st + '"><img src="' + ic.image + '" alt=""></span>'
+    : '<span class="ico" style="' + st + '">' + esc(ic.emoji) + '</span>';
+}
+/* ファビコンは canvas に描いて data URL にする（背景の角丸＋絵文字か画像） */
+function drawFavicon(ic){
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d');
+  if(ic.bg){
+    g.fillStyle = ic.bg; g.beginPath();
+    if(g.roundRect) g.roundRect(0, 0, 64, 64, 14); else g.rect(0, 0, 64, 64);
+    g.fill();
+  }
+  const done = () => { try{ $('#favicon').href = c.toDataURL('image/png'); }catch(e){} };
+  if(ic.type === 'image'){
+    const im = new Image();
+    im.onload = () => { g.save(); g.beginPath(); if(g.roundRect) g.roundRect(0, 0, 64, 64, 14); else g.rect(0, 0, 64, 64);
+      g.clip(); g.drawImage(im, 0, 0, 64, 64); g.restore(); done(); };
+    im.src = ic.image;
+  }else{
+    g.font = (ic.bg ? 40 : 52) + 'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(ic.emoji, 32, 36);
+    done();
+  }
+}
+function applySettings(){
+  const st = S.settings = normSettings(S.settings);
+  $('#brandName').textContent = st.name;
+  $('#brandIcon').innerHTML = iconHTML(st.icon, 20);
+  document.title = st.name;
+  drawFavicon(st.icon);
+  if(st.theme === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = st.theme;
+  WK_START_H = st.calStart; WK_END_H = st.calEnd;
+  document.documentElement.style.setProperty('--main', st.mainColor);
+  document.documentElement.style.setProperty('--sub', st.subColor);
+}
+/* 画像は 128px 四方に切り抜いて縮めてから持つ（tasks.json を太らせないため） */
+function shrinkImage(file){
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = rej;
+      im.onload = () => {
+        const n = Math.min(im.width, im.height), c = document.createElement('canvas');
+        c.width = c.height = 128;
+        c.getContext('2d').drawImage(im, (im.width - n) / 2, (im.height - n) / 2, n, n, 0, 0, 128, 128);
+        res(c.toDataURL('image/png'));
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function openSettings(){
+  const st = normSettings(S.settings);
+  const draft = JSON.parse(JSON.stringify(st));
+  const hourOpts = (sel, from, to) => Array.from({length: to - from + 1}, (_, i) => from + i)
+    .map(h => '<option value="' + h + '"' + (h === sel ? ' selected' : '') + '>' + h + ':00</option>').join('');
+  const I = {
+    brand: '<path d="M4 4h7l9 9-7 7-9-9z"/><circle cx="8.5" cy="8.5" r="1.5"/>',
+    look: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    cal: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/>',
+    auto: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+    light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    dark: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'
+  };
+  const swatches = (k, cur) => '<div class="set-bgs" data-col="' + k + '">' + BTN_COLORS.map(([c, n]) =>
+    '<button data-c="' + c + '" title="' + n + '" class="' + (c === cur ? 'on' : '') + '" style="background:' + c + '"></button>').join('') + '</div>';
+  const svg = k => '<svg class="set-svg" viewBox="0 0 24 24" aria-hidden="true">' + I[k] + '</svg>';
+  const sec = (k, title, note, body) =>
+    '<section class="set-sec"><div class="set-sec-h"><span class="set-sec-i">' + svg(k) + '</span>' +
+    '<div><div class="set-sec-t">' + title + '</div><div class="set-sec-n">' + note + '</div></div></div>' +
+    '<div class="set-sec-b">' + body + '</div></section>';
+  modal('設定', '<div class="set">' +
+    sec('brand', 'ボードの名前とアイコン', '左上とブラウザのタブに出ます',
+      '<div class="set-preview" id="setPreview"></div>' +
+      '<div class="set-grid">' +
+        '<label class="set-l" for="setName">名前</label>' +
+        '<input class="set-in" id="setName" maxlength="20" value="' + esc(draft.name) + '" placeholder="task backlog">' +
+        '<span class="set-l">アイコン</span>' +
+        '<div><div class="set-tabs" id="setIconType">' +
+          '<button data-t="emoji" class="' + (draft.icon.type === 'emoji' ? 'on' : '') + '">絵文字</button>' +
+          '<button data-t="image" class="' + (draft.icon.type === 'image' ? 'on' : '') + '">画像</button></div>' +
+        '<div id="setEmojiBox"' + (draft.icon.type === 'emoji' ? '' : ' hidden') + '>' +
+          '<div class="set-emojis">' + ICON_EMOJIS.map(e => '<button data-e="' + e + '">' + e + '</button>').join('') +
+          '<input class="set-in set-emoji" id="setEmoji" maxlength="4" value="' + esc(draft.icon.emoji) + '" title="好きな絵文字を1つ（Win + . で絵文字パネル）"></div></div>' +
+        '<div id="setImageBox"' + (draft.icon.type === 'image' ? '' : ' hidden') + '>' +
+          '<label class="set-file"><input type="file" id="setImage" accept="image/png,image/jpeg,image/webp,image/gif">画像を選ぶ</label>' +
+          '<span class="set-note">正方形に切り抜いて小さくしてから保存します</span></div></div>' +
+        '<span class="set-l">背景色</span>' +
+        '<div class="set-bgs" id="setBgs">' + ICON_BGS.map(([c, n]) =>
+          '<button data-bg="' + c + '" title="' + n + '" class="' + (c === draft.icon.bg ? 'on' : '') + '" style="background:' +
+          (c || 'transparent') + '">' + (c ? '' : 'なし') + '</button>').join('') + '</div>' +
+      '</div>') +
+    sec('look', '見た目', '画面の明るさと、ボタンの色',
+      '<div class="set-themes" id="setThemes">' + [['auto', 'システムに合わせる'], ['light', 'ライト'], ['dark', 'ダーク']].map(([v, l]) =>
+        '<button data-th="' + v + '" class="' + (draft.theme === v ? 'on' : '') + '">' + svg(v) + '<span>' + l + '</span></button>').join('') +
+      '</div>' +
+      '<div class="set-grid set-colors">' +
+        '<span class="set-l">メインカラー</span><div>' + swatches('main', draft.mainColor) +
+          '<div class="set-note">「カレンダーに追加」「Claude で同期」、設定の見出し</div></div>' +
+        '<span class="set-l">サブカラー</span><div>' + swatches('sub', draft.subColor) +
+          '<div class="set-note">週カレンダーを開いているときの「Backlog」</div></div>' +
+      '</div>') +
+    sec('cal', 'カレンダー', '週カレンダーの縦軸に出す時間（4時間以上）',
+      '<div class="set-row">' +
+        '<select class="set-in" id="setCalStart">' + hourOpts(draft.calStart, 0, 20) + '</select>' +
+        '<span class="set-tilde">〜</span>' +
+        '<select class="set-in" id="setCalEnd">' + hourOpts(draft.calEnd, 4, 24) + '</select>' +
+      '</div>') +
+    '<p class="set-err" id="setErr" hidden></p></div>',
+    `<button class="btn" id="setCancel">キャンセル</button><button class="btn pri" id="setSave">保存</button>`);
+
+  const preview = () => {
+    $('#setPreview').innerHTML = iconHTML(draft.icon, 36) +
+      '<span class="set-preview-name">' + esc($('#setName').value.trim() || 'task backlog') + '</span>';
+  };
+  preview();
+  $('#setName').oninput = preview;
+  $('#setIconType').onclick = e => {
+    const b = e.target.closest('[data-t]'); if(!b) return;
+    /* 画像はまだ選んでいなければ、選んだ時点で切り替える（それまでは絵文字のまま） */
+    if(b.dataset.t === 'emoji') draft.icon.type = 'emoji';
+    else if(draft.icon.image) draft.icon.type = 'image';
+    else $('#setImage').click();
+    $$('#setIconType button').forEach(x => x.classList.toggle('on', x === b));
+    $('#setEmojiBox').hidden = b.dataset.t !== 'emoji';
+    $('#setImageBox').hidden = b.dataset.t !== 'image';
+    preview();
+  };
+  $('.set-emojis').onclick = e => {
+    const b = e.target.closest('[data-e]'); if(!b) return;
+    draft.icon.emoji = b.dataset.e; draft.icon.type = 'emoji'; $('#setEmoji').value = b.dataset.e; preview();
+  };
+  $('#setEmoji').oninput = e => { const v = e.target.value.trim(); if(v){ draft.icon.emoji = v; draft.icon.type = 'emoji'; preview(); } };
+  $('#setImage').onchange = async e => {
+    const f = e.target.files[0]; if(!f) return;
+    try{
+      draft.icon.image = await shrinkImage(f); draft.icon.type = 'image';
+      $$('#setIconType button').forEach(x => x.classList.toggle('on', x.dataset.t === 'image'));
+      $('#setEmojiBox').hidden = true; $('#setImageBox').hidden = false;
+      preview();
+    }
+    catch(err){ $('#setErr').textContent = '画像を読み込めませんでした'; $('#setErr').hidden = false; }
+  };
+  $('#setBgs').onclick = e => {
+    const b = e.target.closest('[data-bg]'); if(!b) return;
+    draft.icon.bg = b.dataset.bg;
+    $$('#setBgs button').forEach(x => x.classList.toggle('on', x === b));
+    preview();
+  };
+  $$('[data-col]').forEach(box => box.onclick = e => {
+    const b = e.target.closest('[data-c]'); if(!b) return;
+    draft[box.dataset.col === 'main' ? 'mainColor' : 'subColor'] = b.dataset.c;
+    $$('button', box).forEach(x => x.classList.toggle('on', x === b));
+  });
+  $('#setThemes').onclick = e => {
+    const b = e.target.closest('[data-th]'); if(!b) return;
+    draft.theme = b.dataset.th;
+    $$('#setThemes button').forEach(x => x.classList.toggle('on', x === b));
+  };
+  $('#setCancel').onclick = closeModal;
+  $('#setSave').onclick = () => {
+    const cs = +$('#setCalStart').value, ce = +$('#setCalEnd').value;
+    if(ce - cs < 4){
+      $('#setErr').textContent = 'カレンダーの表示時間帯は4時間以上あけてください';
+      $('#setErr').hidden = false; return;
+    }
+    draft.name = $('#setName').value.trim() || 'task backlog';
+    draft.calStart = cs; draft.calEnd = ce;
+    S.settings = normSettings(draft);
+    applySettings(); save(); closeModal(); renderAll();
+    toast('設定を保存しました');
+  };
+}
+$('#btnSettings').onclick = openSettings;
+
+/* --- 離脱前に確実に書き出す --- */
+window.addEventListener('beforeunload', () => { try{ localStorage.setItem(LS_DATA, JSON.stringify(S)); }catch(err){} });
+
+/* =========================================================================
+   起動
+   ========================================================================= */
+(async function boot(){
+  /* index.html を直接（file://）開いたときは、裏でサーバーが動いていればそちらへ移る。
+     file:// のままだと保存・カレンダーの読み込み・「Claude で同期」がどれも動かないため。
+     別オリジンなので中身は読めないが、no-cors の fetch が通れば「動いている」と分かる */
+  if(location.protocol === 'file:'){
+    const SERVER = 'http://127.0.0.1:8777/index.html';
+    try{
+      await Promise.race([
+        fetch('http://127.0.0.1:8777/api/ping', {mode: 'no-cors', cache: 'no-store'}),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 1500))
+      ]);
+      location.replace(SERVER);
+      return;
+    }catch(e){ /* サーバーが無ければ、これまでどおりこの場で開く */ }
+  }
+  loadUI();
+  /* 起動処理が転んでも、必ず描画まで進める。
+     ここで例外を漏らすと画面が「読み込み中」のまま何も出なくなる。 */
+  try{
+    await Store.boot();
+  }catch(err){
+    Store.paint('起動に失敗しました', 'warn', 'tasks.json を選ぶ', () => Store.connect());
+    console.error(err);
+  }
+  if(UI.project !== '*' && UI.project !== INBOX_P && !projById(UI.project)) UI.project = S.projects[0].id;
+  applySettings();
+  renderAll();
+  loadCalendar();
+  loadInbox();
+})();
+</script>
+</body>
+</html>

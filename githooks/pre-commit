@@ -1,0 +1,10 @@
+#!/bin/sh
+# データ（業務情報）がコミットに入るのを止める。
+# .gitignore は git add -f やファイル名の変更ですり抜けるので、ここで二重に見る。
+blocked=$(git diff --cached --name-only --diff-filter=ACR | grep -E '\.json$|^backups/|^sync_tmp/|\.log$')
+if [ -n "$blocked" ]; then
+  echo "コミットを止めました。データのファイルが入っています:"
+  echo "$blocked" | sed 's/^/  /'
+  echo "外すには: git restore --staged <ファイル>"
+  exit 1
+fi
