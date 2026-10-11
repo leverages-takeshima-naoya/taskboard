@@ -536,6 +536,8 @@ button{cursor:pointer;background:none;border:0;padding:0}
   color:var(--on-accent);font-weight:600}
 .dr-top{display:flex;justify-content:flex-end;margin:-4px 0 6px}
 .dr-top .danger{margin-top:0}
+.dr-top .dup{color:var(--ink3);font-size:12px;margin-right:14px}
+.dr-top .dup:hover{color:var(--accent);text-decoration:underline}
 .linkout{color:var(--accent);word-break:break-all;font-size:12px}
 .danger{color:var(--red);font-size:12px;margin-top:26px}
 .danger:hover{text-decoration:underline}
@@ -1822,7 +1824,7 @@ function renderDrawer(){
   const completed = t.completedAt ? t.completedAt.slice(0,10) : '';
 
   $('#drBody').innerHTML = `
-    <div class="dr-top"><button class="danger" data-act="d-del">このタスクを削除</button></div>
+    <div class="dr-top"><button class="dup" data-act="d-dup">複製</button><button class="danger" data-act="d-del">このタスクを削除</button></div>
     <textarea class="dr-title" data-act="d-title" rows="2">${esc(t.title)}</textarea>
     <div class="fields">
       <label>プロジェクト</label><select data-act="d-proj">${projOpts}</select>
@@ -1925,6 +1927,27 @@ function toggleDone(t){
     setStatus(t, 'done');
   }
   save();
+}
+/* 複製は中身だけ引き継ぐ。期日・週ビューの時刻・完了状態は持ち越さない
+   （時刻まで写すと、カレンダー同期で同じ予定が2つ入るため）。元のすぐ下に置く。 */
+function duplicateTask(src){
+  const later = S.tasks.filter(x => x.projectId === src.projectId && x.sectionId === src.sectionId
+                                    && x.order > src.order).map(x => x.order);
+  const t = {
+    id: uid('t_'), projectId: src.projectId, sectionId: src.sectionId,
+    title: (src.title || '無題') + '（コピー）',
+    notes: src.notes, status: src.status, priority: src.priority, due: '', url: src.url,
+    estimate: src.estimate, schedule: null,
+    subtasks: src.subtasks.map(s => ({id: uid('k_'), title: s.title, done: false,
+                                      due: '', estimate: s.estimate, schedule: null})),
+    createdAt: new Date().toISOString(), completedAt: null, prevStatus: '',
+    order: later.length ? (src.order + Math.min(...later)) / 2 : src.order + 1000
+  };
+  S.tasks.push(t);
+  if(isDone(src)) setStatus(t, src.prevStatus && src.prevStatus !== 'done' ? src.prevStatus : 'todo');
+  save(); renderAll(); select(t.id);
+  toast('「' + (src.title || '無題') + '」を複製しました');
+  return t;
 }
 function deleteTask(id){
   const i = S.tasks.findIndex(t => t.id === id);
@@ -2819,6 +2842,7 @@ $('#drBody').addEventListener('click', e => {
     t.subtasks.splice(+e.target.dataset.sub, 1);
     save(); renderList(); renderDrawer(); return;
   }
+  if(act === 'd-dup'){ duplicateTask(t); return; }
   if(act === 'd-del'){
     if(confirm('このタスクを削除しますか？')) deleteTask(t.id);
   }
