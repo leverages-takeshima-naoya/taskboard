@@ -22,7 +22,9 @@ Slack で自分に来た依頼（DM・メンション）も拾う。読むのは
     python inbox_sync.py intake-since
         前回どこまで見たか（UNIX 秒）を出す。検索の after に渡す。空なら今日の 0:00 JST
     python inbox_sync.py intake-parse <検索結果のファイル ...>
-        自分の発言・自分宛てDM・見たことのあるものを除いて、判定する候補を出す
+        自分の発言・自分宛てDM・見たことのあるものを除いて、判定する候補を出す。
+        渡した検索結果の中の自分の発言（from:自分 の検索）と突き合わせ、依頼のあとに自分が返信していれば
+        その文を myReply に入れる。返信で済んだかは Claude が判定する
     python inbox_sync.py intake-add <判定の JSON ファイル>
         JSON は [{"id", "title", "due"}, ...]。対応が要ると判定したものだけを入れる。
         title は依頼の要約、due は依頼文から読んだ期日（YYYY-MM-DD、無ければ空）。
@@ -63,6 +65,7 @@ FIELD = {
     'url': re.compile(r'^Permalink:\s*\[[^\]]*\]\((\S+?)\)', re.M),
 }
 MENTION = re.compile(r'<@\w+\|([^>]+)>')
+THREAD = re.compile(r'[?&]thread_ts=([0-9.]+)')
 
 
 def load():
@@ -249,25 +252,50 @@ def cmd_intake_since(_a):
     print(ts)
 
 
+def thread_of(ts, url):
+    """スレッドの親の ts。スレッドの外の発言なら空"""
+    m = THREAD.search(url or '')
+    return m.group(1) if m else ''
+
+
+def replied(ch, ts, url, dm, mine):
+    """依頼より後に、同じスレッド（スレッドの外の DM なら同じ会話）で自分が発言していれば、その最後の文"""
+    root = thread_of(ts, url) or ts
+    last = ''
+    for m in sorted(mine, key=lambda m: float(m['ts'])):
+        if m['ch'] != ch or float(m['ts']) <= float(ts):
+            continue
+        t = thread_of(m['ts'], m['url'])
+        if t == root or (dm and not thread_of(ts, url) and not t):
+            last = m['text'] or '（スタンプ・添付のみ）'
+    return last
+
+
 def cmd_intake_parse(a):
     doc = load()
     skip = set(doc.get('intakeSeen', [])) | {x['id'] for x in doc['items']}
+    hits = [h for f in a.files for h in search_hits(read_text(f))]
+    mine = [h for h in hits if h['fromId'] == ME]
     out, have = [], set()
-    for f in a.files:
-        for h in search_hits(read_text(f)):
-            iid = f"intake-{h['ch']}-{h['ts']}"
-            # bot は include_bots=false でも DM の検索に混ざる。本文が空のもの（Slack 本体の通知など）も読めない
-            if (h['fromId'] == ME or h['ch'] == SELF_DM or h['bot'] or not h['text']
-                    or iid in skip or iid in have):
-                continue
-            have.add(iid)
-            when = datetime.datetime.fromtimestamp(float(h['ts']), JST)
-            out.append({'id': iid, 'when': when.strftime('%m/%d %H:%M'), **h})
+    for h in hits:
+        iid = f"intake-{h['ch']}-{h['ts']}"
+        # bot は include_bots=false でも DM の検索に混ざる。本文が空のもの（Slack 本体の通知など）も読めない
+        if (h['fromId'] == ME or h['ch'] == SELF_DM or h['bot'] or not h['text']
+                or iid in skip or iid in have):
+            continue
+        have.add(iid)
+        when = datetime.datetime.fromtimestamp(float(h['ts']), JST)
+        out.append({'id': iid, 'when': when.strftime('%m/%d %H:%M'), **h,
+                    'myReply': replied(h['ch'], h['ts'], h['url'], not h['chName'].startswith('#'), mine)})
     out.sort(key=lambda x: float(x['ts']))
+    # inbox に入れたあとで返信したもの。画面が「返信済み」と出す
+    later = [x['id'] for x in doc['items'] if x.get('src') == 'intake' and not x.get('replied')
+             and replied(x['id'].split('-')[1], x['id'].split('-')[2], x.get('url'),
+                         not x.get('chName', '').startswith('#'), mine)]
     CAND.parent.mkdir(exist_ok=True)
     with open(CAND, 'w', encoding='utf-8') as fh:
-        json.dump(out, fh, ensure_ascii=False, indent=2)
-    json.dump([{k: x[k] for k in ('id', 'when', 'chName', 'from', 'url', 'text')} for x in out],
+        json.dump({'cands': out, 'later': later}, fh, ensure_ascii=False, indent=2)
+    json.dump([{k: x[k] for k in ('id', 'when', 'chName', 'from', 'url', 'text', 'myReply')} for x in out],
               sys.stdout, ensure_ascii=False, indent=1)
     print()
 
@@ -276,7 +304,8 @@ def cmd_intake_add(a):
     if not CAND.exists():
         sys.exit('候補がありません。先に intake-parse を実行してください')
     with open(CAND, encoding='utf-8') as fh:
-        cand = {x['id']: x for x in json.load(fh)}
+        got = json.load(fh)
+    cand = {x['id']: x for x in got['cands']}
     with open(a.file, encoding='utf-8') as fh:
         picks = json.load(fh)
     doc = load()
@@ -299,15 +328,19 @@ def cmd_intake_add(a):
                              'quote': c['text'][:QUOTE]})
         have.add(c['id'])
         added.append(p['title'].strip())
+    for x in doc['items']:
+        if x['id'] in got['later']:
+            x['replied'] = True
     # 入れなかった候補も見たことにする。検索の after は指定時刻を含むので、id で二重を防ぐ
-    doc['intakeSeen'] = (doc.get('intakeSeen', []) + list(cand))[-SEEN_KEEP:]
-    if cand:
+    seen = list(cand)
+    doc['intakeSeen'] = (doc.get('intakeSeen', []) + seen)[-SEEN_KEEP:]
+    if seen:
         top = max(float(x['ts']) for x in cand.values())
         doc['intakeTs'] = str(max(int(top), int(doc.get('intakeTs') or 0)))
     doc['items'] = sorted(doc['items'], key=lambda x: x.get('receivedAt', ''))[-KEEP:]
     save(doc)
     CAND.unlink()
-    json.dump({'added': added, 'seen': len(cand), 'unknown': unknown, 'intakeTs': doc.get('intakeTs', '')},
+    json.dump({'added': added, 'seen': len(seen), 'replied': len(got['later']), 'unknown': unknown, 'intakeTs': doc.get('intakeTs', '')},
               sys.stdout, ensure_ascii=False)
     print()
 

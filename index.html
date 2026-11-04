@@ -719,6 +719,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .ib-when{font-size:12px;color:var(--ink3);flex:none;font-variant-numeric:tabular-nums}
 .ib-req{flex-wrap:wrap;gap:4px 8px;margin:2px 0 0 6px;font-size:12px;color:var(--ink2)}
 .ib-req-tag{font-size:11px;padding:0 5px;border-radius:4px;background:var(--sunk);color:var(--ink2);font-weight:500;flex:none}
+.ib-req-done{background:var(--accent-bg);color:var(--accent)}
 .ib-req-from{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ib-req-link{color:var(--accent);text-decoration:none;flex:none}
 .ib-req-link:hover{text-decoration:underline}
@@ -3801,6 +3802,8 @@ week.addEventListener('drop', e => {
 /* inbox.json の各項目に Claude が書いた振り分け先の提案。{id: {pid, parent, newParent, reason}}。
    tasks.json には持たない（書き手は Claude）ので、読むたびに作り直す */
 let IB_SUGGEST = {};
+/* Slack の依頼のうち、inbox に入ったあとで自分が返信したものの id。これも Claude が inbox.json に書く */
+let IB_REPLIED = new Set();
 async function loadInbox(){
   let doc;
   try{
@@ -3812,7 +3815,9 @@ async function loadInbox(){
   IB_SUGGEST = {};
   for(const it of (doc && Array.isArray(doc.items) ? doc.items : []))
     if(it && it.id && it.suggest && it.suggest.pid) IB_SUGGEST[it.id] = it.suggest;
-  if(JSON.stringify(IB_SUGGEST) !== prev && UI.project === INBOX_P) renderList();
+  const prevR = [...IB_REPLIED].join();
+  IB_REPLIED = new Set((doc && Array.isArray(doc.items) ? doc.items : []).filter(it => it && it.replied).map(it => it.id));
+  if((JSON.stringify(IB_SUGGEST) !== prev || [...IB_REPLIED].join() !== prevR) && UI.project === INBOX_P) renderList();
   const seen = new Set(S.inboxSeen);
   let n = 0;
   for(const it of (doc && Array.isArray(doc.items) ? doc.items : [])){
@@ -4095,6 +4100,7 @@ function renderInbox(el){
       (x.src !== 'intake' ? '' :
         '<div class="ib-line ib-req">' +
           '<span class="ib-req-tag">依頼</span>' +
+          (IB_REPLIED.has(x.id) ? '<span class="ib-req-tag ib-req-done">返信済み</span>' : '') +
           '<span class="ib-req-from">' + esc(x.from) + (x.chName ? ' · ' + esc(x.chName) : '') + '</span>' +
           (x.url ? '<a class="ib-req-link" href="' + esc(x.url) + '" target="_blank" rel="noopener">元のメッセージ</a>' : '') +
           (x.quote ? '<div class="ib-req-quote">' + esc(x.quote) + '</div>' : '') +
