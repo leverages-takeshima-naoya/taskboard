@@ -9,3 +9,6 @@ sync_tmp/
 # Python
 __pycache__/
 *.pyc
+missions.json
+episodes.json
+evaluation.json

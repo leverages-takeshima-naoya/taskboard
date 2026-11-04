@@ -94,20 +94,20 @@ class Sync:
     LOG = ROOT / 'sync.log'
     TMP = ROOT / 'sync_tmp'
     PROMPT = (
-        'taskboard-sync スキルの手順どおりに、カレンダー同期と inbox の取り込みをして。\n'
+        'taskboard-sync スキルの手順どおりに、カレンダー同期と inbox の取り込み・振り分けの提案・ミッションの読み込み・評価エピソードの候補集めをして。\n'
         '- 作業フォルダは今いる場所（taskboard）。cd や PYTHONIOENCODING は付けず、'
         '`python calendar_sync.py ...` / `python inbox_sync.py ...` の形でそのまま実行する\n'
         '- Slack の取得結果をファイルに保存するときは sync_tmp/ フォルダの中に書く\n'
-        '- 最後の報告は、スキルの「報告」にある決まった形式の7行だけを出す。前置き・まとめ・太字は付けない\n'
+        '- 最後の報告は、スキルの「報告」にある決まった形式の10行だけを出す。前置き・まとめ・太字は付けない\n'
     )
     TOOLS = [
         'Skill', 'ToolSearch', 'Read',
         'Write(./sync_tmp/**)', 'Edit(./sync_tmp/**)',
-        'Bash(python calendar_sync.py:*)', 'Bash(python inbox_sync.py:*)',
+        'Bash(python calendar_sync.py:*)', 'Bash(python inbox_sync.py:*)', 'Bash(python mission_sync.py pull)', 'Bash(python eval_sync.py:*)',
         'mcp__claude_ai_Google_Calendar__list_events', 'mcp__claude_ai_Google_Calendar__get_event',
         'mcp__claude_ai_Google_Calendar__create_event', 'mcp__claude_ai_Google_Calendar__update_event',
         'mcp__claude_ai_Google_Calendar__delete_event',
-        'mcp__claude_ai_Slack__slack_read_channel',
+        'mcp__claude_ai_Slack__slack_read_channel', 'mcp__claude_ai_Slack__slack_search_public_and_private',
     ]
 
     @classmethod
