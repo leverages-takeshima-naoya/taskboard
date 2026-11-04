@@ -6,25 +6,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600&display=swap">
 <title>task backlog</title>
 <link rel="icon" id="favicon" href="data:,">
 <style>
 :root{
-  --bg:#F6F7F8; --panel:#FFFFFF; --sunk:#EFF1F3; --hover:#F3F5F7; --field:#FFFFFF;
-  --ink:#1A1D21; --ink2:#5A6270; --ink3:#8B94A3;
-  --line:#E1E5EA; --line2:#EDF0F3;
-  --accent:#2A6F97; --accent-bg:#E7F0F6; --on-accent:#fff;
-  --red:#B4402F; --red-bg:#FAEAE7;
-  --amber:#8A5B12; --amber-bg:#FAF0DD;
-  --green:#2F6B4F; --green-bg:#E6F1EA;
-  --violet:#5B4A8A; --violet-bg:#EEEBF7;
-  --shadow:0 1px 2px rgba(16,24,40,.05), 0 6px 20px rgba(16,24,40,.07);
-  --radius:8px;
-  /* ハタラクティブのロゴガイドライン v3.0 の推奨に合わせる: 欧文・数字 Montserrat、和文 Noto Sans JP。
+  --bg:#FBFBFC; --panel:#FFFFFF; --side:#F5F5F7; --sunk:#F1F1F3; --hover:#F4F4F6; --field:#FFFFFF;
+  --ink:#1B1C1F; --ink2:#5C5F66; --ink3:#8E9199;
+  --line:#E6E6EA; --line2:#EEEEF1;
+  --accent:#5E6AD2; --accent-bg:#EEEFFC; --on-accent:#fff;
+  --red:#C2483A; --red-bg:#FBECEA;
+  --amber:#9A6A12; --amber-bg:#FAF2E1;
+  --green:#2F7A55; --green-bg:#E7F3EC;
+  --violet:#5E6AD2; --violet-bg:#EEEFFC;
+  --shadow:0 0 0 1px rgba(20,20,40,.04), 0 4px 16px rgba(20,20,40,.08);
+  --radius:6px;
+  /* 見た目の決まりは DESIGN.md（Linear 寄せ）。欧文・数字 Inter、和文 Noto Sans JP。
      どちらも Google Fonts。ネットワークが無い環境では落ちてこないので、
      その下の並び（Segoe UI / Yu Gothic UI）だけで成立するようにしてある。 */
-  --f:"Montserrat","Noto Sans JP","Segoe UI","Yu Gothic UI","Hiragino Sans",system-ui,sans-serif;
+  --f:"Inter","Noto Sans JP","Segoe UI","Yu Gothic UI","Hiragino Sans",system-ui,sans-serif;
   /* Slack リストの色名に合わせた見出し用の色。Slack 側は色名しか持っていないので、
      色味はここで決めている。前が文字色、後ろが背景。 */
   --sc-gray:#5F5E5A;   --sc-gray-bg:#EFEEE9;
@@ -42,15 +42,15 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#262624; --panel:#2B2A28; --sunk:#30302E; --hover:#353431; --field:#30302E;
-    --ink:#F2F1EC; --ink2:#C2C0B6; --ink3:#8E8C84;
-    --line:#3D3C38; --line2:#33322F;
-    --accent:#6FB0D6; --accent-bg:#1B2E3A; --on-accent:#1F1E1D;
-    --red:#E08C7C; --red-bg:#33211E;
-    --amber:#D8A855; --amber-bg:#2E2617;
-    --green:#7BB595; --green-bg:#1A2A22;
-    --violet:#A99BD6; --violet-bg:#25213A;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.28);
+    --bg:#0F1011; --panel:#16171A; --side:#121314; --sunk:#1C1D21; --hover:#1A1B1E; --field:#1C1D21;
+    --ink:#EDEEF0; --ink2:#A0A3AB; --ink3:#6B6E76;
+    --line:#26272B; --line2:#1F2023;
+    --accent:#7C85E8; --accent-bg:#22243A; --on-accent:#fff;
+    --red:#E07A6C; --red-bg:#2E1C1A;
+    --amber:#D9A55A; --amber-bg:#2A2214;
+    --green:#6FBF94; --green-bg:#16251D;
+    --violet:#7C85E8; --violet-bg:#22243A;
+    --shadow:0 0 0 1px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.45);
   --sc-gray:#A6A69E;   --sc-gray-bg:#33322F;
   --sc-brown:#C9A47D;  --sc-brown-bg:#2E2419;
   --sc-orange:#D79B55; --sc-orange-bg:#30251A;
@@ -65,15 +65,15 @@
   }
 }
 :root[data-theme="dark"]{
-  --bg:#262624; --panel:#2B2A28; --sunk:#30302E; --hover:#353431; --field:#30302E;
-  --ink:#F2F1EC; --ink2:#C2C0B6; --ink3:#8E8C84;
-  --line:#3D3C38; --line2:#33322F;
-  --accent:#6FB0D6; --accent-bg:#1B2E3A; --on-accent:#1F1E1D;
-  --red:#E08C7C; --red-bg:#33211E;
-  --amber:#D8A855; --amber-bg:#2E2617;
-  --green:#7BB595; --green-bg:#1A2A22;
-  --violet:#A99BD6; --violet-bg:#25213A;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.28);
+  --bg:#0F1011; --panel:#16171A; --side:#121314; --sunk:#1C1D21; --hover:#1A1B1E; --field:#1C1D21;
+  --ink:#EDEEF0; --ink2:#A0A3AB; --ink3:#6B6E76;
+  --line:#26272B; --line2:#1F2023;
+  --accent:#7C85E8; --accent-bg:#22243A; --on-accent:#fff;
+  --red:#E07A6C; --red-bg:#2E1C1A;
+  --amber:#D9A55A; --amber-bg:#2A2214;
+  --green:#6FBF94; --green-bg:#16251D;
+  --violet:#7C85E8; --violet-bg:#22243A;
+  --shadow:0 0 0 1px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.45);
   --sc-gray:#A6A69E;   --sc-gray-bg:#33322F;
   --sc-brown:#C9A47D;  --sc-brown-bg:#2E2419;
   --sc-orange:#D79B55; --sc-orange-bg:#30251A;
@@ -91,7 +91,7 @@
 html,body{height:100%}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font-family:var(--f); font-size:13.5px; line-height:1.6;
+  font-family:var(--f); font-size:13px; line-height:1.6;
   letter-spacing:-.003em;
   -webkit-font-smoothing:antialiased; overflow:hidden;
 }
@@ -103,12 +103,12 @@ button{cursor:pointer;background:none;border:0;padding:0}
 
 /* ---------- sidebar ---------- */
 .side{
-  background:var(--panel); border-right:1px solid var(--line);
+  background:var(--side); border-right:1px solid var(--line);
   display:flex; flex-direction:column; min-height:0;
 }
 .side-head{padding:14px 14px 10px;border-bottom:1px solid var(--line2)}
 .brand{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:600}
-.brand b{color:var(--ink);font-weight:700}
+.brand b{color:var(--ink);font-weight:600}
 .storage{
   margin-top:9px; display:flex; align-items:center; gap:6px;
   font-size:11.5px; color:var(--ink2);
@@ -121,27 +121,28 @@ button{cursor:pointer;background:none;border:0;padding:0}
   text-underline-offset:2px;
 }
 .side-scroll{flex:1;overflow-y:auto;padding:10px 8px}
+#viewList{margin-bottom:8px}
 .side-label{
-  font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.06em;
+  font-size:12px;font-weight:500;color:var(--ink3);
   padding:8px 6px 5px;display:flex;justify-content:space-between;align-items:center;
 }
 .side-label button{color:var(--ink3);font-size:15px;line-height:1;padding:2px 5px;border-radius:5px}
 .side-label button:hover{background:var(--hover);color:var(--ink)}
 .prow{display:flex;align-items:center;border-radius:6px}
 .prow:hover{background:var(--hover)}
-.prow.on{background:var(--accent-bg)}
+.prow.on{background:var(--sunk)}
 .pitem{
   display:flex;align-items:center;gap:8px;flex:1;min-width:0;text-align:left;
   padding:6px 8px;border-radius:6px;color:var(--ink2);
 }
-.prow.on .pitem{color:var(--ink);font-weight:600}
+.prow.on .pitem{color:var(--ink);font-weight:500}
 .pmenu{
   flex:none;color:var(--ink3);padding:2px 7px;border-radius:5px;
   opacity:0;font-size:14px;line-height:1;
 }
 .prow:hover .pmenu{opacity:1}
 .pmenu:hover{background:var(--sunk);color:var(--ink)}
-.pitem .swatch{width:8px;height:8px;border-radius:2px;flex:none;background:var(--accent)}
+.pitem .swatch{width:8px;height:8px;border-radius:50%;flex:none;background:var(--accent)}
 .pitem .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pitem .ct{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
 .side-foot{
@@ -162,7 +163,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
   border-bottom:1px solid var(--line2)}
 .top-row{display:flex;align-items:center;gap:12px}
 .title{
-  font-size:24px;font-weight:700;letter-spacing:-.01em;
+  font-size:24px;font-weight:600;letter-spacing:-.01em;
   background:none;border:0;padding:2px 4px;margin-left:-4px;border-radius:5px;
   min-width:60px;max-width:640px;
 }
@@ -170,8 +171,8 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .title:focus{outline:2px solid var(--accent);outline-offset:0;background:var(--panel)}
 .spacer{flex:1}
 .search{
-  background:var(--sunk);border:1px solid var(--line);border-radius:999px;
-  padding:7px 16px;width:min(540px, 90%);font-size:13px;color:var(--ink);
+  background:var(--sunk);border:1px solid transparent;border-radius:var(--radius);
+  padding:6px 12px;width:min(540px, 90%);font-size:13px;color:var(--ink);
 }
 .search:focus{outline:none;border-color:var(--accent);background:var(--panel)}
 .iconbtn{
@@ -180,11 +181,11 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .iconbtn:hover{background:var(--hover);color:var(--ink)}
 .chips{display:flex;gap:6px;padding:11px 0 10px;flex-wrap:wrap;align-items:center}
 .chip{
-  padding:3px 10px;border-radius:20px;font-size:12px;color:var(--ink2);
+  height:26px;padding:0 10px;border-radius:var(--radius);font-size:12px;color:var(--ink2);
   border:1px solid var(--line);
 }
 .chip:hover{background:var(--hover)}
-.chip.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.chip.on{background:var(--accent-bg);color:var(--accent);border-color:transparent;font-weight:500}
 .chip .n{font-variant-numeric:tabular-nums;opacity:.7;margin-left:4px}
 .chip.alert:not(.on){color:var(--red);border-color:var(--red)}
 .sep{width:1px;height:16px;background:var(--line);margin:0 3px}
@@ -216,14 +217,6 @@ button{cursor:pointer;background:none;border:0;padding:0}
 ::-webkit-scrollbar-corner{background:transparent}
 
 /* ---------- ビュー切替 ---------- */
-/* 「カレンダーに追加」。ハタラグリーン（ハタラクティブ ロゴガイドライン v3.0 のメインカラー）に白文字 */
-.cal-btn{
-  flex:none;background:var(--main);color:#fff;font-weight:700;font-size:13px;
-  padding:7px 16px;border-radius:7px;letter-spacing:.02em;
-}
-.cal-btn:hover{filter:brightness(.9)}
-/* 週カレンダー表示中は「Backlog に戻る」ボタン。ハタラオレンジ（同ガイドラインのアクセントカラー） */
-.cal-btn.back{background:var(--sub)}
 /* ビューの切り替えはタブ。選んでいるものに下線 */
 .vswitch{display:flex;gap:4px;margin:8px -20px 0;padding:0 16px;border-bottom:1px solid var(--line2)}
 .vswitch button{padding:6px 10px 8px;font-size:13px;color:var(--ink2);border-bottom:2px solid transparent;
@@ -248,13 +241,13 @@ button{cursor:pointer;background:none;border:0;padding:0}
   position:sticky;top:0;z-index:2;background:var(--sunk);border-radius:10px 10px 0 0;
 }
 .col-name{
-  font-weight:700;font-size:13px;background:none;border:0;padding:2px 4px;
+  font-weight:600;font-size:13px;background:none;border:0;padding:2px 4px;
   border-radius:5px;flex:1;min-width:0;
 }
 .col-name:hover{background:var(--hover)}
 .col-name:focus{outline:2px solid var(--accent);background:var(--panel)}
 .col-ct{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
-.col-dot{width:8px;height:8px;border-radius:2px;flex:none}
+.col-dot{width:8px;height:8px;border-radius:50%;flex:none}
 .col-menu{color:var(--ink3);padding:2px 6px;border-radius:5px;opacity:0;font-size:14px;line-height:1}
 .col-head:hover .col-menu{opacity:1}
 .col-menu:hover{background:var(--hover);color:var(--ink)}
@@ -284,11 +277,11 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .newcol button:hover{background:var(--hover);color:var(--accent);border-color:var(--accent)}
 
 .card{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);
   padding:20px 14px;min-height:104px;cursor:grab;position:relative;
   display:flex;flex-direction:column;justify-content:center;
 }
-.card:hover{border-color:var(--ink3)}
+.card:hover{border-color:var(--line)}
 .card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .card.dragging{opacity:.4}
 .card.drop-before::before,.card.drop-after::after{
@@ -332,7 +325,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .caret:hover{background:var(--hover);color:var(--ink)}
 .sec.collapsed .caret{transform:rotate(-90deg)}
 .sec-name{
-  font-weight:700;font-size:13.5px;background:none;border:0;padding:2px 4px;
+  font-weight:600;font-size:13.5px;background:none;border:0;padding:2px 4px;
   border-radius:5px;min-width:40px;
 }
 .sec-name:hover{background:var(--hover)}
@@ -382,8 +375,8 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .row.done .t-title{color:var(--ink3);text-decoration:line-through}
 .meta{display:flex;align-items:center;gap:8px;flex:none}
 /* 一覧の行の工数・期日の欄。普段はバッジのように見せ、触ると入力欄になる */
-.row-est{display:inline-flex;align-items:center;gap:2px;background:var(--sunk);border:1px solid transparent;
-  border-radius:6px;padding:0 8px 0 2px;font-size:12.5px;color:var(--ink2);cursor:text}
+/* 中の数値欄はピッカーのチップに見せ替わるので、外枠は持たない */
+.row-est{display:inline-flex;align-items:center}
 .row-est:hover,.row-due:hover{border-color:var(--line)}
 .row-est:focus-within{border-color:var(--accent);background:var(--field)}
 .row-est input{width:48px;background:none;border:0;padding:4px 0 4px 4px;text-align:right;font-size:12.5px;
@@ -423,7 +416,9 @@ button{cursor:pointer;background:none;border:0;padding:0}
 }
 .row:hover .open{opacity:1}
 .open:hover{background:var(--sunk);color:var(--ink)}
-.proj-tag{font-size:11.5px;font-weight:600;flex:none;padding:2px 9px;border-radius:999px;line-height:1.5;white-space:nowrap}
+/* プロジェクトは色の丸と名前だけ。色の塗りは使わない（DESIGN.md） */
+.proj-tag{font-size:12px;color:var(--ink2);flex:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.proj-tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pc)}
 
 .add{display:flex;align-items:center;gap:9px;padding:0 12px 0 28px;min-height:36px}
 .add input{
@@ -453,7 +448,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 }
 .dr-body{flex:1;overflow-y:auto;padding:14px 16px 40px}
 .dr-title{
-  width:100%;font-size:21px;font-weight:700;line-height:1.45;background:var(--sunk);
+  width:100%;font-size:18px;font-weight:600;line-height:1.45;background:none;
   border:1px solid transparent;border-radius:6px;padding:8px 10px;resize:none;
   font-family:inherit;
 }
@@ -466,8 +461,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .fields input:focus,.fields select:focus{outline:none;border-color:var(--accent);background:var(--panel)}
 .dr-sec{margin-top:20px}
 .dr-sec h4{
-  margin:0 0 7px;font-size:11.5px;font-weight:700;color:var(--ink3);
-  letter-spacing:.06em;text-transform:uppercase;
+  margin:0 0 7px;font-size:12px;font-weight:500;color:var(--ink3);
 }
 .notes{
   width:100%;min-height:96px;background:var(--sunk);border:1px solid transparent;
@@ -553,7 +547,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
   width:min(680px,100%);max-height:86vh;display:flex;flex-direction:column;
   border:1px solid var(--line);
 }
-.mo-head{padding:14px 18px;border-bottom:1px solid var(--line2);font-weight:700;font-size:15px}
+.mo-head{padding:14px 18px;border-bottom:1px solid var(--line2);font-weight:600;font-size:15px}
 .mo-body{padding:16px 18px;overflow-y:auto}
 .mo-foot{
   padding:12px 18px;border-top:1px solid var(--line2);
@@ -588,10 +582,8 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .dropzone{
   position:fixed;inset:0;z-index:70;background:rgba(42,111,151,.14);
   border:3px dashed var(--accent);display:grid;place-items:center;
-  font-size:18px;font-weight:700;color:var(--accent);
+  font-size:18px;font-weight:600;color:var(--accent);
 }
-/* ボタンの色。設定の「メインカラー / サブカラー」で上書きされる */
-:root{--main:#6db52d;--sub:#f29419}
 [hidden]{display:none!important}
 
 /* ---------- 週ビュー（左にタスクバー、右に週カレンダー） ---------- */
@@ -600,20 +592,22 @@ button{cursor:pointer;background:none;border:0;padding:0}
   background:var(--bg);padding:8px 0 10px;margin:-8px 0 0;height:46px;box-sizing:border-box}
 .wk-top button{padding:3px 9px;border:1px solid var(--line);border-radius:6px;color:var(--ink2);font-size:12px}
 .wk-top button:hover{background:var(--hover);color:var(--ink)}
-.wk-range{font-weight:700;margin-left:6px}
+.wk-range{font-weight:600;margin-left:6px}
 .wk-sync{font-size:11.5px;color:var(--ink3)}
 .wk-sync b{color:var(--amber);font-weight:600}
-/* 「Claude で同期」。検索窓の行の右端。ハタラグリーンに白文字 */
-.sync-btn{
-  position:absolute;right:20px;top:50%;transform:translateY(calc(-50% - 6px));
-  border:0;color:#fff;font-weight:700;font-size:12.5px;
-  padding:6px 15px;border-radius:999px;background:var(--main);
-}
-.sync-btn:hover{filter:brightness(.9)}
-.sync-btn:disabled{background:var(--sunk);color:var(--ink2);cursor:default}
+/* 「Claude で同期」。裏で走る作業なので、サイドバー上の保存状態の下に小さく置く（Linear の同期表示と同じ扱い） */
+.sync-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.sync-btn{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 6px;margin-left:-6px;border-radius:5px;
+  font-size:11.5px;color:var(--ink2)}
+.sync-btn:hover{background:var(--hover);color:var(--ink)}
+.sync-btn:disabled{color:var(--ink3);cursor:default;background:none}
+.sync-btn:disabled svg{animation:syncspin 1.2s linear infinite}
+@keyframes syncspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sync-btn:disabled svg{animation:none}}
+.sync-when{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
 /* 同期の結果のポップアップ。画面右上、検索窓の行の下に出す */
 .sync-pop{
-  position:fixed;top:58px;right:20px;z-index:60;display:flex;align-items:center;gap:10px;
+  position:fixed;top:12px;left:248px;z-index:60;display:flex;align-items:center;gap:10px;
   padding:11px 14px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);
   max-width:440px;animation:syncpop .18s ease-out;
 }
@@ -630,7 +624,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .wk-bar{background:var(--sunk);border-radius:10px;padding:10px 8px;position:sticky;top:34px;
   max-height:calc(100vh - 150px);overflow-y:auto}
 .wk-bar.drop{box-shadow:inset 0 0 0 2px var(--accent)}
-.wk-bar-h{display:flex;justify-content:space-between;font-size:12px;font-weight:700;padding:2px 4px 8px}
+.wk-bar-h{display:flex;justify-content:space-between;font-size:12px;font-weight:600;padding:2px 4px 8px}
 .wk-bar-h span{font-weight:400;color:var(--ink3)}
 .wk-items{display:flex;flex-direction:column;gap:6px;min-height:20px}
 .wk-item{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:5px 9px;
@@ -656,7 +650,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
   border-bottom:1px solid var(--line2);box-shadow:0 1px 0 var(--line2)}
 .wk-head,.wk-allday,.wk-grid{display:grid;grid-template-columns:44px repeat(7,minmax(150px,1fr));min-width:max-content}
 .wk-head div{padding:7px 6px;font-size:12px;color:var(--ink2);border-left:1px solid var(--line2)}
-.wk-head div.today{color:var(--accent);font-weight:700}
+.wk-head div.today{color:var(--accent);font-weight:600}
 .wk-head div.off{color:var(--ink3)}
 .wk-allday{border-top:1px solid var(--line2)}
 .wk-allday div{border-left:1px solid var(--line2);padding:2px 3px;min-height:6px;display:flex;flex-direction:column;gap:2px}
@@ -695,34 +689,188 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .wk-legend{display:flex;gap:14px;font-size:11px;color:var(--ink3);margin-top:8px}
 .wk-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:4px}
 /* ---------- inbox ---------- */
-/* 入力欄が多いので、ほかの画面より一回り（約1.3倍）大きくしてある */
-.ib{max-width:1080px}
-.ib-add input{width:100%;background:none;border:1px dashed var(--line);border-radius:8px;
-  padding:11px 13px;font-size:16px;color:var(--ink);margin-bottom:12px}
-.ib-add input:focus{outline:none;border-style:solid;border-color:var(--accent);background:var(--panel)}
-.ib-row{padding:11px 10px 13px;border-bottom:1px solid var(--line2)}
+/* 1行目がタイトル、2行目がチップ。AIの提案は薄いアクセント色の1行（DESIGN.md） */
+.ib{max-width:none}
+/* 空のときは件数や説明を出さず、真ん中に案内だけ置く */
+.ib-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:14vh 16px 40px;color:var(--ink3)}
+.ib-empty svg{color:var(--ink3);margin-bottom:4px}
+.ib-empty b{color:var(--ink);font-size:14px;font-weight:500}
+.ib-empty p{margin:0;font-size:12.5px;line-height:1.7}
+.ib-empty pre{margin:6px 0 0;padding:8px 14px;border-radius:var(--radius);background:var(--sunk);color:var(--ink2);
+  font-family:var(--f);font-size:12.5px;line-height:1.7;text-align:left}
+.ib-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ib-bar .n{color:var(--ink3);font-size:12px}
+.ib-all{margin-left:auto;height:28px;padding:0 12px;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);
+  font-size:12.5px;font-weight:500}
+.ib-all:hover{filter:brightness(1.08)}
+.ib-add input{width:100%;background:none;border:0;border-radius:var(--radius);
+  padding:7px 10px;font-size:13px;color:var(--ink);margin-bottom:4px}
+.ib-add input::placeholder{color:var(--ink3)}
+.ib-add input:hover{background:var(--hover)}
+.ib-add input:focus{outline:none;background:var(--sunk)}
+.ib-row{padding:8px 10px 10px;border-top:1px solid var(--line2);border-radius:0;cursor:default}
 .ib-row:hover{background:var(--hover)}
-.ib-line{display:flex;align-items:center;gap:12px}
-.ib-ctl{flex-wrap:wrap;gap:10px;margin-top:8px;padding-left:5px}
-.ib-title{flex:1;min-width:0;background:none;border:0;font-size:17px;color:var(--ink);padding:4px 5px;border-radius:5px}
+.ib-row.cur{background:var(--hover);box-shadow:inset 2px 0 0 var(--accent)}
+.ib-line{display:flex;align-items:center;gap:10px}
+.ib-ctl{flex-wrap:wrap;gap:6px;margin-top:4px;padding-left:6px}
+.ib-title{flex:1;min-width:0;background:none;border:0;font-size:13px;font-weight:500;color:var(--ink);padding:4px 6px;border-radius:5px}
+.ib-title:hover{background:var(--sunk)}
 .ib-title:focus{outline:none;background:var(--sunk)}
-.ib-when{font-size:14px;color:var(--ink3);flex:none;font-variant-numeric:tabular-nums}
-.ib-sel,.ib-f input{font-size:15px;border:1px solid var(--line);border-radius:7px;padding:6px 9px;
-  background:var(--field);color:var(--ink2);font-family:inherit}
-.ib-sel{max-width:300px}
-.ib-sel:disabled{opacity:.5}
-.ib-f{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink3)}
-.ib-f input[type=number]{width:84px}
-.ib-go{font-size:15px;padding:7px 15px;border-radius:7px;background:var(--accent);color:var(--on-accent);font-weight:600}
-.ib-go:disabled{background:var(--sunk);color:var(--ink3);cursor:default}
-.ib-del{flex:none;color:var(--ink3);padding:3px 8px;border-radius:6px;font-size:16px}
+.ib-when{font-size:12px;color:var(--ink3);flex:none;font-variant-numeric:tabular-nums}
+.ib-go{height:22px;padding:0 10px;border-radius:5px;font-size:12px;font-weight:500;color:var(--accent);margin-left:2px}
+.ib-go:hover{background:var(--accent-bg)}
+.ib-go:disabled{color:var(--ink3);background:none;cursor:default}
+.ib-del{flex:none;color:var(--ink3);width:24px;height:24px;display:grid;place-items:center;border-radius:5px;opacity:0}
+.ib-row:hover .ib-del,.ib-row.cur .ib-del{opacity:1}
 .ib-del:hover{background:var(--red-bg);color:var(--red)}
-.ib-hint{font-size:14px;color:var(--ink3);padding:12px 5px;line-height:1.7}
+.ib-sg{flex-wrap:wrap;gap:6px 10px;margin:8px 0 0 6px;padding:5px 6px 5px 10px;border-radius:var(--radius);
+  background:var(--accent-bg);font-size:12.5px}
+.ib-sg-tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--accent);flex:none}
+.ib-sg-to{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500;min-width:0}
+.ib-sg-to .proj-tag{color:var(--ink);font-size:12.5px}
+.ib-sg-new{font-size:11px;padding:0 5px;border-radius:4px;border:1px solid var(--accent);color:var(--accent);font-weight:500}
+.ib-sg-why{color:var(--ink2);flex:1;min-width:140px}
+.ib-sg-subs{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:2px 0 2px 18px}
+.ib-sg-subs span{height:22px;padding:0 8px;border-radius:5px;background:var(--panel);color:var(--ink);font-size:12px;
+  display:inline-flex;align-items:center;gap:6px}
+.ib-sg-subs i{font-style:normal;color:var(--ink3);font-variant-numeric:tabular-nums}
+.ib-sg-subs em{font-style:normal;color:var(--ink3);font-size:12px;margin-left:4px}
+.ib-sg-go{margin-left:auto;height:24px;padding:0 10px;border-radius:5px;background:var(--accent);color:var(--on-accent);font-size:12px;font-weight:500}
+.ib-sg-go:hover{filter:brightness(1.08)}
+.ib-sg-no{width:24px;height:24px;display:grid;place-items:center;border-radius:5px;color:var(--ink3)}
+.ib-sg-no:hover{color:var(--ink);background:var(--panel)}
+.ib-keys{display:flex;flex-wrap:wrap;gap:6px 16px;padding:14px 6px;font-size:12px;color:var(--ink3);border-top:1px solid var(--line2)}
+.ib-keys kbd{font-family:var(--f);font-size:11px;padding:0 5px;border:1px solid var(--line);border-radius:4px;color:var(--ink2);background:var(--panel)}
+.ib-hint{font-size:12px;color:var(--ink3);padding:4px 6px 12px;line-height:1.7}
 .ib-swatch{background:var(--ink)!important;border-radius:50%!important}
-.pitem .ct.ib-ct{color:var(--accent);font-weight:700}
+.pitem .ct.ib-ct{color:var(--accent);font-weight:600}
+/* ---------- ミッション ---------- */
+.ms{display:flex;flex-direction:column;gap:12px;max-width:1080px}
+.ms-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;color:var(--ink3);font-size:12.5px;padding:2px 2px 4px}
+.ms-top b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.ms-top a{margin-left:auto;color:var(--accent);text-decoration:none}
+.ms-top a:hover{text-decoration:underline}
+.ms-card{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.ms-h{display:flex;align-items:baseline;gap:12px}
+.ms-h h3{margin:0;font-size:14px;font-weight:600;flex:1;min-width:0}
+.ms-w{font-size:12px;color:var(--ink3);flex:none}
+.ms-nums{display:flex;flex-wrap:wrap;gap:8px 28px}
+.ms-nums div{display:flex;align-items:baseline;gap:6px}
+.ms-nums b{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.ms-nums span{font-size:12px;color:var(--ink3)}
+.ms-bar{position:relative;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;flex:1;min-width:60px}
+.ms-card>.ms-bar{flex:none}
+.ms-bar span{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.ms-bar .fc{background:var(--accent-bg)}
+.ms-bar .ac{background:var(--accent)}
+.ms-trend{display:flex;align-items:flex-end;gap:3px;height:28px}
+.ms-trend span{width:10px;height:100%;display:flex;align-items:flex-end;background:var(--sunk);border-radius:2px}
+.ms-trend i{display:block;width:100%;background:var(--accent);border-radius:2px}
+.ms-trend em{font-style:normal;font-size:11.5px;color:var(--ink3);margin-left:6px;align-self:center}
+.ms-team{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:var(--radius);background:var(--sunk)}
+.ms-team div{display:flex;align-items:center;gap:10px;font-size:12.5px}
+.ms-team .nm{width:96px;flex:none}
+.ms-team .ms-bar{background:var(--panel)}
+.ms-team .v{width:52px;text-align:right;font-variant-numeric:tabular-nums}
+.ms-team .miss{font-size:11.5px;color:var(--amber);width:72px}
+.ms-cm{font-size:12.5px;color:var(--ink2);white-space:pre-wrap;line-height:1.7;border-left:2px solid var(--line);padding-left:10px}
+.ms-tasks{display:flex;flex-wrap:wrap;gap:6px}
+.ms-t{height:24px;padding:0 9px;border-radius:5px;background:var(--sunk);font-size:12px;color:var(--ink)}
+.ms-t:hover{background:var(--hover);box-shadow:inset 0 0 0 1px var(--line)}
+.ms-t.done{color:var(--ink3);text-decoration:line-through}
+.ms-cr summary{font-size:12px;color:var(--ink3);cursor:pointer}
+.ms-cr pre{margin:6px 0 0;font-family:var(--f);font-size:12.5px;color:var(--ink2);white-space:pre-wrap;line-height:1.7}
+/* ---------- 評価 ---------- */
+.ev{display:flex;flex-direction:column;gap:20px;max-width:1080px}
+.ev-h{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.ev-h h3{margin:0;font-size:13px;font-weight:600}
+.ev-h span{font-size:12px;color:var(--ink3)}
+.ev-card{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);padding:10px 12px;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.ev-line{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ev-src{font-size:12px;color:var(--ink3);text-decoration:none;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+a.ev-src:hover{color:var(--accent);text-decoration:underline}
+.ev-act{margin-left:auto;display:flex;align-items:center;gap:4px}
+.ev-ok{height:24px;padding:0 12px;border-radius:5px;background:var(--accent);color:var(--on-accent);font-size:12px;font-weight:500}
+.ev-ok:hover{filter:brightness(1.08)}
+.ev-no{width:24px;height:24px;display:grid;place-items:center;border-radius:5px;color:var(--ink3)}
+.ev-no:hover{background:var(--red-bg);color:var(--red)}
+.ev-note{width:100%;background:none;border:0;border-radius:5px;padding:5px 6px;font-size:13px;color:var(--ink)}
+.ev-note:hover{background:var(--hover)}
+.ev-note:focus{outline:none;background:var(--sunk)}
+.ev-t{display:flex;gap:8px;align-items:flex-start}
+.ev-t span{flex:none;width:92px;font-size:12px;color:var(--ink3);padding-top:5px}
+.ev-t textarea{flex:1;min-width:0;background:none;border:0;border-radius:5px;padding:4px 6px;font:inherit;font-size:12.5px;color:var(--ink);resize:vertical;line-height:1.7}
+.ev-t textarea:hover{background:var(--hover)}
+.ev-t textarea:focus{outline:none;background:var(--sunk)}
+.ev-area{font-size:12px;color:var(--ink3);font-weight:500;padding:10px 4px 4px}
+.ev-row{border-top:1px solid var(--line2)}
+.ev-head{display:flex;align-items:center;gap:14px;width:100%;height:36px;padding:0 8px;text-align:left;border-radius:var(--radius)}
+.ev-head:hover{background:var(--hover)}
+.ev-head .nm{flex:1;min-width:0;font-weight:500}
+.ev-cnt{font-size:12px;color:var(--ink3);width:48px;text-align:right}
+.ev-cnt b{color:var(--ink);font-weight:600;font-size:13px;margin-right:2px;font-variant-numeric:tabular-nums}
+.ev-lv3{font-size:11.5px;height:20px;padding:0 7px;border-radius:5px;display:inline-flex;align-items:center;background:var(--accent-bg);color:var(--accent);width:52px;justify-content:center}
+.ev-lv3.none{background:var(--amber-bg);color:var(--amber)}
+.ev-trend{display:flex;gap:3px;width:120px;justify-content:flex-end}
+.ev-trend i{font-style:normal;width:20px;height:20px;border-radius:4px;background:var(--sunk);color:var(--ink2);font-size:11.5px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.ev-boss{font-size:12px;color:var(--ink3);width:52px;text-align:right}
+.ev-body{padding:4px 8px 14px 8px;display:flex;flex-direction:column;gap:8px}
+.ev-focus{font-size:12.5px;color:var(--ink2);line-height:1.7}
+.ev-focus b{font-weight:600;color:var(--ink);margin-right:8px}
+.ev-focus pre{margin:4px 0 0;font-family:var(--f);white-space:pre-wrap;color:var(--ink3);font-size:12px}
+.ev-none{font-size:12.5px;color:var(--ink3);padding:6px 0}
+.ev-new{align-self:flex-start;height:26px;padding:0 10px;border-radius:5px;color:var(--ink2);font-size:12.5px}
+.ev-new:hover{background:var(--hover);color:var(--ink)}
+/* ---------- ピッカー（標準の select・日付・数値の代わりのチップとメニュー） ---------- */
+.pk-src{display:none!important}
+.pk{height:22px;max-width:260px;padding:0 8px;border-radius:5px;background:var(--sunk);color:var(--ink2);
+  display:inline-flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap;flex:none;
+  font-variant-numeric:tabular-nums;justify-self:start;vertical-align:middle}
+.pk span{overflow:hidden;text-overflow:ellipsis}
+.pk:hover,.pk.on{color:var(--ink);background:color-mix(in srgb,var(--sunk) 70%,var(--line))}
+.pk:focus-visible{outline:none;box-shadow:0 0 0 1px var(--accent)}
+.pk.pk-empty{background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--ink3)}
+.pk.pk-empty:hover,.pk.pk-empty.on{color:var(--ink2);background:var(--hover)}
+.pk:disabled{opacity:.45;cursor:default}
+.pk svg{flex:none;opacity:.6}
+.pk.over{color:var(--red);background:var(--red-bg)}
+.pk.today{color:var(--amber);background:var(--amber-bg)}
+.pk.soon{color:var(--accent);background:var(--accent-bg)}
+.fields .pk{height:26px;font-size:12.5px}
+.pk-pop{position:fixed;z-index:200;min-width:200px;max-width:320px;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;box-shadow:var(--shadow);padding:4px;font-size:12.5px;outline:none}
+.pk-q{width:100%;border:0;background:none;padding:6px 8px 8px;color:var(--ink);border-bottom:1px solid var(--line2);
+  margin-bottom:4px;outline:none;font-size:12.5px}
+.pk-list{max-height:300px;overflow-y:auto}
+.pk-opt{display:flex;align-items:center;gap:8px;width:100%;height:28px;padding:0 8px;border-radius:5px;color:var(--ink2);text-align:left}
+.pk-opt span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-opt.act{background:var(--sunk);color:var(--ink)}
+.pk-opt.cur{color:var(--ink);font-weight:500}
+.pk-opt.cur svg{color:var(--accent)}
+.pk-opt:disabled{opacity:.45}
+.pk-none{padding:8px;color:var(--ink3)}
+.pk-cal-h{display:flex;align-items:center;gap:2px;padding:4px 4px 6px 8px}
+.pk-cal-h b{flex:1;font-weight:500;color:var(--ink)}
+.pk-cal-h button{width:26px;height:26px;border-radius:5px;color:var(--ink2);font-size:15px}
+.pk-cal-h button:hover{background:var(--sunk);color:var(--ink)}
+.pk-wk,.pk-days{display:grid;grid-template-columns:repeat(7,30px);gap:2px;padding:0 4px}
+.pk-wk span{text-align:center;font-size:11px;color:var(--ink3);padding:2px 0}
+.pk-day{height:28px;border-radius:5px;color:var(--ink);font-variant-numeric:tabular-nums;font-size:12px}
+.pk-day:hover{background:var(--sunk)}
+.pk-day.out{color:var(--ink3)}
+.pk-day.today{box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent)}
+.pk-day.cur{background:var(--accent);color:var(--on-accent)}
+.pk-quick{display:flex;flex-wrap:wrap;gap:4px;padding:8px 4px 4px;margin-top:4px;border-top:1px solid var(--line2)}
+.pk-quick button,.pk-clear{height:24px;padding:0 8px;border-radius:5px;background:var(--sunk);color:var(--ink2);font-size:12px}
+.pk-quick button:hover,.pk-clear:hover{color:var(--ink)}
+.pk-clear{margin-left:auto;flex:none;white-space:nowrap;background:none;color:var(--ink3)}
+.pk-est{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.pk-est .pk-opt{justify-content:center;font-variant-numeric:tabular-nums}
+.pk-numin{display:flex;align-items:center;gap:4px;margin-top:4px;border-top:1px solid var(--line2);padding-top:4px}
+.pk-numin .pk-q{flex:1;min-width:0;width:auto;border:0;margin:0;padding:6px 8px}
 /* ---------- 左上の名前・アイコン ---------- */
 .brand{display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:.02em;
-  font-size:13.5px;color:var(--ink);font-weight:700}
+  font-size:13.5px;color:var(--ink);font-weight:600}
 .brand-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ico{display:inline-grid;place-items:center;border-radius:6px;flex:none;overflow:hidden;line-height:1}
 .ico img{width:100%;height:100%;object-fit:cover;display:block}
@@ -732,9 +880,9 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .set{display:flex;flex-direction:column;gap:14px}
 .set-sec{border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .set-sec-h{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sunk);border-bottom:1px solid var(--line2)}
-.set-sec-i{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--main);color:#fff;flex:none}
+.set-sec-i{display:grid;place-items:center;width:32px;height:32px;border-radius:var(--radius);background:var(--accent-bg);color:var(--accent);flex:none}
 .set-svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.set-sec-t{font-size:14.5px;font-weight:700;color:var(--ink)}
+.set-sec-t{font-size:14.5px;font-weight:600;color:var(--ink)}
 .set-sec-n{font-size:12px;color:var(--ink2);margin-top:1px}
 .set-sec-b{padding:14px 16px 16px}
 .set-grid{display:grid;grid-template-columns:84px 1fr;gap:14px 14px;align-items:start}
@@ -742,14 +890,14 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .set-preview{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:14px;
   border-radius:10px;border:1px dashed var(--line)}
 .set-preview .ico{border-radius:9px}
-.set-preview-name{font-size:16px;font-weight:700}
+.set-preview-name{font-size:16px;font-weight:600}
 .set-l{font-size:13px;color:var(--ink2);font-weight:600}
 .set-in{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 11px;
   color:var(--ink);font-size:13.5px;font-family:inherit}
 .set-in:focus{outline:none;border-color:var(--accent)}
 .set-tabs{display:inline-flex;gap:4px;padding:3px;border-radius:999px;background:var(--sunk);margin-bottom:10px}
 .set-tabs button{padding:5px 16px;border-radius:999px;color:var(--ink2);font-size:12.5px}
-.set-tabs button.on{background:var(--panel);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.set-tabs button.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .set-emojis{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .set-emojis button{width:36px;height:36px;border-radius:8px;font-size:19px;border:1px solid var(--line);background:var(--field)}
 .set-emojis button:hover{border-color:var(--ink3)}
@@ -767,7 +915,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
   border:1px solid var(--line);background:var(--field);color:var(--ink2);font-size:13px}
 .set-themes button .set-svg{width:22px;height:22px}
 .set-themes button:hover{border-color:var(--ink3)}
-.set-themes button.on{border:2px solid var(--main);color:var(--ink);font-weight:700;padding:13px 7px}
+.set-themes button.on{border:2px solid var(--accent);color:var(--ink);font-weight:600;padding:13px 7px}
 .set-row{display:flex;align-items:center;gap:10px}
 .set-colors{margin-top:16px}
 .set-colors .set-note{margin-top:6px}
@@ -786,8 +934,13 @@ button{cursor:pointer;background:none;border:0;padding:0}
         <span id="storeText">読み込み中</span>
         <button id="storeBtn" hidden></button>
       </div>
+      <div class="sync-row">
+        <button class="sync-btn" id="btnSync" title="Google カレンダーへの反映・会議の取り込み・Slack の DM から inbox への取り込みをまとめてやる（1〜2分）"></button>
+        <span class="sync-when" id="syncWhen"></span>
+      </div>
     </div>
     <div class="side-scroll">
+      <nav id="viewList"></nav>
       <div class="side-label">プロジェクト <button id="addProj" title="プロジェクトを追加">＋</button></div>
       <nav id="projList"></nav>
     </div>
@@ -800,17 +953,15 @@ button{cursor:pointer;background:none;border:0;padding:0}
     <div class="top">
       <div class="top-search">
         <input class="search" id="search" type="search" placeholder="検索  /">
-        <button class="sync-btn" id="btnSync" title="Google カレンダーへの反映・会議の取り込み・Slack の DM から inbox への取り込みをまとめてやる（1〜2分）">Claude で同期</button>
       </div>
       <div class="top-row">
         <input class="title" id="projTitle" aria-label="プロジェクト名">
         <span class="spacer"></span>
-        <button class="cal-btn" id="btnWeek" title="週カレンダーを開いて、タスクを時間に置く">カレンダーに追加</button>
         <button class="iconbtn" id="btnCollapse" title="すべて折りたたむ">⇕</button>
       </div>
       <div class="vswitch" id="vswitch">
-        <button data-view="list">リスト</button>
         <button data-view="board">Backlog</button>
+        <button data-view="list">リスト</button>
       </div>
       <div class="chips" id="chips"></div>
       <div class="fnote" id="filterNote" hidden></div>
@@ -851,6 +1002,12 @@ const LS_DATA = 'inc.take.backlog.data';
 const LS_UI   = 'inc.take.backlog.ui';
 /* サイドバーの inbox を選んでいるときの UI.project */
 const INBOX_P = '~inbox';
+/* サイドバーの「ミッション」を選んでいるときの UI.project */
+const MIS_P = '~mission';
+/* サイドバーの「評価」を選んでいるときの UI.project */
+const EV_P = '~eval';
+/* inbox とミッションは、プロジェクトではない独立したページ */
+const isPage = pid => pid === INBOX_P || pid === MIS_P || pid === EV_P;
 
 /* Slack リスト「task backlog_たけしま」の選択肢に合わせてある。
    セクション名がこのラベルと一致するとき、セクションとステータスは連動する。 */
@@ -898,7 +1055,7 @@ function hoursBadge(t){
 const colorOf = v => COLORS.includes(v) ? v : '';
 const colorFg = v => colorOf(v) ? 'var(--sc-' + v + ')' : 'var(--ink3)';
 /* プロジェクトの札の色。色が未設定ならグレー */
-const projTagStyle = v => 'color:var(--sc-' + (colorOf(v) || 'gray') + ');background:var(--sc-' + (colorOf(v) || 'gray') + '-bg)';
+const projTagStyle = v => '--pc:var(--sc-' + (colorOf(v) || 'gray') + ')';
 /* 横断ビューの区切りは実体が無いので、同じ名前のセクションが持つ色を借りる */
 function colorForSectionName(name){
   for(const p of S.projects)
@@ -943,6 +1100,13 @@ function dueClass(iso){
 /* =========================================================================
    State
    ========================================================================= */
+function normEpisode(x){
+  /* note … 何があったかの1行メモ。評価シートの文章（［経緯・目的］［行動・結果］）は期末にまとめて書く。
+     前の形（context / action）で届いたものは、行動・結果をメモの代わりにする */
+  return {id: x.id || uid('e_'), date: x.date || '', item: String(x.item || ''), level: x.level === '2' ? '2' : '3',
+          note: String(x.note || x.action || ''),
+          source: x.source && typeof x.source === 'object' ? {type: x.source.type || '', ref: x.source.ref || '', url: x.source.url || ''} : {type: 'manual', ref: '', url: ''}};
+}
 function blankState(){
   const pid = uid('p_');
   return {
@@ -971,12 +1135,18 @@ function normalize(st){
     inbox: (Array.isArray(st.inbox) ? st.inbox : [])
       .filter(x => x && x.title)
       .map(x => ({id: x.id || uid('i_'), title: String(x.title), receivedAt: x.receivedAt || '', src: x.src || '',
-                   pid: x.pid || '', parent: x.parent || '', due: x.due || '', estimate: normEstimate(x.estimate)})),
+                   pid: x.pid || '', parent: x.parent || '', due: x.due || '', estimate: normEstimate(x.estimate),
+                   sgOff: !!x.sgOff})),
     inboxSeen: (Array.isArray(st.inboxSeen) ? st.inboxSeen : []).slice(-1000),
     /* eventMoves … ボードで動かした「自分だけの予定」。{eventId: {date, start, end, setAt}}。
        同期でカレンダーに反映されたら消える */
     eventMoves: Object.fromEntries(Object.entries(st.eventMoves && typeof st.eventMoves === 'object' ? st.eventMoves : {})
-      .filter(([, v]) => v && /^\d{4}-\d{2}-\d{2}$/.test(v.date || '') && /^\d{2}:\d{2}$/.test(v.start || '') && /^\d{2}:\d{2}$/.test(v.end || '')))
+      .filter(([, v]) => v && /^\d{4}-\d{2}-\d{2}$/.test(v.date || '') && /^\d{2}:\d{2}$/.test(v.start || '') && /^\d{2}:\d{2}$/.test(v.end || ''))),
+    /* episodes … 採用した評価エピソード。epInbox … Claude が拾った候補のうち、まだ決めていないもの。
+       epSeen … episodes.json から取り込み済みの id */
+    episodes: (Array.isArray(st.episodes) ? st.episodes : []).filter(x => x && x.item).map(normEpisode),
+    epInbox: (Array.isArray(st.epInbox) ? st.epInbox : []).filter(x => x && x.item).map(normEpisode),
+    epSeen: (Array.isArray(st.epSeen) ? st.epSeen : []).slice(-2000)
   };
   out.settings = normSettings(st.settings);
   out.projects = out.projects.map(p => ({
@@ -1015,6 +1185,7 @@ function normalize(st){
       createdAt: t.createdAt || new Date().toISOString(),
       completedAt: t.completedAt || null,
       prevStatus: STATUS.some(x => x[0] === t.prevStatus) ? t.prevStatus : '',
+      mission: typeof t.mission === 'string' ? t.mission : '',   /* ミッション管理シートのミッション名 */
       order: typeof t.order === 'number' ? t.order : (n += 1000)
     };
   });
@@ -1023,7 +1194,7 @@ function normalize(st){
 
 let S  = blankState();
 let UI = {project:'*', q:'', filter:'all', showDone:false, collapsed:{},
-          theme:'auto', view:'list', drafts:{}};
+          theme:'auto', view:'board', drafts:{}};
 let selected = null;
 let lastDeleted = null;
 
@@ -1034,7 +1205,7 @@ function loadUI(){
      タスクが消えたようにしか見えない。 */
   UI.filter = 'all';
   UI.q = '';
-  if(UI.view !== 'board' && UI.view !== 'week') UI.view = 'list';
+  if(UI.view !== 'list' && UI.view !== 'week') UI.view = 'board';   /* メインは Backlog */
   if(UI.theme === 'light' || UI.theme === 'dark') document.documentElement.dataset.theme = UI.theme;
 }
 function saveUI(){
@@ -1417,17 +1588,33 @@ function counts(){
 function renderSide(){
   const nav = $('#projList');
   const total = S.tasks.filter(t => !isDone(t)).length;
-  let html = `<div class="prow${UI.project===INBOX_P?' on':''}">
+  /* 週は「画面」なので、開いている間は週だけを選んだ状態に見せる（プロジェクトの絞り込みは残る） */
+  const inWeek = UI.view === 'week' && !isPage(UI.project);
+  const wk = weekDays();
+  $('#viewList').innerHTML = `<div class="prow${UI.project===INBOX_P?' on':''}">
       <button class="pitem" data-p="${INBOX_P}">
         <span class="swatch ib-swatch"></span>
         <span class="nm">inbox</span><span class="ct${S.inbox.length?' ib-ct':''}">${S.inbox.length}</span></button></div>
-    <div class="prow${UI.project==='*'?' on':''}">
+    <div class="prow${inWeek?' on':''}">
+      <button class="pitem" data-view="week" title="週カレンダーを開いて、タスクを時間に置く">
+        <span class="swatch" style="background:var(--accent)"></span>
+        <span class="nm">週</span><span class="ct">${wk[0].getMonth() + 1}/${wk[0].getDate()}–${wk[6].getDate()}</span></button></div>
+    <div class="prow${UI.project===MIS_P?' on':''}">
+      <button class="pitem" data-p="${MIS_P}" title="ミッション管理シートの進捗">
+        <span class="swatch" style="background:var(--green)"></span>
+        <span class="nm">ミッション</span><span class="ct">${misOverall() == null ? '' : misOverall() + '%'}</span></button></div>
+    <div class="prow${UI.project===EV_P?' on':''}">
+      <button class="pitem" data-p="${EV_P}" title="評価項目ごとのエピソード">
+        <span class="swatch" style="background:var(--amber)"></span>
+        <span class="nm">評価</span><span class="ct${S.epInbox.length?' ib-ct':''}">${S.epInbox.length || ''}</span></button></div>
+    <div class="prow${UI.project==='*' && !inWeek?' on':''}">
       <button class="pitem" data-p="*">
         <span class="swatch" style="background:var(--ink3)"></span>
         <span class="nm">すべてのタスク</span><span class="ct">${total}</span></button></div>`;
+  let html = '';
   for(const p of S.projects){
     const n = S.tasks.filter(t => t.projectId === p.id && !isDone(t)).length;
-    html += `<div class="prow${UI.project===p.id?' on':''}">
+    html += `<div class="prow${UI.project===p.id && !inWeek?' on':''}">
       <button class="pitem" data-p="${esc(p.id)}">
         <span class="swatch" style="background:${colorFg(p.color)}"></span>
         <span class="nm">${esc(p.name)}</span><span class="ct">${n}</span></button>
@@ -1486,21 +1673,29 @@ function renderTop(){
     renderTop(); renderList(); renderSide();
   };
   $$('#vswitch button').forEach(b => b.classList.toggle('on', b.dataset.view === UI.view));
-  const inWeek = UI.view === 'week' && UI.project !== INBOX_P;
-  $('#btnWeek').classList.toggle('back', inWeek);
-  $('#btnWeek').textContent = inWeek ? 'Backlog' : 'カレンダーに追加';
-  $('#btnWeek').title = inWeek ? 'Backlog に戻る' : '週カレンダーを開いて、タスクを時間に置く';
-  /* 同期ボタンは週カレンダーを開いているときだけ、Backlog ボタンの隣に出す */
   $('#btnSync').disabled = syncRunning();
-  $('#btnSync').textContent = syncRunning() ? '同期中…（1〜2分）' : 'Claude で同期';
+  $('#btnSync').innerHTML = IC_SYNC + (syncRunning() ? '同期中…（1〜2分）' : 'Claude で同期');
+  $('#syncWhen').textContent = syncRunning() ? '' : syncWhen();
   $('#btnCollapse').hidden = UI.view !== 'list';
+  if(UI.project === EV_P){
+    t.value = '評価'; t.readOnly = true;
+    $('#chips').hidden = true; note.hidden = true;
+    $('#vswitch').hidden = true; $('#btnCollapse').hidden = true;
+    return;
+  }
+  if(UI.project === MIS_P){
+    t.value = 'ミッション'; t.readOnly = true;
+    $('#chips').hidden = true; note.hidden = true;
+    $('#vswitch').hidden = true; $('#btnCollapse').hidden = true;
+    return;
+  }
   if(UI.project === INBOX_P){
     t.value = 'inbox'; t.readOnly = true;
     $('#chips').hidden = true; note.hidden = true;
     $('#vswitch').hidden = true; $('#btnCollapse').hidden = true;
     return;
   }
-  /* 週カレンダーは別ページのように見せたいので、リスト / Backlog のタブを隠す（戻るのは右上の Backlog ボタン） */
+  /* 週カレンダーは別ページのように見せたいので、リスト / Backlog のタブを隠す（戻るのはサイドバーのプロジェクトから） */
   $('#vswitch').hidden = UI.view === 'week';
   /* 週ビューの左のタスクバーは「未完了・時刻未定」に固定なので、チップは効かない */
   $('#chips').hidden = UI.view === 'week';
@@ -1536,7 +1731,7 @@ function rowHTML(t, opt){
   /* 工数: サブタスクがあるときは合計なので読み取りだけ。無ければその場で入力できる */
   if(subs) meta += hoursBadge(t);
   else meta += `<label class="row-est" title="工数（${EST_STEP}h 刻み）"><input type="number" data-act="rowest"
-    step="${EST_STEP}" min="0" max="100" value="${t.estimate == null ? '' : t.estimate}" placeholder="—"><span>h</span></label>`;
+    step="${EST_STEP}" min="0" max="100" value="${t.estimate == null ? '' : t.estimate}" placeholder="—"></label>`;
   /* 期日: 押すとカレンダーが開く。空でも欄は出す（ここから設定できるように） */
   meta += `<input type="date" class="row-due ${t.due && !done ? dc : ''}${t.due ? '' : ' nodue'}" data-act="rowdue"
     value="${esc(t.due)}" title="期日（クリックでカレンダー）">`;
@@ -1608,7 +1803,7 @@ function cardHTML(t, showProject){
   /* 工数・期日はリストの行と同じ欄。その場で変えられる */
   meta += subs ? hoursBadge(t)
     : '<label class="row-est" title="工数（' + EST_STEP + 'h 刻み）"><input type="number" data-act="rowest" step="' + EST_STEP +
-      '" min="0" max="100" value="' + (t.estimate == null ? '' : t.estimate) + '" placeholder="—"><span>h</span></label>';
+      '" min="0" max="100" value="' + (t.estimate == null ? '' : t.estimate) + '" placeholder="—"></label>';
   meta += '<input type="date" class="row-due ' + (t.due && !done ? dueClass(t.due) : '') + (t.due ? '' : ' nodue') +
     '" data-act="rowdue" value="' + esc(t.due) + '" title="期日（クリックでカレンダー）">';
   if(t.priority) meta += '<span class="badge b-pri-' + t.priority + '">' + priLabel(t.priority) + '</span>';
@@ -1689,10 +1884,10 @@ function renderList(){
   const el = $('#list');
   const pid = UI.project;
 
-  if(pid === INBOX_P){
+  if(isPage(pid)){
     el.hidden = false; $('#week').hidden = true;
     el.classList.remove('board-mode');
-    renderInbox(el); return;
+    ({[INBOX_P]: renderInbox, [MIS_P]: renderMissions, [EV_P]: renderEval})[pid](el); return;
   }
   el.hidden = UI.view === 'week';
   $('#week').hidden = UI.view !== 'week';
@@ -1830,6 +2025,7 @@ function renderDrawer(){
       <label>プロジェクト</label><select data-act="d-proj">${projOpts}</select>
       <label>セクション</label><select data-act="d-sec">${secOpts}</select>
       <label>優先度</label><select data-act="d-pri">${prOpts}</select>
+      <label>ミッション</label><select data-act="d-mis">${misOpts(t)}</select>
       <label>工数</label>${estFieldHTML(t)}
       <label>期日</label><input type="date" data-act="d-due" value="${esc(t.due)}">
       <label>参照リンク</label><input type="url" data-act="d-url" value="${esc(t.url)}" placeholder="Slack / ドキュメントの URL">
@@ -2387,11 +2583,19 @@ function handleFile(file){
    イベント
    ========================================================================= */
 /* --- サイドバー --- */
-$('#projList').addEventListener('click', e => {
+/* 週カレンダーはサイドバーの「週」で開く。inbox から開いたら、すべてのタスクの週にする */
+$('.side-scroll').addEventListener('click', e => {
   if(e.target.dataset.act === 'pmenu'){ projectMenu(e.target.dataset.p); return; }
   const b = e.target.closest('.pitem'); if(!b) return;
+  selected = null;
+  if(b.dataset.view === 'week'){
+    if(isPage(UI.project)) UI.project = '*';
+    if(UI.view !== 'week') UI.lastView = UI.view;
+    UI.view = 'week'; saveUI(); renderAll(); loadCalendar(); return;
+  }
+  if(UI.view === 'week') UI.view = UI.lastView || 'board';
   UI.project = b.dataset.p; UI.q = ''; $('#search').value = '';
-  selected = null; saveUI(); renderAll();
+  saveUI(); renderAll();
 });
 
 /* プロジェクトの並べ替えと削除。削除するときは、中のタスクを必ず別プロジェクトへ移す。 */
@@ -2469,15 +2673,6 @@ $('#btnCollapse').onclick = () => {
 $('#projTitle').addEventListener('input', e => {
   const p = projById(UI.project); if(!p) return;
   p.name = e.target.value; save(); renderSide();
-});
-/* 週カレンダーはタブから外して、目立つボタンで開く。inbox からでも開ける（inbox の項目も置けるため） */
-/* 週カレンダーを開いている間は、同じボタンが「Backlog」（ハタラオレンジ）になり、押すと Backlog へ戻る */
-$('#btnWeek').addEventListener('click', () => {
-  if(UI.view === 'week' && UI.project !== INBOX_P){
-    UI.view = 'board'; saveUI(); renderAll(); return;
-  }
-  if(UI.project === INBOX_P) UI.project = '*';
-  UI.view = 'week'; saveUI(); renderAll(); loadCalendar();
 });
 $('#vswitch').addEventListener('click', e => {
   const b = e.target.closest('button'); if(!b) return;
@@ -2573,7 +2768,7 @@ list.addEventListener('change', e => {
   if(e.target.dataset.act !== 'addproj') return;
   UI.addProject = e.target.value; saveUI();
   /* 追加欄はどの区切りにも出るので、全部そろえる（再描画は入力を消すのでしない） */
-  $$('[data-act="addproj"]', list).forEach(sel => { sel.value = UI.addProject; });
+  $$('[data-act="addproj"]', list).forEach(sel => { sel.value = UI.addProject; pkSync(sel); });
 });
 
 list.addEventListener('keydown', e => {
@@ -2772,7 +2967,7 @@ $('#drClose').onclick = () => select(null);
    ポップアップ類（設定・確認・通知）の上で押したときも閉じない */
 document.addEventListener('mousedown', e => {
   if(!selected) return;
-  if(e.target.closest('#drawer, .row, .card, .wk-item, .wk-blk.task, #modalRoot, #toastRoot, #syncPop')) return;
+  if(e.target.closest('#drawer, .row, .card, .wk-item, .wk-blk.task, #modalRoot, #toastRoot, #syncPop, .pk-pop')) return;
   select(null);
   if(UI.view === 'week') renderWeek();
 });
@@ -2830,6 +3025,7 @@ $('#drBody').addEventListener('change', e => {
   }
   if(act === 'd-status'){ setStatus(t, v); save(); renderAll(); return; }
   if(act === 'd-pri'){ t.priority = v; save(); renderList(); return; }
+  if(act === 'd-mis'){ t.mission = v; save(); renderSide(); return; }
   if(act === 'subdone'){
     t.subtasks[+sub].done = e.target.checked;
     save(); renderList(); renderDrawer(); return;
@@ -3098,7 +3294,7 @@ async function loadCalendar(){
   if(a1 || a2) save();
   if(UI.view === 'week') renderWeek();
 }
-window.addEventListener('focus', () => { loadInbox(); if(UI.view === 'week') loadCalendar(); });
+window.addEventListener('focus', () => { loadInbox(); loadMissions(); loadEval(); if(UI.view === 'week') loadCalendar(); });
 
 /* --- 「Claude に同期を頼む」ボタン ---
    server.py が裏で Claude Code（コマンド版）に taskboard-sync を頼む。終わるまで数十秒〜数分。
@@ -3106,6 +3302,14 @@ window.addEventListener('focus', () => { loadInbox(); if(UI.view === 'week') loa
 let syncInfo = null;        // server.py の /api/sync の返事
 let syncTimer = null;
 const syncRunning = () => !!(syncInfo && syncInfo.state === 'running');
+const IC_SYNC = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 8a5 5 0 1 1-1.5-3.5M13 2.5v2.5h-2.5"/></svg>';
+/* 最後に同期が終わった時刻。今日なら時刻だけ */
+function syncWhen(){
+  const d = syncInfo && syncInfo.finishedAt ? new Date(syncInfo.finishedAt) : null;
+  if(!d || isNaN(d)) return '';
+  const hm = pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  return isoOf(d) === isoOf(new Date()) ? hm : (d.getMonth() + 1) + '/' + d.getDate() + ' ' + hm;
+}
 async function startSync(){
   try{
     /* 週カレンダーで今週・来週以外を見ていたら、その週も取り込んでもらう */
@@ -3132,7 +3336,7 @@ function pollSync(){
   syncTimer = setTimeout(async () => {
     try{ syncInfo = await (await fetch('/api/sync?ts=' + Date.now(), {cache: 'no-store'})).json(); }catch(e){}
     if(syncRunning()){ pollSync(); return; }
-    await loadCalendar(); await loadInbox();
+    await loadCalendar(); await loadInbox(); await loadMissions(); await loadEval();
     renderTop();
     if(UI.view === 'week') renderWeek();
     showSyncPop();
@@ -3141,7 +3345,8 @@ function pollSync(){
 /* 開いたときに裏で同期中なら、終わるのを待つ */
 (async () => {
   try{ syncInfo = await (await fetch('/api/sync?ts=' + Date.now(), {cache: 'no-store'})).json(); }catch(e){ return; }
-  if(syncRunning()){ renderTop(); pollSync(); }
+  renderTop();
+  if(syncRunning()) pollSync();
 })();
 $('#btnSync').addEventListener('click', () => { if(!syncRunning()) startSync(); });
 /* 同期の結果は「成功か、失敗ならその理由」だけ出す。
@@ -3585,6 +3790,9 @@ week.addEventListener('drop', e => {
    inbox.json に書く。この画面は inbox.json を読んで S.inbox に取り込むだけで、書かない。
    プロジェクトを選ぶと、そのプロジェクトの「未着手」に普通のタスクとして移る。
    ========================================================================= */
+/* inbox.json の各項目に Claude が書いた振り分け先の提案。{id: {pid, parent, newParent, reason}}。
+   tasks.json には持たない（書き手は Claude）ので、読むたびに作り直す */
+let IB_SUGGEST = {};
 async function loadInbox(){
   let doc;
   try{
@@ -3592,6 +3800,11 @@ async function loadInbox(){
     if(!r.ok) return;
     doc = await r.json();
   }catch(e){ return; }
+  const prev = JSON.stringify(IB_SUGGEST);
+  IB_SUGGEST = {};
+  for(const it of (doc && Array.isArray(doc.items) ? doc.items : []))
+    if(it && it.id && it.suggest && it.suggest.pid) IB_SUGGEST[it.id] = it.suggest;
+  if(JSON.stringify(IB_SUGGEST) !== prev && UI.project === INBOX_P) renderList();
   const seen = new Set(S.inboxSeen);
   let n = 0;
   for(const it of (doc && Array.isArray(doc.items) ? doc.items : [])){
@@ -3606,53 +3819,355 @@ async function loadInbox(){
   toast('inbox に ' + n + ' 件入りました');
 }
 
+/* =========================================================================
+   ミッション — ミッション管理シートの進捗
+   正本はシート。Claude（taskboard-sync）が mission_sync.py で読んで missions.json に書く。
+   この画面は読むだけ。タスクとのつながりは tasks.json の t.mission（ミッション名）に持つ
+   ========================================================================= */
+let MIS = null;
+async function loadMissions(){
+  try{
+    const r = await fetch('missions.json?ts=' + Date.now(), {cache: 'no-store'});
+    if(!r.ok) return;
+    MIS = await r.json();
+  }catch(e){ return; }
+  renderSide();
+  if(UI.project === MIS_P) renderList();
+}
+const misWeek = m => MIS ? (m.history || [])[MIS.weeks.indexOf(MIS.week)] || {} : {};
+/* 自分のミッション全体の進捗。ウェイトのあるミッションの、ウェイト×実績の加重平均 */
+function misOverall(){
+  if(!MIS) return null;
+  const ms = MIS.mine.filter(m => m.weight);
+  const w = ms.reduce((a, m) => a + m.weight, 0);
+  return w ? Math.round(ms.reduce((a, m) => a + m.weight * (misWeek(m).actual || 0), 0) / w) : null;
+}
+function misOpts(t){
+  const names = MIS ? MIS.mine.map(m => m.name) : [];
+  if(t.mission && !names.includes(t.mission)) names.push(t.mission);
+  return '<option value="">なし</option>' + names.map(n =>
+    '<option value="' + esc(n) + '"' + (t.mission === n ? ' selected' : '') + '>' + esc(n) + '</option>').join('');
+}
+const misPct = v => v == null ? '—' : (Math.round(v * 10) / 10) + '%';
+function misBar(actual, forecast){
+  return '<div class="ms-bar"><span class="fc" style="width:' + Math.min(100, forecast || 0) + '%"></span>' +
+    '<span class="ac" style="width:' + Math.min(100, actual || 0) + '%"></span></div>';
+}
+function renderMissions(el){
+  if(!MIS){
+    el.innerHTML = '<div class="ib"><div class="ib-empty"><b>ミッションはまだ読み込まれていません</b>' +
+      '<p>「Claude で同期」を押すと、ミッション管理シートから読み込みます。</p></div></div>';
+    return;
+  }
+  const d = new Date(MIS.week + 'T00:00');
+  const all = misOverall();
+  const cards = MIS.mine.map(m => {
+    const w = misWeek(m);
+    const tasks = S.tasks.filter(t => t.mission === m.name);
+    const done = tasks.filter(isDone).length;
+    const team = /ライターマネジメント/.test(m.name) && MIS.team;
+    const trend = (m.history || []).filter(h => h.actual != null || h.forecast != null);
+    return '<section class="ms-card">' +
+      '<div class="ms-h"><h3>' + esc(m.name) + '</h3>' +
+        '<span class="ms-w">' + (m.weight ? 'ウェイト ' + m.weight : 'ウェイト未設定') + '</span></div>' +
+      '<div class="ms-nums"><div><b>' + misPct(w.actual) + '</b><span>実績</span></div>' +
+        '<div><b>' + misPct(w.forecast) + '</b><span>着地見込</span></div>' +
+        (team ? '<div><b>' + misPct(team.weighted) + '</b><span>メンバーの加重平均</span></div>' : '') +
+        (tasks.length ? '<div><b>' + done + '/' + tasks.length + '</b><span>紐づくタスク</span></div>' : '') + '</div>' +
+      misBar(w.actual, w.forecast) +
+      (trend.length > 1 ? '<div class="ms-trend">' + trend.map(h =>
+        '<span title="' + h.week + '：実績 ' + misPct(h.actual) + '"><i style="height:' + Math.max(2, h.actual || 0) + '%"></i></span>').join('') +
+        '<em>' + trend.length + '週</em></div>' : '') +
+      (team ? '<div class="ms-team">' + team.members.map(p =>
+        '<div><span class="nm">' + esc(p.name) + '</span>' + misBar(p.weighted, 100) +
+        '<span class="v">' + misPct(p.weighted) + '</span>' +
+        (p.missing ? '<span class="miss">未入力 ' + p.missing + '件</span>' : '') + '</div>').join('') + '</div>' : '') +
+      (w.comment ? '<div class="ms-cm">' + esc(w.comment) + '</div>' : '') +
+      (tasks.length ? '<div class="ms-tasks">' + tasks.map(t =>
+        '<button class="ms-t' + (isDone(t) ? ' done' : '') + '" data-mt="' + esc(t.id) + '">' + esc(t.title) + '</button>').join('') + '</div>' : '') +
+      '<details class="ms-cr"><summary>達成基準</summary><pre>' + esc(m.criteria) + '</pre></details>' +
+    '</section>';
+  }).join('');
+  el.innerHTML = '<div class="ms">' +
+    '<div class="ms-top"><span>FY26下期</span><span>' + (d.getMonth() + 1) + '/' + d.getDate() + ' の週</span>' +
+      (all != null ? '<span>全体（加重平均） <b>' + all + '%</b></span>' : '') +
+      '<a href="https://docs.google.com/spreadsheets/d/' + esc(MIS.sheetId) + '/edit" target="_blank" rel="noopener">シートを開く</a></div>' +
+    cards +
+    '<div class="ib-hint">シートの数字は同期のときに読み込みます。週の実績・着地見込・コメントは、Claude に「ミッションの進捗を書いて」と頼むとシートに書き込みます。' +
+      'タスクは詳細の「ミッション」で紐づけます。</div>' +
+  '</div>';
+}
+list.addEventListener('click', e => {
+  const b = e.target.closest('[data-mt]'); if(!b) return;
+  select(b.dataset.mt);
+});
+
+/* =========================================================================
+   評価 — 評価項目ごとのエピソードのストック
+   評価項目と過去の評点は evaluation.json（評価シートから Claude が読む）。
+   エピソードの候補は episodes.json（Claude が Slack・会議・完了タスクから拾う）。
+   この画面はどちらも読むだけで、採用・却下・手書きのエピソードは tasks.json（S.episodes / S.epInbox）に持つ
+   ========================================================================= */
+let EVAL = null;
+const EV_FROM = '2026-10-01';     /* 今期（FY26下期）の始まり */
+let evOpen = '';                  /* ボードで開いている評価項目 */
+async function loadEval(){
+  try{
+    const r = await fetch('evaluation.json?ts=' + Date.now(), {cache: 'no-store'});
+    if(r.ok) EVAL = await r.json();
+  }catch(e){}
+  let doc = null;
+  try{
+    const r = await fetch('episodes.json?ts=' + Date.now(), {cache: 'no-store'});
+    if(r.ok) doc = await r.json();
+  }catch(e){}
+  const seen = new Set(S.epSeen);
+  let n = 0;
+  for(const it of (doc && Array.isArray(doc.items) ? doc.items : [])){
+    if(!it || !it.id || !it.item || seen.has(it.id)) continue;
+    S.epInbox.push(normEpisode(it)); S.epSeen.push(it.id); seen.add(it.id); n++;
+  }
+  if(n){ S.epSeen = S.epSeen.slice(-2000); save(); toast('評価エピソードの候補が ' + n + ' 件届きました'); }
+  renderSide();
+  if(UI.project === EV_P) renderList();
+}
+const evItems = () => EVAL ? EVAL.items : [];
+/* 直近の評点。期の名前に「_上長名」が付くもの（自己評価を除く）と「前回確定」は上長の評点、それ以外は自己評点 */
+const evIsBoss = period => period === '前回確定' || (/_/.test(period) && !/自己評価/.test(period));
+function evLastScores(it){
+  const hs = it.history.filter(h => h.score);
+  const selfs = hs.filter(h => !evIsBoss(h.period)), bosses = hs.filter(h => evIsBoss(h.period));
+  return {boss: bosses[bosses.length - 1], trend: selfs.slice(-5)};
+}
+function evItemOpts(cur){
+  return evItems().map(it => '<option value="' + esc(it.name) + '"' + (it.name === cur ? ' selected' : '') + '>' + esc(it.name) + '</option>').join('') ||
+    '<option value="' + esc(cur) + '">' + esc(cur) + '</option>';
+}
+const evLevelOpts = cur => ['2', '3'].map(l => '<option value="' + l + '"' + (cur === l ? ' selected' : '') + '>レベル' + l + '</option>').join('');
+function evSourceHTML(x){
+  const s = x.source || {};
+  const label = {slack: 'Slack', calendar: '会議', task: 'タスク', manual: '手書き'}[s.type] || s.type || '';
+  const text = esc(label + (s.ref ? '：' + s.ref : ''));
+  return s.url ? '<a class="ev-src" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + text + '</a>' : '<span class="ev-src">' + text + '</span>';
+}
+function evCard(x, inbox){
+  const id = esc(x.id), kind = inbox ? 'in' : 'ok';
+  return '<div class="ev-card" data-ev="' + id + '" data-evk="' + kind + '">' +
+    '<div class="ev-line">' +
+      '<select data-evf="item">' + evItemOpts(x.item) + '</select>' +
+      '<select data-evf="level">' + evLevelOpts(x.level) + '</select>' +
+      '<input type="date" data-evf="date" value="' + esc(x.date) + '">' +
+      evSourceHTML(x) +
+      (inbox ? '<span class="ev-act"><button class="ev-ok" data-evok="' + id + '">採用</button>' +
+                 '<button class="ev-no" data-evno="' + id + '" title="捨てる">' + IC_X + '</button></span>'
+             : '<span class="ev-act"><button class="ev-no" data-evdel="' + id + '" title="消す">' + IC_X + '</button></span>') +
+    '</div>' +
+    '<input class="ev-note" data-evf="note" value="' + esc(x.note) + '" placeholder="何があったか（1行）">' +
+  '</div>';
+}
+function renderEval(el){
+  const inbox = S.epInbox;
+  const mine = S.episodes.filter(x => x.date >= EV_FROM);
+  const items = evItems();
+  let areas = '';
+  let lastArea = '';
+  for(const it of items){
+    const eps = mine.filter(x => x.item === it.name);
+    const lv3 = eps.filter(x => x.level === '3').length;
+    const sc = evLastScores(it);
+    const open = evOpen === it.name;
+    if(it.area !== lastArea){ areas += '<div class="ev-area">' + esc(it.area) + '</div>'; lastArea = it.area; }
+    areas += '<div class="ev-row' + (open ? ' ev-open' : '') + (lv3 ? '' : ' gap') + '">' +
+      '<button class="ev-head" data-evitem="' + esc(it.name) + '">' +
+        '<span class="nm">' + esc(it.name) + '</span>' +
+        '<span class="ev-cnt"><b>' + eps.length + '</b>件</span>' +
+        '<span class="ev-lv3' + (lv3 ? '' : ' none') + '">Lv3 ' + lv3 + '</span>' +
+        '<span class="ev-trend">' + sc.trend.map(h => '<i title="' + esc(h.period) + '">' + esc(h.score) + '</i>').join('') + '</span>' +
+        '<span class="ev-boss">' + (sc.boss ? '確定 ' + esc(sc.boss.score) : '') + '</span>' +
+      '</button>' +
+      (open ? '<div class="ev-body">' +
+        ['3', '2'].map(l => it.levels[l] ? '<div class="ev-focus"><b>レベル' + l + '</b>' + esc(it.levels[l].focus) +
+          (it.levels[l].examples ? '<pre>' + esc(it.levels[l].examples) + '</pre>' : '') + '</div>' : '').join('') +
+        (eps.length ? eps.map(x => evCard(x, false)).join('') : '<div class="ev-none">今期のエピソードはまだありません</div>') +
+        '<button class="ev-new" data-evnew="' + esc(it.name) + '">＋ この項目のエピソードを書く</button>' +
+      '</div>' : '') +
+    '</div>';
+  }
+  el.innerHTML = '<div class="ev">' +
+    '<section><div class="ev-h"><h3>受け箱</h3><span>' + (inbox.length ? inbox.length + '件・Claude が拾った候補' : '新しい候補はありません') + '</span></div>' +
+      inbox.map(x => evCard(x, true)).join('') + '</section>' +
+    '<section><div class="ev-h"><h3>評価項目</h3><span>FY26下期 · 採用 ' + mine.length + '件 · 左の数字は今期のエピソード、右は過去の自己評点' +
+      '</span></div>' + (items.length ? areas : '<div class="ev-none">評価シートがまだ読み込まれていません。「Claude で同期」で読み込みます。</div>') + '</section>' +
+    '<div class="ib-hint">候補は1日1回、同期のときに Claude が Slack・会議・完了したタスクから拾います。期末に、採用したメモと出典から評価シートの文章をまとめて書きます。</div>' +
+  '</div>';
+}
+function evFind(id){
+  for(const [arr, k] of [[S.epInbox, 'in'], [S.episodes, 'ok']]){
+    const x = arr.find(y => y.id === id); if(x) return {x, arr, k};
+  }
+  return {};
+}
+list.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b || UI.project !== EV_P) return;
+  const d = b.dataset;
+  if(d.evitem){ evOpen = evOpen === d.evitem ? '' : d.evitem; renderList(); return; }
+  if(d.evok){
+    const i = S.epInbox.findIndex(x => x.id === d.evok); if(i < 0) return;
+    const x = S.epInbox.splice(i, 1)[0]; S.episodes.push(x);
+    save(); renderSide(); renderList(); toast('「' + x.item + '」に採用しました'); return;
+  }
+  if(d.evno || d.evdel){
+    const id = d.evno || d.evdel, {x, arr} = evFind(id); if(!x) return;
+    const at = arr.indexOf(x); arr.splice(at, 1);
+    save(); renderSide(); renderList();
+    toast(d.evno ? '候補を捨てました' : 'エピソードを消しました', '元に戻す', () => { arr.splice(at, 0, x); save(); renderSide(); renderList(); });
+    return;
+  }
+  if(d.evnew){
+    const today = isoOf(new Date());
+    S.episodes.push(normEpisode({id: uid('e_'), date: today, item: d.evnew, level: '3', source: {type: 'manual'}}));
+    save(); renderList(); return;
+  }
+});
+list.addEventListener('change', e => {
+  const f = e.target.dataset && e.target.dataset.evf; if(!f) return;
+  const card = e.target.closest('[data-ev]'); const {x} = evFind(card && card.dataset.ev); if(!x) return;
+  x[f] = e.target.value; save();
+  if(f === 'item' || f === 'level') renderList();
+});
+list.addEventListener('input', e => {
+  const f = e.target.dataset && e.target.dataset.evf; if(f !== 'note') return;
+  const card = e.target.closest('[data-ev]'); const {x} = evFind(card && card.dataset.ev); if(!x) return;
+  x[f] = e.target.value; save();
+});
+
 /* 振り分け先（プロジェクト・親タスク）と期日・工数は、移すまで inbox の項目に持っておく。
-   選びかけで画面を閉じても消えないようにするため */
+   選びかけで画面を閉じても消えないようにするため。
+   select・日付・数値の欄は、ピッカーがチップとメニューに見せ替える */
+const IC_X = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l8 8M12 4l-8 8"/></svg>';
+const IC_SPARK = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.4L14 7.5l-4.4 1.6L8 13.5 6.4 9.1 2 7.5l4.4-1.6z"/></svg>';
+let ibCur = '';      /* キーボードで選んでいる inbox の項目 */
 function renderInbox(el){
   const when = iso => {
     if(!iso) return '';
     const d = new Date(iso);
     return isNaN(d) ? '' : (d.getMonth() + 1) + '/' + d.getDate() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
   };
+  if(!S.inbox.some(x => x.id === ibCur)) ibCur = S.inbox.length ? S.inbox[0].id : '';
   const rows = S.inbox.map(x => {
     const id = esc(x.id);
     const projOpts = '<option value="">プロジェクト</option>' + S.projects.map(p =>
       '<option value="' + esc(p.id) + '"' + (x.pid === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('');
     const parents = x.pid ? S.tasks.filter(t => t.projectId === x.pid && !isDone(t))
       .sort((a, b) => a.order - b.order) : [];
-    const parentOpts = '<option value="">親タスクなし</option>' + parents.map(t =>
+    const parentOpts = '<option value="">親タスク</option>' + parents.map(t =>
       '<option value="' + esc(t.id) + '"' + (x.parent === t.id ? ' selected' : '') + '>' + esc(t.title || '（無題）') + '</option>').join('');
-    return '<div class="ib-row" data-ib="' + id + '">' +
+    const sg = ibSuggest(x);
+    const sgRow = !sg ? '' :
+      '<div class="ib-line ib-sg">' +
+        '<span class="ib-sg-tag">' + IC_SPARK + '提案</span>' +
+        '<span class="ib-sg-to"><span class="proj-tag" style="' + projTagStyle(sg.p.color) + '">' + esc(sg.p.name) + '</span> › ' +
+          (sg.breakdown.length ? '<span class="ib-sg-new">親タスク</span>サブタスク ' + sg.breakdown.length + ' 件に分ける'
+            : sg.parent ? esc(sg.parent.title || '（無題）') : sg.newParent ? '<span class="ib-sg-new">新規</span>' + esc(sg.newParent) : '親タスクなし') + '</span>' +
+        '<button class="ib-sg-go" data-ibsg="' + id + '">この案で移す</button>' +
+        '<button class="ib-sg-no" data-ibsgno="' + id + '" title="提案を消す">' + IC_X + '</button>' +
+        (sg.breakdown.length ? '<div class="ib-sg-subs">' + sg.breakdown.map(b =>
+            '<span>' + esc(b.title) + (b.estimate != null ? '<i>' + showHours(b.estimate) + '</i>' : '') + '</span>').join('') +
+          (sg.ref ? '<em>「' + esc(sg.ref) + '」を参考</em>' : '') + '</div>' : '') +
+      '</div>';
+    return '<div class="ib-row' + (x.id === ibCur ? ' cur' : '') + '" data-ib="' + id + '">' +
       '<div class="ib-line">' +
         '<input class="ib-title" data-ibt="' + id + '" value="' + esc(x.title) + '">' +
         '<span class="ib-when">' + when(x.receivedAt) + (x.src === 'slack' ? ' · Slack' : '') + '</span>' +
-        '<button class="ib-del" data-ibdel="' + id + '" title="消す">✕</button>' +
+        '<button class="ib-del" data-ibdel="' + id + '" title="消す">' + IC_X + '</button>' +
       '</div>' +
       '<div class="ib-line ib-ctl">' +
-        '<select class="ib-sel" data-ibf="pid" data-id="' + id + '">' + projOpts + '</select>' +
-        '<select class="ib-sel ib-parent" data-ibf="parent" data-id="' + id + '"' + (x.pid ? '' : ' disabled') + '>' + parentOpts + '</select>' +
-        '<label class="ib-f">期日<input type="date" data-ibf="due" data-id="' + id + '" value="' + esc(x.due || '') + '"></label>' +
-        '<label class="ib-f">工数<input type="number" min="0" step="' + EST_STEP + '" data-ibf="estimate" data-id="' + id + '"' +
-          ' value="' + (x.estimate != null ? x.estimate : '') + '" placeholder="h"></label>' +
+        '<select data-ibf="pid" data-id="' + id + '">' + projOpts + '</select>' +
+        '<select data-ibf="parent" data-id="' + id + '"' + (x.pid ? '' : ' disabled') + '>' + parentOpts + '</select>' +
+        '<input type="date" data-ibf="due" data-id="' + id + '" value="' + esc(x.due || '') + '">' +
+        '<input type="number" min="0" step="' + EST_STEP + '" data-ibf="estimate" data-id="' + id + '"' +
+          ' value="' + (x.estimate != null ? x.estimate : '') + '">' +
         '<button class="ib-go" data-ibgo="' + id + '"' + (x.pid ? '' : ' disabled') + '>' +
           (x.parent ? 'サブタスクにする' : '移す') + '</button>' +
       '</div>' +
+      sgRow +
     '</div>';
   }).join('');
+  const nSg = S.inbox.filter(x => ibSuggest(x)).length;
+  if(!rows){
+    el.innerHTML = '<div class="ib">' +
+      '<div class="ib-add"><input id="ibAdd" placeholder="＋ inbox に追加（Enter）"></div>' +
+      '<div class="ib-empty">' +
+        '<svg width="28" height="28" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2.5 9.5h3l1 2h3l1-2h3"/><path d="M3.5 3.5h9l1 6v3.5h-11V9.5z"/></svg>' +
+        '<b>inbox は空です</b>' +
+        '<p>自分宛てのSlack DMに「タスク」で始まるメッセージを送ると、<br>同期のときここに入ります。振り分け先は Claude が提案します。</p>' +
+        '<pre>タスク<br>CPP文言見直す<br>スクショABの数値確認</pre>' +
+      '</div></div>';
+    return;
+  }
   el.innerHTML = '<div class="ib">' +
+    '<div class="ib-bar"><span class="n">' + S.inbox.length + '件・振り分け待ち</span>' +
+      (nSg ? '<button class="ib-all" data-iball="1">提案をまとめて移す（' + nSg + '）</button>' : '') + '</div>' +
     '<div class="ib-add"><input id="ibAdd" placeholder="＋ inbox に追加（Enter）"></div>' +
-    (rows || '<div class="empty"><b>inbox は空です</b>Slack の自分宛てDMで、1行目を「タスク」にして送ると、同期のときここに入ります。</div>') +
-    '<div class="ib-hint">プロジェクトを選んで「移す」と、そのプロジェクトの「未着手」に入ります。' +
-      '親タスクも選ぶと、そのタスクのサブタスクになります。期日と工数は空のままでも移せます。' +
-      'DMは「タスク」の次の行から1行1件です。</div>' +
+    rows +
+    ('<div class="ib-keys"><span><kbd>↑</kbd> <kbd>↓</kbd> 選ぶ</span><span><kbd>Enter</kbd> 提案（なければ選んだ先）へ移す</span>' +
+      '<span><kbd>P</kbd> プロジェクト</span><span><kbd>D</kbd> 期日</span><span><kbd>E</kbd> 工数</span><span><kbd>X</kbd> 提案を消す</span><span><kbd>C</kbd> 追加</span></div>') +
+    '<div class="ib-hint">「移す」でプロジェクトの「未着手」へ。親タスクも選ぶとサブタスクになります。</div>' +
     '</div>';
 }
 
+/* 提案が今のボードでも通用するときだけ返す。親タスクが完了・削除済みなら、その提案は出さない */
+function ibSuggest(x){
+  const s = !x.sgOff && IB_SUGGEST[x.id]; if(!s) return null;
+  const p = projById(s.pid); if(!p) return null;
+  const parent = s.parent ? taskById(s.parent) : null;
+  if(s.parent && (!parent || isDone(parent) || parent.projectId !== p.id)) return null;
+  const breakdown = Array.isArray(s.breakdown) ? s.breakdown.filter(b => b && b.title) : [];
+  return {p, parent: breakdown.length ? null : parent, newParent: parent || breakdown.length ? '' : (s.newParent || ''),
+          breakdown, ref: s.ref || '', reason: s.reason || ''};
+}
+/* 提案どおりに移す。新しい親タスクの提案なら、その親を「未着手」に作ってからサブタスクにする。
+   同じ名前の親が同じプロジェクトにもうあれば（まとめて移したときなど）、それを使う。
+   分解の提案なら、項目そのものを親タスクにして、サブタスク案をまとめて作る（直すのは詳細で） */
+function inboxAccept(id, quiet){
+  const x = S.inbox.find(y => y.id === id); if(!x) return;
+  const sg = ibSuggest(x); if(!sg) return;
+  if(sg.breakdown.length){
+    inboxTake(id);
+    const t = addTask(sg.p.id, ensureStatusSection(sg.p, STATUS[0][1]).id, x.title);
+    if(t){
+      t.due = x.due || '';
+      t.subtasks = sg.breakdown.map(b => ({id: uid('k_'), title: String(b.title), done: false, due: '',
+                                           estimate: normEstimate(b.estimate), schedule: null}));
+    }
+    save();
+    if(!quiet){ toast('「' + x.title + '」をサブタスク ' + sg.breakdown.length + ' 件に分けて ' + sg.p.name + ' へ'); renderSide(); renderList(); }
+    return;
+  }
+  x.pid = sg.p.id; x.parent = sg.parent ? sg.parent.id : '';
+  if(sg.newParent){
+    const same = S.tasks.find(t => t.projectId === sg.p.id && !isDone(t) && t.title === sg.newParent);
+    const t = same || addTask(sg.p.id, ensureStatusSection(sg.p, STATUS[0][1]).id, sg.newParent);
+    if(t) x.parent = t.id;
+  }
+  inboxMove(id, quiet);
+}
+function inboxAcceptAll(){
+  const ids = S.inbox.filter(x => ibSuggest(x)).map(x => x.id);
+  if(!ids.length) return;
+  ids.forEach(id => inboxAccept(id, true));
+  save(); renderSide(); renderList();
+  toast(ids.length + ' 件を提案どおりに移しました');
+}
+function inboxDismiss(id){
+  const x = S.inbox.find(y => y.id === id); if(!x || !ibSuggest(x)) return;
+  x.sgOff = true; save(); renderList();
+}
 function inboxTake(id){
   const i = S.inbox.findIndex(x => x.id === id);
   return i < 0 ? null : S.inbox.splice(i, 1)[0];
 }
-function inboxMove(id){
+function inboxMove(id, quiet){
   const x = S.inbox.find(y => y.id === id); if(!x) return;
   const p = projById(x.pid); if(!p) return;
   const parent = x.parent ? taskById(x.parent) : null;
@@ -3661,14 +4176,14 @@ function inboxMove(id){
     parent.subtasks.push({id: uid('k_'), title: x.title, done: false, due: x.due || '',
                           estimate: normEstimate(x.estimate), schedule: null});
     save();
-    toast('「' + x.title + '」を「' + parent.title + '」のサブタスクに');
+    if(!quiet) toast('「' + x.title + '」を「' + parent.title + '」のサブタスクに');
   }else{
     const sec = ensureStatusSection(p, STATUS[0][1]);
     const t = addTask(p.id, sec.id, x.title);
     if(t){ t.due = x.due || ''; t.estimate = normEstimate(x.estimate); save(); }
-    toast('「' + x.title + '」を ' + p.name + ' へ');
+    if(!quiet) toast('「' + x.title + '」を ' + p.name + ' へ');
   }
-  renderSide(); renderList();
+  if(!quiet){ renderSide(); renderList(); }
 }
 list.addEventListener('change', e => {
   const f = e.target.dataset && e.target.dataset.ibf; if(!f) return;
@@ -3682,9 +4197,16 @@ list.addEventListener('change', e => {
   if(f === 'pid' || f === 'parent') renderList();     /* 親タスクの候補とボタンの文言が変わる */
 });
 list.addEventListener('click', e => {
-  const go = e.target.dataset && e.target.dataset.ibgo;
-  if(go){ inboxMove(go); return; }
-  const id = e.target.dataset && e.target.dataset.ibdel; if(!id) return;
+  /* ボタンの中はアイコン（svg）のこともあるので、押されたボタンから data を読む */
+  const b = e.target.closest('button');
+  const d = b ? b.dataset : {};
+  if(d.ibgo){ inboxMove(d.ibgo); return; }
+  if(d.ibsg){ inboxAccept(d.ibsg); return; }
+  if(d.ibsgno){ inboxDismiss(d.ibsgno); return; }
+  if(d.iball){ inboxAcceptAll(); return; }
+  const row = e.target.closest('.ib-row');
+  if(row && !b && row.dataset.ib !== ibCur) ibFocus(row.dataset.ib);
+  const id = d.ibdel; if(!id) return;
   const at = S.inbox.findIndex(x => x.id === id);
   const x = inboxTake(id); if(!x) return;
   save(); renderSide(); renderList();
@@ -3701,6 +4223,35 @@ list.addEventListener('keydown', e => {
     const a = $('#ibAdd'); if(a) a.focus();
   }else if(e.target.dataset && e.target.dataset.ibt){ e.target.blur(); }
 });
+/* inbox のキーボード操作。入力中・メニューが開いているときは何もしない */
+function ibFocus(id){
+  ibCur = id;
+  $$('.ib-row', list).forEach(r => r.classList.toggle('cur', r.dataset.ib === id));
+  const r = list.querySelector('.ib-row.cur'); if(r) r.scrollIntoView({block: 'nearest'});
+}
+document.addEventListener('keydown', e => {
+  if(UI.project !== INBOX_P || UI.view === 'week' || pkOpen || $('#modalRoot').innerHTML) return;
+  if(/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if(k === 'c'){ const a = $('#ibAdd'); if(a){ e.preventDefault(); a.focus(); } return; }
+  const i = S.inbox.findIndex(x => x.id === ibCur); if(i < 0) return;
+  const row = list.querySelector('.ib-row.cur');
+  const chip = f => { const el = row && row.querySelector('[data-ibf="' + f + '"]'); if(el && el._pk){ e.preventDefault(); pkOpenMenu(el._pk); } };
+  if(k === 'arrowdown' || k === 'j'){ e.preventDefault(); if(S.inbox[i + 1]) ibFocus(S.inbox[i + 1].id); }
+  else if(k === 'arrowup' || k === 'k'){ e.preventDefault(); if(S.inbox[i - 1]) ibFocus(S.inbox[i - 1].id); }
+  else if(k === 'enter'){
+    const x = S.inbox[i];
+    if(!ibSuggest(x) && !x.pid) return;
+    e.preventDefault();
+    const next = (S.inbox[i + 1] || S.inbox[i - 1] || {}).id || '';
+    if(ibSuggest(x)) inboxAccept(x.id); else inboxMove(x.id);
+    ibFocus(next);
+  }
+  else if(k === 'p') chip('pid');
+  else if(k === 'd') chip('due');
+  else if(k === 'e') chip('estimate');
+  else if(k === 'x'){ e.preventDefault(); inboxDismiss(ibCur); }
+});
 list.addEventListener('focusout', e => {
   const id = e.target.dataset && e.target.dataset.ibt; if(!id) return;
   const x = S.inbox.find(y => y.id === id); const v = e.target.value.trim();
@@ -3714,11 +4265,6 @@ list.addEventListener('focusout', e => {
 const ICON_BGS = [
   ['#6db52d', 'ハタラグリーン'], ['#f29419', 'ハタラオレンジ'], ['#2A6F97', '青'],
   ['#5B4A8A', '紫'], ['#5F5E5A', 'グレー'], ['', 'なし']
-];
-/* ボタンの色の候補。どれも白い文字が読める濃さにしてある */
-const BTN_COLORS = [
-  ['#6db52d', 'ハタラグリーン'], ['#f29419', 'ハタラオレンジ'], ['#2A6F97', '青'], ['#16897A', 'ティール'],
-  ['#5B4A8A', '紫'], ['#C0503C', '赤'], ['#5F5E5A', 'グレー']
 ];
 const ICON_EMOJIS = ['📋', '✅', '🗂️', '🌱', '🔥', '⚡', '🎯', '🚀', '☕', '🐣'];
 function normSettings(v){
@@ -3736,8 +4282,6 @@ function normSettings(v){
       bg: typeof ic.bg === 'string' ? ic.bg : '#6db52d'
     },
     theme: ['auto', 'light', 'dark'].includes(v.theme) ? v.theme : (UI && UI.theme) || 'auto',
-    mainColor: BTN_COLORS.some(c => c[0] === v.mainColor) ? v.mainColor : '#6db52d',
-    subColor: BTN_COLORS.some(c => c[0] === v.subColor) ? v.subColor : '#f29419',
     calStart: cs, calEnd: ce
   };
 }
@@ -3779,8 +4323,6 @@ function applySettings(){
   if(st.theme === 'auto') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = st.theme;
   WK_START_H = st.calStart; WK_END_H = st.calEnd;
-  document.documentElement.style.setProperty('--main', st.mainColor);
-  document.documentElement.style.setProperty('--sub', st.subColor);
 }
 /* 画像は 128px 四方に切り抜いて縮めてから持つ（tasks.json を太らせないため） */
 function shrinkImage(file){
@@ -3814,8 +4356,6 @@ function openSettings(){
     light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
     dark: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'
   };
-  const swatches = (k, cur) => '<div class="set-bgs" data-col="' + k + '">' + BTN_COLORS.map(([c, n]) =>
-    '<button data-c="' + c + '" title="' + n + '" class="' + (c === cur ? 'on' : '') + '" style="background:' + c + '"></button>').join('') + '</div>';
   const svg = k => '<svg class="set-svg" viewBox="0 0 24 24" aria-hidden="true">' + I[k] + '</svg>';
   const sec = (k, title, note, body) =>
     '<section class="set-sec"><div class="set-sec-h"><span class="set-sec-i">' + svg(k) + '</span>' +
@@ -3842,15 +4382,9 @@ function openSettings(){
           '<button data-bg="' + c + '" title="' + n + '" class="' + (c === draft.icon.bg ? 'on' : '') + '" style="background:' +
           (c || 'transparent') + '">' + (c ? '' : 'なし') + '</button>').join('') + '</div>' +
       '</div>') +
-    sec('look', '見た目', '画面の明るさと、ボタンの色',
+    sec('look', '見た目', '画面の明るさ',
       '<div class="set-themes" id="setThemes">' + [['auto', 'システムに合わせる'], ['light', 'ライト'], ['dark', 'ダーク']].map(([v, l]) =>
         '<button data-th="' + v + '" class="' + (draft.theme === v ? 'on' : '') + '">' + svg(v) + '<span>' + l + '</span></button>').join('') +
-      '</div>' +
-      '<div class="set-grid set-colors">' +
-        '<span class="set-l">メインカラー</span><div>' + swatches('main', draft.mainColor) +
-          '<div class="set-note">「カレンダーに追加」「Claude で同期」、設定の見出し</div></div>' +
-        '<span class="set-l">サブカラー</span><div>' + swatches('sub', draft.subColor) +
-          '<div class="set-note">週カレンダーを開いているときの「Backlog」</div></div>' +
       '</div>') +
     sec('cal', 'カレンダー', '週カレンダーの縦軸に出す時間（4時間以上）',
       '<div class="set-row">' +
@@ -3899,11 +4433,6 @@ function openSettings(){
     $$('#setBgs button').forEach(x => x.classList.toggle('on', x === b));
     preview();
   };
-  $$('[data-col]').forEach(box => box.onclick = e => {
-    const b = e.target.closest('[data-c]'); if(!b) return;
-    draft[box.dataset.col === 'main' ? 'mainColor' : 'subColor'] = b.dataset.c;
-    $$('button', box).forEach(x => x.classList.toggle('on', x === b));
-  });
   $('#setThemes').onclick = e => {
     const b = e.target.closest('[data-th]'); if(!b) return;
     draft.theme = b.dataset.th;
@@ -3924,6 +4453,203 @@ function openSettings(){
   };
 }
 $('#btnSettings').onclick = openSettings;
+
+/* =========================================================================
+   ピッカー — ブラウザ標準の select・日付・数値の入力を、チップとメニューに見せ替える
+   元の要素は隠して DOM に残す。選んだら値を入れて input と change を投げるので、
+   今ある受け手（data-act などで拾う処理）はそのまま動く。
+   描画で増えた要素は MutationObserver で拾うので、各画面の描画コードは標準の要素を書くだけでよい
+   ========================================================================= */
+const PK_SRC = 'select, input[type=date], input[type=number]';
+const PK_EST = [0.25, 0.5, 1, 1.5, 2, 3, 4, 6, 8];
+const IC_DOWN = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>';
+const IC_CHECK = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+const pkKind = el => el.tagName === 'SELECT' ? 'sel' : el.type === 'date' ? 'date' : 'num';
+let pkOpen = null;   /* 開いているメニュー {el, chip, pop} */
+
+function pkText(el){
+  const k = pkKind(el);
+  if(k === 'sel'){ const o = el.options[el.selectedIndex]; return o ? o.textContent : ''; }
+  if(k === 'date'){
+    if(!el.value) return /^着手日/.test(el.title || '') ? '着手日' : '期日';
+    const [y, m, d] = el.value.split('-').map(Number);
+    return (y === new Date().getFullYear() ? '' : y + '/') + m + '/' + d;
+  }
+  return el.value === '' ? '工数' : showHours(+el.value);
+}
+/* チップの文言・空かどうか・期日の色（元の要素の over / today / soon）を元の要素に合わせる */
+function pkSync(el){
+  const b = el._pk; if(!b) return;
+  const k = pkKind(el);
+  const due = k === 'date' ? ['over', 'today', 'soon'].filter(c => el.classList.contains(c)) : [];
+  b.className = ['pk', 'pk-' + k, el.value === '' ? 'pk-empty' : '', ...due].filter(Boolean).join(' ');
+  b.disabled = el.disabled;
+  b.innerHTML = '<span>' + esc(pkText(el)) + '</span>' + (k === 'sel' ? IC_DOWN : '');
+}
+function pkEnhance(root){
+  const els = root.matches(PK_SRC) ? [root] : $$(PK_SRC, root);
+  for(const el of els){
+    if(el._pk) continue;
+    const b = document.createElement('button');
+    b.type = 'button'; b._src = el; el._pk = b;
+    if(el.title) b.title = el.title;
+    el.classList.add('pk-src'); el.after(b); pkSync(el);
+  }
+}
+new MutationObserver(ms => {
+  for(const m of ms) for(const n of m.addedNodes)
+    if(n.nodeType === 1 && !n.classList.contains('pk')) pkEnhance(n);
+}).observe(document.body, {childList: true, subtree: true});
+pkEnhance(document.body);
+
+function pkSet(el, v){
+  el.value = v;
+  el.dispatchEvent(new Event('input', {bubbles: true}));
+  el.dispatchEvent(new Event('change', {bubbles: true}));
+  if(el.isConnected) pkSync(el);   /* 受け手が値を直したり、期日の色を変えたりしたあとに合わせる */
+}
+function pkClose(){
+  if(!pkOpen) return;
+  pkOpen.pop.remove(); pkOpen.chip.classList.remove('on');
+  const chip = pkOpen.chip; pkOpen = null;
+  if(chip.isConnected) chip.focus({preventScroll: true});
+}
+function pkOpenMenu(chip){
+  const el = chip._src; if(!el || el.disabled) return;
+  if(pkOpen && pkOpen.chip === chip){ pkClose(); return; }
+  pkClose();
+  const pop = document.createElement('div');
+  pop.className = 'pk-pop'; pop.tabIndex = -1;
+  document.body.appendChild(pop);
+  pkOpen = {el, chip, pop};
+  chip.classList.add('on');
+  /* メニューの中のキーとクリックは、外（行の選択・詳細を閉じる処理など）へ流さない */
+  pop.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){ e.preventDefault(); pkClose(); }
+    e.stopPropagation();
+  });
+  pop.addEventListener('click', e => e.stopPropagation());
+  ({sel: pkSelMenu, date: pkDateMenu, num: pkNumMenu})[pkKind(el)](pop, el);
+  pkPlace();
+  ($('.pk-q', pop) || pop).focus({preventScroll: true});
+}
+function pkPlace(){
+  const {chip, pop} = pkOpen;
+  const r = chip.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+  let y = r.bottom + 4;
+  if(y + h > innerHeight - 8) y = Math.max(8, r.top - h - 4);
+  pop.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
+  pop.style.top = y + 'px';
+}
+function pkChoose(el, v){
+  pkClose();
+  if(v !== el.value) pkSet(el, v);
+}
+
+/* 選択肢。8件以上なら上に絞り込みの欄を出す */
+function pkSelMenu(pop, el){
+  const many = el.options.length > 7;
+  pop.innerHTML = (many ? '<input class="pk-q" type="text" placeholder="絞り込む">' : '') + '<div class="pk-list"></div>';
+  const box = $('.pk-list', pop), q = $('.pk-q', pop);
+  let shown = [], act = 0;
+  const draw = () => {
+    box.innerHTML = shown.map((o, i) => {
+      const cur = o.value === el.value;
+      return '<button type="button" class="pk-opt' + (cur ? ' cur' : '') + (i === act ? ' act' : '') + '" data-i="' + i + '"' +
+        (o.disabled ? ' disabled' : '') + '><span>' + esc(o.textContent) + '</span>' + (cur ? IC_CHECK : '') + '</button>';
+    }).join('') || '<div class="pk-none">見つかりません</div>';
+    const a = $('.pk-opt.act', box); if(a) a.scrollIntoView({block: 'nearest'});
+  };
+  const filter = () => {
+    const w = q ? q.value.trim().toLowerCase() : '';
+    shown = Array.from(el.options).filter(o => !w || o.textContent.toLowerCase().includes(w));
+    act = w ? 0 : Math.max(0, shown.findIndex(o => o.value === el.value));
+    draw();
+  };
+  filter();
+  if(q) q.addEventListener('input', filter);
+  box.addEventListener('mousemove', e => {
+    const b = e.target.closest('.pk-opt'); if(!b || +b.dataset.i === act) return;
+    act = +b.dataset.i; $$('.pk-opt', box).forEach(x => x.classList.toggle('act', x === b));
+  });
+  box.addEventListener('click', e => {
+    const b = e.target.closest('.pk-opt'); if(b && !b.disabled) pkChoose(el, shown[+b.dataset.i].value);
+  });
+  pop.addEventListener('keydown', e => {
+    if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+      e.preventDefault();
+      act = Math.max(0, Math.min(shown.length - 1, act + (e.key === 'ArrowDown' ? 1 : -1))); draw();
+    }else if(e.key === 'Enter' && shown[act] && !shown[act].disabled){
+      e.preventDefault(); pkChoose(el, shown[act].value);
+    }
+  });
+}
+
+/* 日付。週は日曜始まり（週ビューと同じ） */
+function pkDateMenu(pop, el){
+  const iso = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const plus = n => { const d = new Date(today); d.setDate(d.getDate() + n); return iso(d); };
+  const base = el.value ? new Date(el.value + 'T00:00') : today;
+  let view = new Date(base.getFullYear(), base.getMonth(), 1);
+  const draw = () => {
+    const y = view.getFullYear(), m = view.getMonth();
+    const start = new Date(y, m, 1 - view.getDay());
+    let days = '';
+    for(let i = 0; i < 42; i++){
+      const d = new Date(start); d.setDate(start.getDate() + i);
+      const v = iso(d);
+      days += '<button type="button" class="pk-day' + (d.getMonth() !== m ? ' out' : '') + (v === iso(today) ? ' today' : '') +
+        (v === el.value ? ' cur' : '') + '" data-v="' + v + '">' + d.getDate() + '</button>';
+    }
+    pop.innerHTML = '<div class="pk-cal-h"><b>' + y + '年' + (m + 1) + '月</b>' +
+        '<button type="button" data-nav="-1" aria-label="前の月">‹</button><button type="button" data-nav="1" aria-label="次の月">›</button></div>' +
+      '<div class="pk-wk">' + '日月火水木金土'.split('').map(w => '<span>' + w + '</span>').join('') + '</div>' +
+      '<div class="pk-days">' + days + '</div>' +
+      '<div class="pk-quick"><button type="button" data-v="' + iso(today) + '">今日</button>' +
+        '<button type="button" data-v="' + plus(1) + '">明日</button>' +
+        '<button type="button" data-v="' + plus((8 - today.getDay()) % 7 || 7) + '">来週の月曜</button>' +
+        (el.value ? '<button type="button" class="pk-clear" data-v="">消す</button>' : '') + '</div>';
+  };
+  draw();
+  pop.addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    if(b.dataset.nav){ view = new Date(view.getFullYear(), view.getMonth() + +b.dataset.nav, 1); draw(); pkPlace(); return; }
+    if(b.dataset.v != null) pkChoose(el, b.dataset.v);
+  });
+}
+
+/* 工数。よく使う長さを並べ、ほかの長さは打てるようにする */
+function pkNumMenu(pop, el){
+  const cur = el.value === '' ? null : +el.value;
+  pop.innerHTML = '<div class="pk-est">' + PK_EST.map(h =>
+      '<button type="button" class="pk-opt' + (h === cur ? ' cur' : '') + '" data-v="' + h + '">' + showHours(h) + '</button>').join('') + '</div>' +
+    '<div class="pk-numin"><input class="pk-q" type="text" inputmode="decimal" placeholder="ほかの時間（h）" value="' +
+      (cur != null && !PK_EST.includes(cur) ? cur : '') + '">' +
+      (cur != null ? '<button type="button" class="pk-clear" data-v="">消す</button>' : '') + '</div>';
+  pop.addEventListener('click', e => {
+    const b = e.target.closest('button'); if(b && b.dataset.v != null) pkChoose(el, b.dataset.v);
+  });
+  $('.pk-q', pop).addEventListener('keydown', e => {
+    if(e.key !== 'Enter') return;
+    e.preventDefault();
+    const v = parseFloat(e.target.value.replace(/[^\d.]/g, ''));
+    if(!isNaN(v)) pkChoose(el, String(v));
+  });
+}
+
+/* チップを押したら開く。行の選択や、行の入力欄に向けた処理より先に拾う */
+document.addEventListener('click', e => {
+  const chip = e.target.closest && e.target.closest('.pk');
+  if(!chip) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  pkOpenMenu(chip);
+}, true);
+document.addEventListener('mousedown', e => {
+  if(pkOpen && !pkOpen.pop.contains(e.target) && !pkOpen.chip.contains(e.target)) pkClose();
+}, true);
+document.addEventListener('scroll', e => { if(pkOpen && !pkOpen.pop.contains(e.target)) pkClose(); }, true);
+window.addEventListener('resize', pkClose);
 
 /* --- 離脱前に確実に書き出す --- */
 window.addEventListener('beforeunload', () => { try{ localStorage.setItem(LS_DATA, JSON.stringify(S)); }catch(err){} });
@@ -3955,11 +4681,11 @@ window.addEventListener('beforeunload', () => { try{ localStorage.setItem(LS_DAT
     Store.paint('起動に失敗しました', 'warn', 'tasks.json を選ぶ', () => Store.connect());
     console.error(err);
   }
-  if(UI.project !== '*' && UI.project !== INBOX_P && !projById(UI.project)) UI.project = S.projects[0].id;
+  if(UI.project !== '*' && !isPage(UI.project) && !projById(UI.project)) UI.project = S.projects[0].id;
   applySettings();
   renderAll();
   loadCalendar();
-  loadInbox();
+  loadInbox(); loadMissions(); loadEval();
 })();
 </script>
 </body>
