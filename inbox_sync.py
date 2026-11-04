@@ -24,10 +24,12 @@ Slack で自分に来た依頼（DM・メンション）も拾う。読むのは
     python inbox_sync.py intake-parse <検索結果のファイル ...>
         自分の発言・自分宛てDM・見たことのあるものを除いて、判定する候補を出す。
         渡した検索結果の中の自分の発言（from:自分 の検索）と突き合わせ、依頼のあとに自分が返信していれば
-        その文を myReply に入れる。返信で済んだかは Claude が判定する
+        その文を myReply に入れる。返信で済んだかは Claude が判定する。
+        inbox に入ったあとで返信した依頼も、返信の文と一緒に later に出す
     python inbox_sync.py intake-add <判定の JSON ファイル>
-        JSON は [{"id", "title", "due"}, ...]。対応が要ると判定したものだけを入れる。
-        title は依頼の要約、due は依頼文から読んだ期日（YYYY-MM-DD、無ければ空）。
+        JSON は {"add": [{"id", "title", "due"}, ...], "done": [id, ...]}。
+        add は対応が要ると判定した候補。title は依頼の要約、due は依頼文から読んだ期日（YYYY-MM-DD、無ければ空）。
+        done は later のうち、返信で済んだと判定したもの。画面に「返信済み」と出る。
         候補に出したものは入れなかった分も「見た」ことにして、次から出さない
 
 書き込むのは inbox.json だけ。tasks.json への取り込みは画面（index.html）がやる。
@@ -289,14 +291,19 @@ def cmd_intake_parse(a):
                     'myReply': replied(h['ch'], h['ts'], h['url'], not h['chName'].startswith('#'), mine)})
     out.sort(key=lambda x: float(x['ts']))
     # inbox に入れたあとで返信したもの。画面が「返信済み」と出す
-    later = [x['id'] for x in doc['items'] if x.get('src') == 'intake' and not x.get('replied')
-             and replied(x['id'].split('-')[1], x['id'].split('-')[2], x.get('url'),
-                         not x.get('chName', '').startswith('#'), mine)]
+    later = []
+    for x in doc['items']:
+        if x.get('src') != 'intake' or x.get('replied'):
+            continue
+        r = replied(x['id'].split('-')[1], x['id'].split('-')[2], x.get('url'),
+                    not x.get('chName', '').startswith('#'), mine)
+        if r:
+            later.append({'id': x['id'], 'title': x['title'], 'text': x.get('quote', ''), 'myReply': r})
     CAND.parent.mkdir(exist_ok=True)
     with open(CAND, 'w', encoding='utf-8') as fh:
         json.dump({'cands': out, 'later': later}, fh, ensure_ascii=False, indent=2)
-    json.dump([{k: x[k] for k in ('id', 'when', 'chName', 'from', 'url', 'text', 'myReply')} for x in out],
-              sys.stdout, ensure_ascii=False, indent=1)
+    json.dump({'cands': [{k: x[k] for k in ('id', 'when', 'chName', 'from', 'url', 'text', 'myReply')} for x in out],
+               'later': later}, sys.stdout, ensure_ascii=False, indent=1)
     print()
 
 
@@ -308,6 +315,10 @@ def cmd_intake_add(a):
     cand = {x['id']: x for x in got['cands']}
     with open(a.file, encoding='utf-8') as fh:
         picks = json.load(fh)
+    done = set()
+    if isinstance(picks, dict):
+        done = set(picks.get('done', [])) & {x['id'] for x in got['later']}
+        picks = picks.get('add', [])
     doc = load()
     have = {x['id'] for x in doc['items']}
     added, unknown = [], []
@@ -329,7 +340,7 @@ def cmd_intake_add(a):
         have.add(c['id'])
         added.append(p['title'].strip())
     for x in doc['items']:
-        if x['id'] in got['later']:
+        if x['id'] in done:
             x['replied'] = True
     # 入れなかった候補も見たことにする。検索の after は指定時刻を含むので、id で二重を防ぐ
     seen = list(cand)
@@ -340,7 +351,7 @@ def cmd_intake_add(a):
     doc['items'] = sorted(doc['items'], key=lambda x: x.get('receivedAt', ''))[-KEEP:]
     save(doc)
     CAND.unlink()
-    json.dump({'added': added, 'seen': len(seen), 'replied': len(got['later']), 'unknown': unknown, 'intakeTs': doc.get('intakeTs', '')},
+    json.dump({'added': added, 'seen': len(seen), 'replied': len(done), 'unknown': unknown, 'intakeTs': doc.get('intakeTs', '')},
               sys.stdout, ensure_ascii=False)
     print()
 
