@@ -972,7 +972,7 @@ a.ev-src:hover{color:var(--accent);text-decoration:underline}
     </div>
     <div class="side-scroll">
       <nav id="viewList"></nav>
-      <div class="side-label">プロジェクト <button id="addProj" title="プロジェクトを追加">＋</button></div>
+      <div class="side-label">Projects <button id="addProj" title="プロジェクトを追加">＋</button></div>
       <nav id="projList"></nav>
     </div>
     <div class="side-foot">
@@ -1631,21 +1631,21 @@ function renderSide(){
         <span class="swatch ib-swatch"></span>
         <span class="nm">inbox</span><span class="ct${ibAwakeN?' ib-ct':''}">${ibAwakeN}</span></button></div>
     <div class="prow${inWeek?' on':''}">
-      <button class="pitem" data-view="week" title="週カレンダーを開いて、タスクを時間に置く">
+      <button class="pitem" data-view="week" title="カレンダーを開いて、タスクを時間に置く">
         <span class="swatch" style="background:var(--accent)"></span>
-        <span class="nm">週</span><span class="ct">${wk[0].getMonth() + 1}/${wk[0].getDate()}–${wk[6].getDate()}</span></button></div>
+        <span class="nm">Calendar</span><span class="ct">${wk[0].getMonth() + 1}/${wk[0].getDate()}–${wk[6].getDate()}</span></button></div>
     <div class="prow${UI.project===MIS_P?' on':''}">
       <button class="pitem" data-p="${MIS_P}" title="ミッション管理シートの進捗">
         <span class="swatch" style="background:var(--green)"></span>
-        <span class="nm">ミッション</span><span class="ct">${misOverall() == null ? '' : misOverall() + '%'}</span></button></div>
+        <span class="nm">Mission</span><span class="ct">${misOverall() == null ? '' : misOverall() + '%'}</span></button></div>
     <div class="prow${UI.project===EV_P?' on':''}">
       <button class="pitem" data-p="${EV_P}" title="評価項目ごとのエピソード">
         <span class="swatch" style="background:var(--amber)"></span>
-        <span class="nm">評価</span><span class="ct${S.epInbox.length?' ib-ct':''}">${S.epInbox.length || ''}</span></button></div>
+        <span class="nm">Competency</span><span class="ct${S.epInbox.length?' ib-ct':''}">${S.epInbox.length || ''}</span></button></div>
     <div class="prow${UI.project==='*' && !inWeek?' on':''}">
       <button class="pitem" data-p="*">
         <span class="swatch" style="background:var(--ink3)"></span>
-        <span class="nm">すべてのタスク</span><span class="ct">${total}</span></button></div>`;
+        <span class="nm">All Tasks</span><span class="ct">${total}</span></button></div>`;
   let html = '';
   for(const p of S.projects){
     const n = S.tasks.filter(t => t.projectId === p.id && !isDone(t)).length;
@@ -1665,7 +1665,7 @@ function renderSide(){
 function renderTop(){
   const t = $('#projTitle');
   const p = projById(UI.project);
-  t.value = UI.project === '*' ? 'すべてのタスク' : (p ? p.name : '');
+  t.value = UI.project === '*' ? 'All Tasks' : (p ? p.name : '');
   t.readOnly = UI.project === '*';
 
   const c = counts();
@@ -1713,13 +1713,13 @@ function renderTop(){
   $('#syncWhen').textContent = syncRunning() ? '' : syncWhen();
   $('#btnCollapse').hidden = UI.view !== 'list';
   if(UI.project === EV_P){
-    t.value = '評価'; t.readOnly = true;
+    t.value = 'Competency'; t.readOnly = true;
     $('#chips').hidden = true; note.hidden = true;
     $('#vswitch').hidden = true; $('#btnCollapse').hidden = true;
     return;
   }
   if(UI.project === MIS_P){
-    t.value = 'ミッション'; t.readOnly = true;
+    t.value = 'Mission'; t.readOnly = true;
     $('#chips').hidden = true; note.hidden = true;
     $('#vswitch').hidden = true; $('#btnCollapse').hidden = true;
     return;
