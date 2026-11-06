@@ -7,7 +7,8 @@ Slack の自分宛てDMから、taskboard の inbox に入れるタスクを拾�
     python inbox_sync.py since
         前回どこまで読んだか（Slack の ts）を出す。slack_read_channel の oldest に渡す
     python inbox_sync.py ingest <slack_read_channel の出力ファイル ...>
-        「タスク」で始まるメッセージの2行目以降を、1行1件で inbox.json に足す
+        「タスク」で始まるメッセージの2行目以降を、1行1件で inbox.json に足す。
+        リンクだけの行は直前のタスクのリンクにする。転送したメッセージ（Forwarded message from 〜）より後は読まない
     python inbox_sync.py pending
         振り分け先の提案がまだ無い inbox の項目と、振り分け先の候補（プロジェクトと未完了の親タスク）を出す
     python inbox_sync.py suggest <提案の JSON ファイル>
@@ -50,6 +51,8 @@ HISTORY = 40      # 分解の参考に渡す、サブタスクを持つ過去の
 MAX_SUBS = 12
 HEADS = {'タスク', 'たすく', 'task'}
 BULLET = re.compile(r'^\s*(?:[-*・•●]|\d+[.)．])\s*')
+LINK_ONLY = re.compile(r'^<?(https?://[^\s|>]+)(?:\|[^>]*)?>?$')
+FORWARD = re.compile(r'^Forwarded message from ')
 MSG = re.compile(r'^=== Message from .*? ===\s*$', re.M)
 TS = re.compile(r'^Message TS:\s*([0-9.]+)\s*$', re.M)
 
@@ -124,9 +127,16 @@ def tasks_in(text):
         return []
     out = []
     for ln in lines[1:]:
+        if FORWARD.match(ln):
+            break
         t = BULLET.sub('', ln).strip()
+        m = LINK_ONLY.match(t)
+        if m:
+            if out and not out[-1]['url']:
+                out[-1]['url'] = m.group(1)
+            continue
         if t:
-            out.append(t)
+            out.append({'title': t, 'url': ''})
     return out
 
 
@@ -140,13 +150,17 @@ def cmd_ingest(a):
     added = []
     for f in a.files:
         for ts, body in messages(read_text(f)):
-            for i, title in enumerate(tasks_in(body)):
+            for i, task in enumerate(tasks_in(body)):
+                title = task['title']
                 iid = f'slack-{ts}-{i}'
                 if iid in have:
                     continue
                 when = datetime.datetime.fromtimestamp(float(ts), datetime.timezone.utc)
-                doc['items'].append({'id': iid, 'title': title, 'src': 'slack',
-                                     'receivedAt': when.isoformat().replace('+00:00', 'Z')})
+                item = {'id': iid, 'title': title, 'src': 'slack',
+                        'receivedAt': when.isoformat().replace('+00:00', 'Z')}
+                if task['url']:
+                    item['url'] = task['url']
+                doc['items'].append(item)
                 have.add(iid)
                 added.append(title)
             if float(ts) > float(doc['lastTs'] or 0):
