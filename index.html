@@ -4095,6 +4095,7 @@ function renderInbox(el){
       '<div class="ib-line">' +
         '<input class="ib-title" data-ibt="' + id + '" value="' + esc(x.title) + '">' +
         '<span class="ib-when">' + when(x.receivedAt) + (x.src === 'slack' ? ' · Slack' : '') + '</span>' +
+        (x.src === 'slack' && x.url ? '<a class="ib-req-link" href="' + esc(x.url) + '" target="_blank" rel="noopener">リンク</a>' : '') +
         '<button class="ib-del" data-ibdel="' + id + '" title="消す">' + IC_X + '</button>' +
       '</div>' +
       (x.src !== 'intake' ? '' :
@@ -4207,7 +4208,8 @@ function inboxMove(id, quiet){
     if(t){
       t.due = x.due || ''; t.estimate = normEstimate(x.estimate);
       /* Slack の依頼は元のメッセージに戻れるようにしておく */
-      if(x.src === 'intake'){ t.url = x.url || ''; t.notes = x.from + (x.chName ? '（' + x.chName + '）' : '') + '\n' + (x.quote || ''); }
+      if(x.url) t.url = x.url;
+      if(x.src === 'intake') t.notes = x.from + (x.chName ? '（' + x.chName + '）' : '') + '\n' + (x.quote || '');
       save();
     }
     if(!quiet) toast('「' + x.title + '」を ' + p.name + ' へ');
