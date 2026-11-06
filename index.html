@@ -738,6 +738,42 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .ib-req-from{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ib-req-link{color:var(--accent);text-decoration:none;flex:none}
 .ib-req-link:hover{text-decoration:underline}
+.ib-plan-ok{background:var(--accent-bg);color:var(--accent)}
+.ib-plan-run{background:var(--sunk);color:var(--ink3)}
+.ib-dt-tg{height:20px;padding:0 8px;border-radius:5px;font-size:12px;color:var(--ink2);flex:none}
+.ib-dt-tg:hover{background:var(--sunk);color:var(--ink)}
+/* 依頼の詳細。概要・方針・返信案・やりとりを縦に積む。AI が出したもの（方針）は薄いアクセント色（DESIGN.md） */
+.ib-dt{margin:10px 0 2px 6px;display:flex;flex-direction:column;gap:14px;max-width:760px}
+.ib-dt-sec h4{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:12px;font-weight:600;color:var(--ink2)}
+.ib-dt-from{font-size:12px;color:var(--ink2);margin-bottom:4px}
+.ib-dt-sum{margin:0 0 8px;font-size:13px;line-height:1.7;color:var(--ink)}
+.ib-dt-none,.ib-dt-err{margin:0;font-size:12.5px;color:var(--ink3);line-height:1.7}
+.ib-dt-err{color:var(--red)}
+.ib-ctx,.ib-log{display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--line2);padding-left:10px}
+.ib-ctx-m,.ib-log-m{padding:4px 0}
+.ib-ctx-h{display:flex;align-items:baseline;gap:8px;font-size:12px}
+.ib-ctx-h b{font-weight:500;color:var(--ink)}
+.ib-ctx-h span{color:var(--ink3);font-variant-numeric:tabular-nums}
+.ib-ctx-m p,.ib-log-m p{margin:2px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
+.ib-ctx-m.me b,.ib-log-m.me b{color:var(--accent)}
+.ib-plan{padding:8px 12px;border-radius:var(--radius);background:var(--accent-bg);font-size:13px;line-height:1.7}
+.ib-plan-l{margin:0;padding-left:18px}
+.ib-log-m .ib-plan-l{margin-top:2px;font-size:12.5px;color:var(--ink2)}
+.ib-q{margin-top:6px;padding-top:6px;border-top:1px solid var(--line2)}
+.ib-q b{font-size:12px;font-weight:600;color:var(--accent)}
+.ib-q ol{margin:2px 0 0;padding-left:20px}
+.ib-plan-go,.ib-copy{height:22px;padding:0 10px;border-radius:5px;font-size:12px;font-weight:500;color:var(--accent);margin-left:auto}
+.ib-plan-go:hover,.ib-copy:hover{background:var(--accent-bg)}
+.ib-plan-st{margin-left:auto;font-size:12px;font-weight:400;color:var(--ink3)}
+.ib-reply{margin:0;padding:8px 12px;border:1px solid var(--line2);border-radius:var(--radius);background:var(--panel);
+  font-family:var(--f);font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+.ib-cm{display:flex;align-items:flex-end;gap:8px;margin-top:8px}
+.ib-cm textarea{flex:1;min-width:0;resize:vertical;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);
+  color:var(--ink);font-family:var(--f);font-size:13px;line-height:1.6;padding:6px 10px}
+.ib-cm textarea:focus{outline:none;border-color:var(--accent)}
+.ib-cm button{height:28px;padding:0 12px;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-size:12.5px;font-weight:500}
+.ib-cm button:disabled{background:var(--sunk);color:var(--ink3);cursor:default}
+.ib-dt-ro{margin-left:0}
 .ib-req-quote{flex-basis:100%;color:var(--ink3);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:2;
   -webkit-box-orient:vertical;overflow:hidden}
 .ib-go{height:22px;padding:0 10px;border-radius:5px;font-size:12px;font-weight:500;color:var(--accent);margin-left:2px}
@@ -1170,7 +1206,7 @@ function normalize(st){
       .map(x => ({id: x.id || uid('i_'), title: String(x.title), receivedAt: x.receivedAt || '', src: x.src || '',
                    pid: x.pid || '', parent: x.parent || '', due: x.due || '', estimate: normEstimate(x.estimate),
                    sgOff: !!x.sgOff, from: x.from || '', chName: x.chName || '', url: x.url || '',
-                   quote: x.quote || '', snooze: x.snooze || ''})),
+                   quote: x.quote || '', snooze: x.snooze || '', talk: normTalk(x.talk)})),
     inboxSeen: (Array.isArray(st.inboxSeen) ? st.inboxSeen : []).slice(-1000),
     /* eventMoves … ボードで動かした「自分だけの予定」。{eventId: {date, start, end, setAt}}。
        同期でカレンダーに反映されたら消える */
@@ -1220,6 +1256,8 @@ function normalize(st){
       completedAt: t.completedAt || null,
       prevStatus: STATUS.some(x => x[0] === t.prevStatus) ? t.prevStatus : '',
       mission: typeof t.mission === 'string' ? t.mission : '',   /* ミッション管理シートのミッション名 */
+      /* inbox から移した Slack の依頼の記録（概要・方針・やりとり）。詳細で読むだけ */
+      intakes: (Array.isArray(t.intakes) ? t.intakes : []).filter(d => d && typeof d === 'object'),
       order: typeof t.order === 'number' ? t.order : (n += 1000)
     };
   });
@@ -2079,6 +2117,8 @@ function renderDrawer(){
         <span class="spacer"></span>
         <button class="sub-add-go" data-act="subadd-go">追加</button>
       </div></div></div>
+    ${t.intakes.map(d => `<div class="dr-sec"><h4>Slack の依頼${t.intakes.length > 1 ? '：' + esc(d.title || '') : ''}</h4>
+      <div class="ib-dt ib-dt-ro">${ibLogHTML(d, d.talk, '')}</div></div>`).join('')}
     <div class="stamp">作成 ${esc(created)}${completed ? ' ／ 完了 ' + esc(completed) : ''}</div>`;
 }
 
@@ -3419,7 +3459,7 @@ function jobOutcome(info){
 const syncOutcome = () => jobOutcome(syncInfo);
 
 /* ページごとのボタン。ミッションの読み込みと評価エピソードの候補集めを、そのページから頼む */
-const JOB_NAMES = {auto: '同期', mission: 'ミッションの読み込み', eval: '評価エピソードの候補集め'};
+const JOB_NAMES = {auto: '同期', mission: 'ミッションの読み込み', eval: '評価エピソードの候補集め', plan: '依頼の方針づくり'};
 const jobInfo = {};          // {job: server.py の /api/sync?job= の返事}
 const jobTimer = {};
 const jobRunning = job => !!(jobInfo[job] && jobInfo[job].state === 'running');
@@ -3543,10 +3583,12 @@ function inboxToSchedule(x, date, start){
   if(parent){
     parent.subtasks.push({id: uid('k_'), title: x.title, done: false, due: x.due || date,
                           estimate: normEstimate(x.estimate) || WK_DEFAULT_H, schedule});
+    ibAttach(parent, x);
   }else{
     const sec = ensureStatusSection(p, STATUS[1][1]);
     const t = addTask(p.id, sec.id, x.title);
-    if(t){ t.due = x.due || date; t.estimate = normEstimate(x.estimate) || WK_DEFAULT_H; t.schedule = schedule; }
+    if(t){ t.due = x.due || date; t.estimate = normEstimate(x.estimate) || WK_DEFAULT_H; t.schedule = schedule;
+           if(x.url) t.url = x.url; ibAttach(t, x); }
   }
   save(); renderWeek(); renderSide();
   toast('「' + x.title + '」を ' + (parent ? parent.title : p.name) + ' に入れて置きました');
@@ -3958,6 +4000,9 @@ week.addEventListener('drop', e => {
 let IB_SUGGEST = {};
 /* Slack の依頼のうち、inbox に入ったあとで自分が返信したものの id。これも Claude が inbox.json に書く */
 let IB_REPLIED = new Set();
+/* Slack の依頼の詳細。{id: {summary, context, plans}}。context は拾った時点のスレッドの前後、
+   plans は Claude が出した方針（古い順。{at, plan, questions, reply}）。これも Claude が inbox.json に書く */
+let IB_DOC = {};
 async function loadInbox(){
   let doc;
   try{
@@ -3971,7 +4016,14 @@ async function loadInbox(){
     if(it && it.id && it.suggest && it.suggest.pid) IB_SUGGEST[it.id] = it.suggest;
   const prevR = [...IB_REPLIED].join();
   IB_REPLIED = new Set((doc && Array.isArray(doc.items) ? doc.items : []).filter(it => it && it.replied).map(it => it.id));
-  if((JSON.stringify(IB_SUGGEST) !== prev || [...IB_REPLIED].join() !== prevR) && UI.project === INBOX_P) renderList();
+  const prevD = JSON.stringify(IB_DOC);
+  IB_DOC = {};
+  for(const it of (doc && Array.isArray(doc.items) ? doc.items : []))
+    if(it && it.id && it.src === 'intake')
+      IB_DOC[it.id] = {summary: it.summary || '', context: Array.isArray(it.context) ? it.context : [],
+                       plans: Array.isArray(it.plans) ? it.plans : []};
+  if((JSON.stringify(IB_SUGGEST) !== prev || [...IB_REPLIED].join() !== prevR || JSON.stringify(IB_DOC) !== prevD)
+     && UI.project === INBOX_P) renderList();
   const seen = new Set(S.inboxSeen);
   let n = 0;
   for(const it of (doc && Array.isArray(doc.items) ? doc.items : [])){
@@ -4261,7 +4313,9 @@ function renderInbox(el){
           (IB_REPLIED.has(x.id) ? '<span class="ib-req-tag ib-req-done">返信済み</span>' : '') +
           '<span class="ib-req-from">' + esc(x.from) + (x.chName ? ' · ' + esc(x.chName) : '') + '</span>' +
           (x.url ? '<a class="ib-req-link" href="' + esc(x.url) + '" target="_blank" rel="noopener">元のメッセージ</a>' : '') +
-          (x.quote ? '<div class="ib-req-quote">' + esc(x.quote) + '</div>' : '') +
+          ibPlanBadge(x) +
+          '<button class="ib-dt-tg" data-ibdt="' + id + '">' + (ibOpen === x.id ? '詳細を閉じる' : '詳細') + '</button>' +
+          (x.quote && ibOpen !== x.id ? '<div class="ib-req-quote">' + esc(x.quote) + '</div>' : '') +
         '</div>') +
       '<div class="ib-line ib-ctl">' +
         '<select data-ibf="pid" data-id="' + id + '">' + projOpts + '</select>' +
@@ -4274,6 +4328,7 @@ function renderInbox(el){
           (x.parent ? 'サブタスクにする' : '移す') + '</button>' +
       '</div>' +
       sgRow +
+      (x.src === 'intake' && ibOpen === x.id ? ibDetailHTML(x) : '') +
     '</div>';
   }).join('');
   const nSg = ibShown().filter(x => ibSuggest(x)).length;
@@ -4288,6 +4343,8 @@ function renderInbox(el){
       '</div></div>';
     return;
   }
+  /* 書きかけのコメント欄にいたら、描き直したあとも同じ欄に戻す（同期で inbox.json が変わると描き直すため） */
+  const typing = document.activeElement && document.activeElement.dataset && document.activeElement.dataset.ibcm;
   el.innerHTML = '<div class="ib">' +
     '<div class="ib-bar"><span class="n">' + nAwake + '件・振り分け待ち</span>' +
       (nSnz ? '<button class="ib-snz' + (ibSnzOpen ? ' on' : '') + '" data-ibsnz="1">スヌーズ中 ' + nSnz + '件</button>' : '') +
@@ -4296,11 +4353,13 @@ function renderInbox(el){
     (nAwake ? '' : '<div class="ib-none">振り分け待ちはありません</div>') +
     rows +
     ('<div class="ib-keys"><span><kbd>↑</kbd> <kbd>↓</kbd> 選ぶ</span><span><kbd>1</kbd> 提案（なければ選んだ先）へ移す</span>' +
-      '<span><kbd>2</kbd> 消す</span><span><kbd>3</kbd> スヌーズ</span>' +
+      '<span><kbd>2</kbd> 消す</span><span><kbd>3</kbd> スヌーズ</span><span><kbd>Space</kbd> 依頼の詳細</span>' +
       '<span><kbd>P</kbd> プロジェクト</span><span><kbd>Shift</kbd>+<kbd>D</kbd> 期日</span><span><kbd>E</kbd> 工数</span>' +
       '<span><kbd>X</kbd> 提案を消す</span><span><kbd>C</kbd> 追加</span></div>') +
     '<div class="ib-hint">「移す」でプロジェクトの「未着手」へ。親タスクも選ぶとサブタスクになります。</div>' +
     '</div>';
+  const back = typing && el.querySelector('[data-ibcm="' + CSS.escape(typing) + '"]');
+  if(back){ back.focus({preventScroll: true}); back.setSelectionRange(back.value.length, back.value.length); }
 }
 
 /* スヌーズ … 選んだ日（snooze）の前日まで inbox から隠し、その日になったら戻す。
@@ -4336,6 +4395,130 @@ function ibWake(){
   if(UI.project === INBOX_P && UI.view !== 'week' && !list.contains(document.activeElement)) renderList();
 }
 
+/* ---------- 依頼の詳細（Slack で拾った依頼だけ。「タスク」メモには出さない） ----------
+   概要（要約とスレッドの前後）・方針と問い・返信案・すり合わせのやりとり。
+   方針と返信案は Claude が inbox.json に書く（taskboard-plan）。コメントは画面が tasks.json に書き、
+   「方針を出して」とコメントのたびに server.py へ渡して Claude を起動する */
+let ibOpen = '';        /* 詳細を開いている依頼の id */
+let IB_PLAN = {};       /* server.py の方針づくりの状態。{id: {state: queued / running / done / error, error}} */
+const ibDraft = {};     /* 書きかけのコメント。描き直しても消えないように持っておく */
+function normTalk(v){
+  return (Array.isArray(v) ? v : []).filter(m => m && m.text).map(m => ({at: m.at || '', text: String(m.text)}));
+}
+const ibAt = iso => { const d = new Date(iso); return isNaN(d) ? '' : (d.getMonth() + 1) + '/' + d.getDate() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
+const ibLines = s => '<ul class="ib-plan-l">' + String(s || '').split('\n').map(l => l.replace(/^\s*[-・*]\s*/, '').trim())
+  .filter(Boolean).map(l => '<li>' + esc(l) + '</li>').join('') + '</ul>';
+function ibPlanBusy(id){ const s = IB_PLAN[id]; return !!s && (s.state === 'queued' || s.state === 'running'); }
+function ibPlanBadge(x){
+  const d = IB_DOC[x.id];
+  if(ibPlanBusy(x.id)) return '<span class="ib-req-tag ib-plan-run">' + (IB_PLAN[x.id].state === 'queued' ? '方針：順番待ち' : '方針を考え中') + '</span>';
+  return d && d.plans.length ? '<span class="ib-req-tag ib-plan-ok">方針あり</span>' : '';
+}
+/* 概要・方針・返信案・やりとり。d は {summary, context, plans, quote, from, chName, url}。
+   id があれば inbox の詳細（ボタンとコメント欄つき）、無ければ移したタスクの詳細（読むだけ） */
+function ibLogHTML(d, talk, id){
+  const ctx = Array.isArray(d.context) ? d.context : [], plans = Array.isArray(d.plans) ? d.plans : [];
+  const last = plans[plans.length - 1], st = id ? IB_PLAN[id] : null, busy = id && ibPlanBusy(id);
+  const who = (m, me) => '<div class="ib-ctx-h"><b>' + esc(me ? '自分' : m) + '</b>';
+  let h = '<div class="ib-dt-sec"><h4>概要</h4>' +
+    (id ? '' : '<div class="ib-dt-from">' + esc(d.from || '') + (d.chName ? ' · ' + esc(d.chName) : '') +
+      (d.url ? ' · <a class="ib-req-link" href="' + esc(d.url) + '" target="_blank" rel="noopener">元のメッセージ</a>' : '') + '</div>') +
+    (d.summary ? '<p class="ib-dt-sum">' + esc(d.summary) + '</p>' : '') +
+    '<div class="ib-ctx">' + (ctx.length
+      ? ctx.map(m => '<div class="ib-ctx-m' + (m.me ? ' me' : '') + '">' + who(m.from || '', m.me) + '<span>' + esc(m.when || '') + '</span></div>' +
+          '<p>' + esc(m.text) + '</p></div>').join('')
+      : (d.quote ? '<div class="ib-ctx-m"><p>' + esc(d.quote) + '</p></div>' : '')) + '</div></div>';
+  h += '<div class="ib-dt-sec ib-dt-plan"><h4>方針' +
+      (!id ? '' : busy ? '<span class="ib-plan-st">' + (st.state === 'queued' ? '順番待ち（ほかの同期のあとに出します）' : '考え中…（1〜3分）') + '</span>'
+        : '<button class="ib-plan-go" data-ibplan="' + esc(id) + '">' + (last ? '出し直す' : '方針を出して') + '</button>') + '</h4>' +
+    (st && st.state === 'error' ? '<p class="ib-dt-err">前回は出せませんでした：' + esc(String(st.error || '').trim().split('\n').pop()) + '</p>' : '') +
+    (last ? '<div class="ib-plan">' + ibLines(last.plan) +
+        (last.questions && last.questions.length ? '<div class="ib-q"><b>決めてほしいこと</b><ol>' +
+          last.questions.map(q => '<li>' + esc(q) + '</li>').join('') + '</ol></div>' : '') + '</div>'
+      : '<p class="ib-dt-none">' + (id ? '「方針を出して」を押すと、Claude が読むだけの範囲で調べて、方針と返信案を出します。' : 'なし') + '</p>') +
+    '</div>';
+  if(last && last.reply)
+    h += '<div class="ib-dt-sec"><h4>返信案<button class="ib-copy" data-ibcopy="1">コピー</button></h4><pre class="ib-reply">' + esc(last.reply) + '</pre></div>';
+  const log = normTalk(talk).map(m => ({at: m.at, me: true, text: m.text}))
+    .concat(plans.map(p => ({at: p.at, me: false, text: p.plan})))
+    .sort((a, b) => a.at < b.at ? -1 : a.at > b.at ? 1 : 0);
+  if(log.length > 1 || id)
+    h += '<div class="ib-dt-sec"><h4>やりとり</h4>' +
+      (log.length ? '<div class="ib-log">' + log.map(m => '<div class="ib-log-m' + (m.me ? ' me' : '') + '">' +
+          '<div class="ib-ctx-h"><b>' + (m.me ? '自分' : 'Claude') + '</b><span>' + ibAt(m.at) + '</span></div>' +
+          (m.me ? '<p>' + esc(m.text) + '</p>' : ibLines(m.text)) + '</div>').join('') + '</div>' : '') +
+      (id ? '<div class="ib-cm"><textarea data-ibcm="' + esc(id) + '" rows="2" placeholder="方針へのコメント。送ると方針と返信案を書き直します（Ctrl+Enter）">' +
+          esc(ibDraft[id] || '') + '</textarea><button data-ibcmgo="' + esc(id) + '"' + (busy ? ' disabled' : '') + '>送る</button></div>' : '') +
+      '</div>';
+  return h;
+}
+function ibDetailHTML(x){
+  const d = IB_DOC[x.id] || {summary: '', context: [], plans: []};
+  return '<div class="ib-dt">' + ibLogHTML({...d, quote: x.quote}, x.talk, x.id) + '</div>';
+}
+function ibToggle(id){
+  ibOpen = ibOpen === id ? '' : id;
+  if(ibOpen) ibCur = id;
+  renderList();
+  const r = list.querySelector('.ib-row.cur'); if(r) r.scrollIntoView({block: 'nearest'});
+}
+/* 移したタスクに、依頼の記録を写しておく。inbox.json の項目はいずれ消えるため */
+function ibAttach(t, x){
+  if(!t || x.src !== 'intake') return;
+  const d = IB_DOC[x.id] || {};
+  (t.intakes = t.intakes || []).push({id: x.id, title: x.title, from: x.from, chName: x.chName, url: x.url, quote: x.quote,
+    summary: d.summary || '', context: d.context || [], plans: d.plans || [], talk: x.talk || [], movedAt: new Date().toISOString()});
+}
+async function ibAskPlan(x){
+  let info;
+  try{
+    const r = await fetch('/api/plan', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({id: x.id, talk: x.talk})});
+    info = await r.json();
+  }catch(e){ toast('頼めませんでした。サーバーが動いているか確認してください'); return; }
+  if(info.ok === false){ toast(info.error || '頼めませんでした'); return; }
+  IB_PLAN[x.id] = {state: info.state === 'queued' ? 'queued' : 'running', error: ''};
+  renderList(); ibPollPlan();
+}
+let ibPlanTimer = null;
+function ibPollPlan(){
+  clearTimeout(ibPlanTimer);
+  ibPlanTimer = setTimeout(async () => {
+    let got;
+    try{ got = await (await fetch('/api/plan?ts=' + Date.now(), {cache: 'no-store'})).json(); }catch(e){ return; }
+    const before = IB_PLAN, prev = JSON.stringify(IB_PLAN);
+    IB_PLAN = got.plans || {};
+    const was = id => before[id] && (before[id].state === 'queued' || before[id].state === 'running');
+    const ended = Object.keys(before).filter(id => was(id) && !ibPlanBusy(id));
+    if(ended.length) await loadInbox();
+    for(const id of ended){
+      const s = IB_PLAN[id], x = inboxItem(id);
+      toast(s && s.state === 'error' ? '方針を出せませんでした' : '「' + (x ? x.title : '依頼') + '」の方針が出ました');
+    }
+    if(JSON.stringify(IB_PLAN) !== prev && UI.project === INBOX_P && UI.view !== 'week') renderList();
+    if(Object.keys(IB_PLAN).some(ibPlanBusy)) ibPollPlan();
+  }, 4000);
+}
+/* 開いたときに裏で方針を考えていれば、終わるのを待つ */
+(async () => {
+  try{ IB_PLAN = (await (await fetch('/api/plan?ts=' + Date.now(), {cache: 'no-store'})).json()).plans || {}; }catch(e){ return; }
+  if(Object.keys(IB_PLAN).some(ibPlanBusy)) ibPollPlan();
+})();
+function ibSendComment(id){
+  const x = S.inbox.find(y => y.id === id), ta = list.querySelector('[data-ibcm="' + CSS.escape(id) + '"]');
+  const v = (ta ? ta.value : '').trim();
+  if(!x || !v || ibPlanBusy(id)) return;
+  x.talk.push({at: new Date().toISOString(), text: v});
+  delete ibDraft[id]; save();
+  if(ta){ ta.value = ''; ta.blur(); }
+  ibAskPlan(x);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-ibcopy]'); if(!b) return;
+  const pre = b.closest('.ib-dt-sec').querySelector('.ib-reply');
+  if(pre && navigator.clipboard) navigator.clipboard.writeText(pre.textContent).then(() => toast('返信案をコピーしました'), () => {});
+});
+
 /* 提案が今のボードでも通用するときだけ返す。親タスクが完了・削除済みなら、その提案は出さない */
 function ibSuggest(x){
   const s = !x.sgOff && IB_SUGGEST[x.id]; if(!s) return null;
@@ -4359,6 +4542,8 @@ function inboxAccept(id, quiet){
       t.due = x.due || '';
       t.subtasks = sg.breakdown.map(b => ({id: uid('k_'), title: String(b.title), done: false, due: '',
                                            estimate: normEstimate(b.estimate), schedule: null}));
+      if(x.url) t.url = x.url;
+      ibAttach(t, x);
     }
     save();
     if(!quiet){ toast('「' + x.title + '」をサブタスク ' + sg.breakdown.length + ' 件に分けて ' + sg.p.name + ' へ'); renderSide(); renderList(); }
@@ -4395,6 +4580,7 @@ function inboxMove(id, quiet){
   if(parent){
     parent.subtasks.push({id: uid('k_'), title: x.title, done: false, due: x.due || '',
                           estimate: normEstimate(x.estimate), schedule: null});
+    ibAttach(parent, x);     /* サブタスクには詳細が無いので、依頼の記録は親に付ける */
     save();
     if(!quiet) toast('「' + x.title + '」を「' + parent.title + '」のサブタスクに');
   }else{
@@ -4405,6 +4591,7 @@ function inboxMove(id, quiet){
       /* Slack の依頼は元のメッセージに戻れるようにしておく */
       if(x.url) t.url = x.url;
       if(x.src === 'intake') t.notes = x.from + (x.chName ? '（' + x.chName + '）' : '') + '\n' + (x.quote || '');
+      ibAttach(t, x);
       save();
     }
     if(!quiet) toast('「' + x.title + '」を ' + p.name + ' へ');
@@ -4432,6 +4619,9 @@ list.addEventListener('click', e => {
   if(d.ibsgno){ inboxDismiss(d.ibsgno); return; }
   if(d.iball){ inboxAcceptAll(); return; }
   if(d.ibsnz){ ibSnzOpen = !ibSnzOpen; renderList(); return; }
+  if(d.ibdt){ ibToggle(d.ibdt); return; }
+  if(d.ibplan){ const x = inboxItem(d.ibplan); if(x) ibAskPlan(x); return; }
+  if(d.ibcmgo){ ibSendComment(d.ibcmgo); return; }
   if(d.ibdel){ inboxDelete(d.ibdel); return; }
   const row = e.target.closest('.ib-row');
   if(row && !b && row.dataset.ib !== ibCur) ibFocus(row.dataset.ib);
@@ -4446,6 +4636,10 @@ function inboxDelete(id){
 }
 list.addEventListener('keydown', e => {
   if(e.key !== 'Enter' || e.isComposing) return;
+  if(e.target.dataset && e.target.dataset.ibcm){
+    if(e.ctrlKey || e.metaKey){ e.preventDefault(); ibSendComment(e.target.dataset.ibcm); }
+    return;
+  }
   if(e.target.id === 'ibAdd'){
     const v = e.target.value.trim(); if(!v) return;
     S.inbox.push({id: uid('i_'), title: v, receivedAt: new Date().toISOString(), src: 'manual'});
@@ -4483,10 +4677,14 @@ document.addEventListener('keydown', e => {
   }
   else if(k === '2'){ e.preventDefault(); inboxDelete(x.id); ibFocus(next); }
   else if(k === '3' || k === 'h') chip('snooze');
+  else if(k === ' ' && x.src === 'intake'){ e.preventDefault(); ibToggle(x.id); }
   else if(k === 'p') chip('pid');
   else if(k === 'd') chip('due');      /* Shift+D（Linear と同じ）。D だけでも開く */
   else if(k === 'e') chip('estimate');
   else if(k === 'x'){ e.preventDefault(); inboxDismiss(ibCur); }
+});
+list.addEventListener('input', e => {
+  const id = e.target.dataset && e.target.dataset.ibcm; if(id) ibDraft[id] = e.target.value;
 });
 list.addEventListener('focusout', e => {
   const id = e.target.dataset && e.target.dataset.ibt; if(!id) return;

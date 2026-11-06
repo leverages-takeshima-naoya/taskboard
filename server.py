@@ -10,6 +10,7 @@ POST するだけで、実際に tasks.json へ書くのはこちらの仕事に
 
 127.0.0.1 にだけ待ち受ける。外部からは触れない。
 書き込むのはこのフォルダの tasks.json と backups/ の中だけ。
+ほかに、Claude に渡すもの（依頼の詳細に書いたコメント）を sync_tmp/ に置く。
 """
 import argparse
 import datetime
@@ -17,6 +18,7 @@ import http.server
 import json
 import os
 import pathlib
+import re
 import shutil
 import socketserver
 import subprocess
@@ -95,12 +97,13 @@ class Sync:
     """Claude Code（コマンド版）に taskboard の同期スキルを頼む。
        仕事（job）は3つ。auto はカレンダーと Slack で、タイマー（平日 10:00〜19:00 の30分ごと）と
        週ビューの「Claude で同期」ボタンから動く。mission と eval は各ページのボタンから動く。
-       同時に動くのは1本だけ。スキルごとに別の Claude を起動し、モデルはスキルの model: に従う。
+       plan は inbox の依頼の詳細（「方針を出して」とコメント）から、依頼1件ずつ動く。
+       同時に動くのは1本だけ。plan だけは、ほかが動いていれば順番待ちに並べて、終わったあとに回す。スキルごとに別の Claude を起動し、モデルはスキルの model: に従う。
        結果の文章は sync-<job>.log に残し、画面には先頭だけ返す。
        Claude に許すのは、そのスキルに要るツールだけ。"""
     lock = threading.Lock()
     TMP = ROOT / 'sync_tmp'
-    JOBS = {'auto': ['calendar', 'slack'], 'mission': ['mission'], 'eval': ['eval']}
+    JOBS = {'auto': ['calendar', 'slack'], 'mission': ['mission'], 'eval': ['eval'], 'plan': ['plan']}
     PARTS = {
         'calendar': {
             'skill': 'taskboard-calendar', 'ask': 'カレンダー同期をして。',
@@ -119,6 +122,16 @@ class Sync:
         'eval': {
             'skill': 'taskboard-eval', 'ask': '評価エピソードの候補を集めて。',
             'tools': ['Bash(python eval_sync.py:*)', 'mcp__claude_ai_Slack__slack_search_public_and_private']},
+        # inbox の依頼の方針と返信案。調べるのは読むだけの範囲。Slack への送信・下書きは許さない
+        'plan': {
+            'skill': 'taskboard-plan', 'ask': 'inbox の依頼の方針と返信案を出して。',
+            'tools': ['Bash(python inbox_sync.py plan-get:*)', 'Bash(python inbox_sync.py plan-set:*)',
+                      'mcp__claude_ai_Slack__slack_read_thread', 'mcp__claude_ai_Slack__slack_read_channel',
+                      'mcp__claude_ai_Slack__slack_search_public_and_private', 'mcp__claude_ai_Slack__slack_read_canvas',
+                      'mcp__claude_ai_Slack__slack_read_user_profile', 'mcp__claude_ai_Slack__slack_search_users',
+                      'mcp__claude_ai_Google_Drive__search_files', 'mcp__claude_ai_Google_Drive__read_file_content',
+                      'mcp__claude_ai_Google_Drive__get_file_metadata',
+                      'mcp__claude_ai_Google_Sheets__get_values', 'mcp__claude_ai_Google_Sheets__get_spreadsheet']},
     }
     PROMPT = (
         '{skill} スキルの手順どおりに、{ask}\n'
@@ -132,6 +145,9 @@ class Sync:
     busy = ''
     states = {j: {'state': 'idle', 'startedAt': None, 'finishedAt': None, 'summary': '', 'trigger': ''}
               for j in JOBS}
+    # 方針は依頼ごと。ほかの仕事が動いている間に頼まれたら waiting に並べ、終わったら順に回す
+    waiting = []      # [(job, extra, trigger)]
+    plans = {}        # {依頼の id: {'state': queued / running / done / error, 'at', 'error'}}
 
     @classmethod
     def status(cls, job='auto'):
@@ -144,6 +160,11 @@ class Sync:
             return {'ok': False, 'state': 'error', 'error': f'知らない仕事です: {job}'}
         with cls.lock:
             if cls.busy:
+                if job == 'plan':
+                    if all(w[1] != extra for w in cls.waiting):
+                        cls.waiting.append((job, extra, trigger))
+                    cls.plans[extra] = {'state': 'queued', 'at': utc_now(), 'error': ''}
+                    return {'ok': True, 'state': 'queued', 'job': job, 'busy': cls.busy}
                 return {**cls.states[job], 'job': job, 'busy': cls.busy, 'ok': False, 'error': 'already running'}
             exe = shutil.which('claude')
             if not exe:
@@ -151,6 +172,8 @@ class Sync:
             cls.busy = job
             cls.states[job] = {'state': 'running', 'startedAt': utc_now(), 'finishedAt': None,
                                'summary': '', 'trigger': trigger}
+            if job == 'plan':
+                cls.plans[extra] = {'state': 'running', 'at': utc_now(), 'error': ''}
         threading.Thread(target=cls._run, args=(job, exe, extra), daemon=True).start()
         return {**cls.status(job), 'ok': True}
 
@@ -179,6 +202,8 @@ class Sync:
         if name == 'calendar' and extra:
             prompt += (f'- 今週・来週に加えて、{extra[0]}〜{extra[1]} の週も取り込む。list_events をその範囲でも呼び、'
                        f'ingest には --range 今週日曜:来週土曜 --range {extra[0]}:{extra[1]} の形で両方の範囲を渡す\n')
+        if name == 'plan':
+            prompt += f'- 対象の依頼の id は {extra}。`python inbox_sync.py plan-get {extra}` から始める\n'
         try:
             p = subprocess.run(args, input=prompt, capture_output=True, text=True,
                                encoding='utf-8', errors='replace', cwd=str(ROOT), env=env,
@@ -213,6 +238,25 @@ class Sync:
             cls.busy = ''
             cls.states[job] = {**cls.states[job], 'state': 'done' if ok else 'error',
                                'finishedAt': utc_now(), 'summary': summary[:3000]}
+            if job == 'plan':
+                cls.plans[extra] = {'state': 'done' if ok else 'error', 'at': utc_now(),
+                                    'error': '' if ok else summary[-500:]}
+            nxt = cls.waiting.pop(0) if cls.waiting else None
+        if nxt:
+            cls.start(*nxt)
+
+    @classmethod
+    def plan(cls, iid, talk):
+        """依頼の詳細から方針を頼む。竹島のコメント（talk）は sync_tmp/plan-<id>.json に置き、
+           Claude が inbox_sync.py plan-get で読む"""
+        if not re.fullmatch(r'[\w.-]{1,120}', iid or ''):
+            return {'ok': False, 'state': 'error', 'error': '依頼の id が正しくありません'}
+        cls.TMP.mkdir(exist_ok=True)
+        talk = [{'at': str(t.get('at', ''))[:30], 'text': str(t.get('text', ''))[:4000]}
+                for t in (talk if isinstance(talk, list) else []) if isinstance(t, dict) and t.get('text')][-50:]
+        (cls.TMP / f'plan-{iid}.json').write_text(json.dumps({'id': iid, 'talk': talk}, ensure_ascii=False),
+                                                  encoding='utf-8')
+        return cls.start('plan', iid)
 
     @classmethod
     def timer(cls):
@@ -258,6 +302,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             q = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
             self._json(200, Sync.status((q.get('job') or ['auto'])[0]))
             return
+        if self.path.split('?')[0] == '/api/plan':
+            with Sync.lock:
+                self._json(200, {'plans': dict(Sync.plans), 'busy': Sync.busy})
+            return
         super().do_GET()
 
     def do_POST(self):
@@ -276,6 +324,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             except (ValueError, json.JSONDecodeError, AttributeError):
                 extra = None
             self._json(200, Sync.start(job, extra))
+            return
+        if self.path.split('?')[0] == '/api/plan':
+            # 本文は {"id": 依頼の id, "talk": [{"at", "text"}, ...]}。talk は詳細に書いたコメント（古い順）
+            try:
+                n = int(self.headers.get('Content-Length') or 0)
+                body = json.loads(self.rfile.read(n).decode('utf-8')) if 0 < n < 512 * 1024 else {}
+            except (ValueError, json.JSONDecodeError):
+                body = {}
+            if not isinstance(body, dict):
+                body = {}
+            self._json(200, Sync.plan(str(body.get('id') or ''), body.get('talk')))
             return
         if self.path.split('?')[0] != '/api/save':
             self._json(404, {'ok': False, 'error': 'not found'})
