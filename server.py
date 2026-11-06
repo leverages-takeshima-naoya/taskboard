@@ -22,6 +22,8 @@ import socketserver
 import subprocess
 import sys
 import threading
+import urllib.parse
+import time
 import webbrowser
 
 # ログイン時の自動起動は pythonw（ウィンドウなし）で動かす。そのとき標準出力が無く、
@@ -85,80 +87,145 @@ def write_atomic(payload):
     os.replace(tmp, DATA)
 
 
+SKILLS = pathlib.Path.home() / '.claude' / 'skills'
+COMMON_TOOLS = ['Skill', 'ToolSearch', 'Read', 'Write(./sync_tmp/**)', 'Edit(./sync_tmp/**)']
+
+
 class Sync:
-    """画面の「同期」ボタンから、Claude Code（コマンド版）に taskboard-sync を頼む。
-       同時に1本だけ。結果の文章は sync.log に残し、画面には先頭だけ返す。
-       Claude に許すのは、同期に要るツールだけ（カレンダー・Slack の読み取り・2つのスクリプト）。"""
+    """Claude Code（コマンド版）に taskboard の同期スキルを頼む。
+       仕事（job）は3つ。auto はカレンダーと Slack で、タイマー（平日 10:00〜19:00 の30分ごと）と
+       週ビューの「Claude で同期」ボタンから動く。mission と eval は各ページのボタンから動く。
+       同時に動くのは1本だけ。スキルごとに別の Claude を起動し、モデルはスキルの model: に従う。
+       結果の文章は sync-<job>.log に残し、画面には先頭だけ返す。
+       Claude に許すのは、そのスキルに要るツールだけ。"""
     lock = threading.Lock()
-    state = {'state': 'idle', 'startedAt': None, 'finishedAt': None, 'summary': ''}
-    LOG = ROOT / 'sync.log'
     TMP = ROOT / 'sync_tmp'
+    JOBS = {'auto': ['calendar', 'slack'], 'mission': ['mission'], 'eval': ['eval']}
+    PARTS = {
+        'calendar': {
+            'skill': 'taskboard-calendar', 'ask': 'カレンダー同期をして。',
+            'tools': ['Bash(python calendar_sync.py:*)',
+                      'mcp__claude_ai_Google_Calendar__list_events', 'mcp__claude_ai_Google_Calendar__get_event',
+                      'mcp__claude_ai_Google_Calendar__create_event', 'mcp__claude_ai_Google_Calendar__update_event',
+                      'mcp__claude_ai_Google_Calendar__delete_event']},
+        'slack': {
+            'skill': 'taskboard-slack', 'ask': '「タスク」メモと Slack の依頼を inbox に拾い、振り分け先を提案して。',
+            'tools': ['Bash(python inbox_sync.py:*)',
+                      'mcp__claude_ai_Slack__slack_read_channel', 'mcp__claude_ai_Slack__slack_search_public_and_private',
+                      'mcp__claude_ai_Slack__slack_read_thread']},
+        'mission': {
+            'skill': 'taskboard-mission', 'ask': 'ミッションを読み込んで。シートには書かない。',
+            'tools': ['Bash(python mission_sync.py pull)']},
+        'eval': {
+            'skill': 'taskboard-eval', 'ask': '評価エピソードの候補を集めて。',
+            'tools': ['Bash(python eval_sync.py:*)', 'mcp__claude_ai_Slack__slack_search_public_and_private']},
+    }
     PROMPT = (
-        'taskboard-sync スキルの手順どおりに、カレンダー同期と inbox の取り込み・Slack の依頼の拾い上げ・振り分けの提案・ミッションの読み込み・評価エピソードの候補集めをして。\n'
+        '{skill} スキルの手順どおりに、{ask}\n'
         '- 作業フォルダは今いる場所（taskboard）。cd や PYTHONIOENCODING は付けず、'
-        '`python calendar_sync.py ...` / `python inbox_sync.py ...` の形でそのまま実行する\n'
-        '- Slack の取得結果をファイルに保存するときは sync_tmp/ フォルダの中に書く\n'
-        '- 最後の報告は、スキルの「報告」にある決まった形式の11行だけを出す。前置き・まとめ・太字は付けない\n'
+        '`python calendar_sync.py ...` のようにそのまま実行する\n'
+        '- Slack・カレンダーの取得結果をファイルに保存するときは sync_tmp/ フォルダの中に書く\n'
+        '- 最後の報告は、スキルの「報告」にある決まった形式の行だけを出す。前置き・まとめ・太字は付けない\n'
     )
-    TOOLS = [
-        'Skill', 'ToolSearch', 'Read',
-        'Write(./sync_tmp/**)', 'Edit(./sync_tmp/**)',
-        'Bash(python calendar_sync.py:*)', 'Bash(python inbox_sync.py:*)', 'Bash(python mission_sync.py pull)', 'Bash(python eval_sync.py:*)',
-        'mcp__claude_ai_Google_Calendar__list_events', 'mcp__claude_ai_Google_Calendar__get_event',
-        'mcp__claude_ai_Google_Calendar__create_event', 'mcp__claude_ai_Google_Calendar__update_event',
-        'mcp__claude_ai_Google_Calendar__delete_event',
-        'mcp__claude_ai_Slack__slack_read_channel', 'mcp__claude_ai_Slack__slack_search_public_and_private',
-        'mcp__claude_ai_Slack__slack_read_thread',
-    ]
+    AUTO_DAYS = range(0, 5)                 # 月〜金
+    AUTO_FROM, AUTO_TO = (10, 0), (19, 0)   # この間の毎時 0分・30分（19:00 も含む）
+    busy = ''
+    states = {j: {'state': 'idle', 'startedAt': None, 'finishedAt': None, 'summary': '', 'trigger': ''}
+              for j in JOBS}
 
     @classmethod
-    def status(cls):
+    def status(cls, job='auto'):
         with cls.lock:
-            return dict(cls.state)
+            return {**cls.states.get(job, cls.states['auto']), 'job': job, 'busy': cls.busy}
 
     @classmethod
-    def start(cls, extra=None):
+    def start(cls, job='auto', extra=None, trigger='manual'):
+        if job not in cls.JOBS:
+            return {'ok': False, 'state': 'error', 'error': f'知らない仕事です: {job}'}
         with cls.lock:
-            if cls.state['state'] == 'running':
-                return {**cls.state, 'ok': False, 'error': 'already running'}
+            if cls.busy:
+                return {**cls.states[job], 'job': job, 'busy': cls.busy, 'ok': False, 'error': 'already running'}
             exe = shutil.which('claude')
             if not exe:
                 return {'ok': False, 'state': 'error', 'error': 'claude コマンドが見つかりません'}
-            cls.state = {'state': 'running', 'startedAt': utc_now(), 'finishedAt': None, 'summary': ''}
-        threading.Thread(target=cls._run, args=(exe, extra), daemon=True).start()
-        return {**cls.status(), 'ok': True}
+            cls.busy = job
+            cls.states[job] = {'state': 'running', 'startedAt': utc_now(), 'finishedAt': None,
+                               'summary': '', 'trigger': trigger}
+        threading.Thread(target=cls._run, args=(job, exe, extra), daemon=True).start()
+        return {**cls.status(job), 'ok': True}
+
+    @staticmethod
+    def model_of(skill):
+        """スキルの SKILL.md の model: を読む。無ければ空（既定のモデル）"""
+        try:
+            head = (SKILLS / skill / 'SKILL.md').read_text(encoding='utf-8').split('---')[1]
+        except (OSError, IndexError):
+            return ''
+        for ln in head.splitlines():
+            if ln.startswith('model:'):
+                return ln.split(':', 1)[1].strip()
+        return ''
 
     @classmethod
-    def _run(cls, exe, extra=None):
-        cls.TMP.mkdir(exist_ok=True)
+    def _part(cls, exe, name, extra):
+        part = cls.PARTS[name]
         env = {**os.environ, 'PYTHONIOENCODING': 'utf-8'}
-        args = [exe, '-p', '--output-format', 'text', '--allowedTools', *cls.TOOLS]
+        args = [exe, '-p', '--output-format', 'text', '--allowedTools', *COMMON_TOOLS, *part['tools']]
+        model = cls.model_of(part['skill'])
+        if model:
+            args[1:1] = ['--model', model]
         flags = getattr(subprocess, 'CREATE_NO_WINDOW', 0)   # 裏で動かしているときに黒い窓を出さない
+        prompt = cls.PROMPT.format(**part)
+        if name == 'calendar' and extra:
+            prompt += (f'- 今週・来週に加えて、{extra[0]}〜{extra[1]} の週も取り込む。list_events をその範囲でも呼び、'
+                       f'ingest には --range 今週日曜:来週土曜 --range {extra[0]}:{extra[1]} の形で両方の範囲を渡す\n')
         try:
-            prompt = cls.PROMPT
-            if extra:
-                prompt += (f'- 今週・来週に加えて、{extra[0]}〜{extra[1]} の週も取り込む。list_events をその範囲でも呼び、'
-                           f'ingest には --range 今週日曜:来週土曜 --range {extra[0]}:{extra[1]} の形で両方の範囲を渡す\n')
             p = subprocess.run(args, input=prompt, capture_output=True, text=True,
                                encoding='utf-8', errors='replace', cwd=str(ROOT), env=env,
                                timeout=15 * 60, creationflags=flags)
             out = (p.stdout or '').strip()
             lines = [ln for ln in out.splitlines() if 'andbox' not in ln]   # 警告行は捨てる
             summary = '\n'.join(lines).strip()
-            ok = p.returncode == 0
-            if not ok:
+            if p.returncode != 0:
                 summary = (summary + '\n' + (p.stderr or '')).strip()
+                return False, summary + f'\nエラー：{part["skill"]} が異常終了しました'
+            return True, summary
         except subprocess.TimeoutExpired:
-            ok, summary = False, '15分で終わらなかったので止めました'
+            return False, f'エラー：{part["skill"]} が15分で終わらなかったので止めました'
         except OSError as e:
-            ok, summary = False, f'起動できませんでした: {e}'
+            return False, f'エラー：{part["skill"]} を起動できませんでした: {e}'
+
+    @classmethod
+    def _run(cls, job, exe, extra=None):
+        cls.TMP.mkdir(exist_ok=True)
+        ok, texts = True, []
+        for name in cls.JOBS[job]:
+            # カレンダーが失敗しても Slack は回す。別の仕事なので
+            o, text = cls._part(exe, name, extra)
+            ok = ok and o
+            texts.append(text)
+        summary = '\n'.join(texts)
         try:
-            cls.LOG.write_text(f'[{utc_now()}] ok={ok}\n{summary}\n', encoding='utf-8')
+            (ROOT / f'sync-{job}.log').write_text(f'[{utc_now()}] ok={ok}\n{summary}\n', encoding='utf-8')
         except OSError:
             pass
         with cls.lock:
-            cls.state = {**cls.state, 'state': 'done' if ok else 'error',
-                         'finishedAt': utc_now(), 'summary': summary[:1500]}
+            cls.busy = ''
+            cls.states[job] = {**cls.states[job], 'state': 'done' if ok else 'error',
+                               'finishedAt': utc_now(), 'summary': summary[:3000]}
+
+    @classmethod
+    def timer(cls):
+        """平日 10:00〜19:00 の毎時 0分・30分に auto を回す。何かが動いていたらその回は飛ばす"""
+        last = ''
+        while True:
+            now = datetime.datetime.now()
+            slot = now.strftime('%Y-%m-%d %H:%M')
+            if (now.weekday() in cls.AUTO_DAYS and now.minute in (0, 30)
+                    and cls.AUTO_FROM <= (now.hour, now.minute) <= cls.AUTO_TO and slot != last):
+                last = slot
+                cls.start('auto', trigger='timer')
+            time.sleep(20)
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -188,24 +255,27 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._json(200, {'ok': True, 'mode': 'server', 'file': DATA.name})
             return
         if self.path.split('?')[0] == '/api/sync':
-            self._json(200, Sync.status())
+            q = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+            self._json(200, Sync.status((q.get('job') or ['auto'])[0]))
             return
         super().do_GET()
 
     def do_POST(self):
         if self.path.split('?')[0] == '/api/sync':
-            # 本文に {"from": "YYYY-MM-DD", "to": "YYYY-MM-DD"} があれば、その週も取り込む（画面で見ている週）
-            extra = None
+            # 本文の job で仕事を選ぶ（auto / mission / eval。無ければ auto）。
+            # {"from": "YYYY-MM-DD", "to": "YYYY-MM-DD"} があれば、その週もカレンダーに取り込む（画面で見ている週）
+            extra, job = None, 'auto'
             try:
                 n = int(self.headers.get('Content-Length') or 0)
                 if 0 < n < 10000:
                     body = json.loads(self.rfile.read(n).decode('utf-8'))
+                    job = str(body.get('job') or 'auto')
                     f, t = str(body.get('from', '')), str(body.get('to', ''))
                     if len(f) == 10 and len(t) == 10 and f[4] == '-' and t[4] == '-':
                         extra = (f, t)
-            except (ValueError, json.JSONDecodeError):
+            except (ValueError, json.JSONDecodeError, AttributeError):
                 extra = None
-            self._json(200, Sync.start(extra))
+            self._json(200, Sync.start(job, extra))
             return
         if self.path.split('?')[0] != '/api/save':
             self._json(404, {'ok': False, 'error': 'not found'})
@@ -270,6 +340,7 @@ def main():
         print()
         if not a.no_browser:
             threading.Timer(0.6, lambda: webbrowser.open(url)).start()
+        threading.Thread(target=Sync.timer, daemon=True).start()
         try:
             srv.serve_forever()
         except KeyboardInterrupt:

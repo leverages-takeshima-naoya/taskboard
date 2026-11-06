@@ -92,15 +92,23 @@ Slack リスト「task backlog_たけしま」の作りに合わせてありま�
 - 左の「この週にやる」は、タスク化・進行中・リリース待ちのもの。未着手は下に畳んである
 - 灰色は Google カレンダーの会議。破線のブロックはまだカレンダーに反映していないもの
 
-**週カレンダー上部の「Claude に同期を頼む」ボタン**（2026-10-02）で、`server.py` が裏で
-Claude Code（コマンド版 `claude -p`）を起動し、`taskboard-sync` を実行します。1〜2分で終わり、
-結果がボタンの下に出ます。裏の Claude に許すツールは `server.py` の `Sync.TOOLS` に限定してあります
-（カレンダーの読み書き、Slack の読み取り、`calendar_sync.py` / `inbox_sync.py`、`sync_tmp/` への書き込み）。
-最後の結果は `sync.log` に残ります。コマンド版 Claude のログイン先組織に、Google カレンダーと
-Slack のコネクタがつながっている必要があります。
+**Claude の同期は仕事ごとに分かれています**（2026-11-06）。`server.py` が裏で Claude Code（コマンド版 `claude -p`）を
+スキルごとに起動します。モデルは各スキルの `SKILL.md` の `model:` に従います（無ければ既定のモデル）。
+
+| 仕事 | スキル | いつ動くか |
+|---|---|---|
+| カレンダー同期 | `taskboard-calendar` | 平日 10:00〜19:00 の毎時 0分・30分に自動。週カレンダー上部の「Claude で同期」でも動く |
+| inbox の取り込み・Slack の依頼・振り分け提案 | `taskboard-slack` | 上と同じ（カレンダーの次に続けて動く） |
+| ミッションの読み込み | `taskboard-mission` | ミッションのページの「シートから読み込む」 |
+| 評価エピソードの候補集め | `taskboard-eval` | 評価のページの「候補を集める」 |
+
+同時に動くのは1本だけです。自動の時刻に別の仕事が動いていれば、その回は飛ばします。
+裏の Claude に許すツールは `server.py` の `Sync.PARTS` にスキルごとに限定してあります。
+最後の結果は `sync-<仕事>.log`（auto / mission / eval）に残ります。コマンド版 Claude のログイン先組織に、
+Google カレンダーと Slack のコネクタがつながっている必要があります。PC とサーバーが起きているときしか動きません。
 
 **Google カレンダーへの反映は Claude が受け持ちます。** 「カレンダー同期して」と頼むと、
-スキル `taskboard-sync` が `calendar_sync.py` を使って予定を作り・動かし・消し、
+スキル `taskboard-calendar` が `calendar_sync.py` を使って予定を作り・動かし・消し、
 会議とカレンダー側の変更を `calendar.json` に書きます。画面は calendar.json を読むだけです。
 カレンダーで予定を動かすと、次に同期したあとボードの時刻も動きます。
 
@@ -116,7 +124,7 @@ gcloud の認証ではカレンダーの権限が Google にブロックされ�
 CPP文言見直す
 ```
 
-拾うのは Claude の同期（`taskboard-sync`）のときです。`inbox_sync.py` が `inbox.json` に書き、
+拾うのは Claude の同期（`taskboard-slack`）のときです。`inbox_sync.py` が `inbox.json` に書き、
 画面はそれを読んで取り込みます。画面の入力欄から直接足すこともできます。
 
 各項目でプロジェクト・親タスク・期日・工数を選べます。

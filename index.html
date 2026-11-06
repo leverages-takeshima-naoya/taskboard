@@ -757,6 +757,12 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .ms-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;color:var(--ink3);font-size:12.5px;padding:2px 2px 4px}
 .ms-top b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 .ms-top a{margin-left:auto;color:var(--accent);text-decoration:none}
+.job-btn{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:var(--radius);
+  border:1px solid var(--line);color:var(--ink2);font-size:12px;font-weight:500;flex:none}
+.job-btn:hover{background:var(--hover);color:var(--ink)}
+.job-btn:disabled{color:var(--ink3);cursor:default;background:none}
+.ev-h .job-btn{margin-left:auto}
+.ib-empty .job-btn{margin-top:10px}
 .ms-top a:hover{text-decoration:underline}
 .ms-card{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .ms-h{display:flex;align-items:baseline;gap:12px}
@@ -3175,7 +3181,7 @@ window.addEventListener('drop', e => {
    カレンダーに置く単位は「最小のタスク」。サブタスクがあるタスクはサブタスクを置き、
    親は置かない。時刻は置いたもの（タスク or サブタスク）の schedule {date, start, setAt} に持つ。
    長さは工数から出す。
-   Google カレンダーへの反映は Claude の同期ルーティン（taskboard-sync）の仕事で、
+   Google カレンダーへの反映は Claude の同期ルーティン（taskboard-calendar）の仕事で、
    結果は calendar.json に置かれる。この画面は calendar.json を読むだけで書かない。
    書き手を1人ずつに分けて、tasks.json と calendar.json が上書きし合わないようにするため。
    ========================================================================= */
@@ -3304,10 +3310,14 @@ async function loadCalendar(){
   if(UI.view === 'week') renderWeek();
 }
 window.addEventListener('focus', () => { loadInbox(); loadMissions(); loadEval(); if(UI.view === 'week') loadCalendar(); });
+/* 平日 10〜19時は server.py が30分ごとに自動で同期する。開きっぱなしでも反映されるよう、5分ごとに読み直す */
+setInterval(() => { loadInbox(); if(UI.view === 'week') loadCalendar(); }, 5 * 60 * 1000);
 
 /* --- 「Claude に同期を頼む」ボタン ---
-   server.py が裏で Claude Code（コマンド版）に taskboard-sync を頼む。終わるまで数十秒〜数分。
-   その間は数秒おきに様子を見て、終わったら calendar.json と inbox.json を読み直す。 */
+   server.py が裏で Claude Code（コマンド版）にカレンダー同期と Slack の取り込み（job: auto）を頼む。
+   同じものが平日 10〜19時に30分ごと自動でも動く。終わるまで数十秒〜数分。
+   その間は数秒おきに様子を見て、終わったら calendar.json と inbox.json を読み直す。
+   ミッションの読み込み（mission）と評価エピソードの候補集め（eval）は、各ページのボタンから頼む（jobButton） */
 let syncInfo = null;        // server.py の /api/sync の返事
 let syncTimer = null;
 const syncRunning = () => !!(syncInfo && syncInfo.state === 'running');
@@ -3322,18 +3332,18 @@ function syncWhen(){
 async function startSync(){
   try{
     /* 週カレンダーで今週・来週以外を見ていたら、その週も取り込んでもらう */
-    let body = null;
+    const req = {job: 'auto'};
     if(UI.view === 'week' && (wkOffset < 0 || wkOffset > 1)){
       const d = weekDays().map(isoOf);
-      body = JSON.stringify({from: d[0], to: d[6]});
+      req.from = d[0]; req.to = d[6];
     }
-    const r = await fetch('/api/sync', body ? {method: 'POST', headers: {'Content-Type': 'application/json'}, body}
-                                            : {method: 'POST'});
+    const r = await fetch('/api/sync', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(req)});
     syncInfo = await r.json();
   }catch(e){
     toast('同期を始められませんでした。サーバーが動いているか確認してください');
     return;
   }
+  if(syncInfo.ok === false && syncInfo.busy && syncInfo.busy !== 'auto'){ toast(JOB_NAMES[syncInfo.busy] + 'の途中です。終わってから押してください'); return; }
   if(syncInfo.ok === false && syncInfo.state !== 'running'){ toast(syncInfo.error || '同期を始められませんでした'); return; }
   $('#syncPop').hidden = true;
   renderTop();
@@ -3359,16 +3369,59 @@ function pollSync(){
 })();
 $('#btnSync').addEventListener('click', () => { if(!syncRunning()) startSync(); });
 /* 同期の結果は「成功か、失敗ならその理由」だけ出す。
-   成功＝プロセスが正常終了し、報告の「エラー：」行が「なし」。それ以外は失敗として理由を出す */
-function syncOutcome(){
-  if(!syncInfo || (!syncInfo.summary && syncInfo.state !== 'error')) return null;
-  const text = syncInfo.summary || '';
-  const lines = text.split('\n').map(x => x.trim()).filter(Boolean);
-  const line = lines.find(x => /^エラー[：:]/.test(x));
-  const reason = line ? line.replace(/^エラー[：:]\s*/, '') : '';
-  if(syncInfo.state === 'done' && (reason === 'なし' || (!line && lines.length))) return {ok: true};
-  return {ok: false, reason: reason && reason !== 'なし' ? reason : (lines[lines.length - 1] || '原因不明')};
+   成功＝プロセスが正常終了し、報告の「エラー：」行がどれも「なし」（auto はスキル2つ分の報告が並ぶ）。
+   それ以外は失敗として理由を出す */
+function jobOutcome(info){
+  if(!info || (!info.summary && info.state !== 'error')) return null;
+  const lines = (info.summary || '').split('\n').map(x => x.trim()).filter(Boolean);
+  const errs = lines.filter(x => /^エラー[：:]/.test(x)).map(x => x.replace(/^エラー[：:]\s*/, ''));
+  const bad = errs.filter(x => x !== 'なし');
+  if(info.state === 'done' && !bad.length && lines.length) return {ok: true};
+  return {ok: false, reason: bad.join(' / ') || lines[lines.length - 1] || '原因不明'};
 }
+const syncOutcome = () => jobOutcome(syncInfo);
+
+/* ページごとのボタン。ミッションの読み込みと評価エピソードの候補集めを、そのページから頼む */
+const JOB_NAMES = {auto: '同期', mission: 'ミッションの読み込み', eval: '評価エピソードの候補集め'};
+const jobInfo = {};          // {job: server.py の /api/sync?job= の返事}
+const jobTimer = {};
+const jobRunning = job => !!(jobInfo[job] && jobInfo[job].state === 'running');
+function jobButton(job, label){
+  return '<button class="job-btn" data-job="' + job + '"' + (jobRunning(job) ? ' disabled' : '') + '>' + IC_SYNC +
+    (jobRunning(job) ? JOB_NAMES[job] + '中…' : label) + '</button>';
+}
+async function startJob(job){
+  let info;
+  try{
+    const r = await fetch('/api/sync', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({job})});
+    info = await r.json();
+  }catch(e){ toast('始められませんでした。サーバーが動いているか確認してください'); return; }
+  if(info.ok === false){
+    toast(info.busy ? JOB_NAMES[info.busy] + 'の途中です。終わってから押してください' : (info.error || '始められませんでした'));
+    return;
+  }
+  jobInfo[job] = info; renderList(); pollJob(job);
+}
+function pollJob(job){
+  clearTimeout(jobTimer[job]);
+  jobTimer[job] = setTimeout(async () => {
+    try{ jobInfo[job] = await (await fetch('/api/sync?job=' + job + '&ts=' + Date.now(), {cache: 'no-store'})).json(); }catch(e){}
+    if(jobRunning(job)){ pollJob(job); return; }
+    if(job === 'mission') await loadMissions(); else await loadEval();
+    renderList();
+    const o = jobOutcome(jobInfo[job]);
+    if(o) toast(o.ok ? JOB_NAMES[job] + 'が終わりました' : 'エラー：' + o.reason);
+  }, 4000);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-job]'); if(!b || b.disabled) return;
+  startJob(b.dataset.job);
+});
+/* 開いたときに裏で動いていれば、終わるのを待つ */
+for(const job of ['mission', 'eval']) (async () => {
+  try{ jobInfo[job] = await (await fetch('/api/sync?job=' + job + '&ts=' + Date.now(), {cache: 'no-store'})).json(); }catch(e){ return; }
+  if(jobRunning(job)) pollJob(job);
+})();
 let syncPopTimer = null;
 function showSyncPop(){
   const pop = $('#syncPop'), o = syncOutcome();
@@ -3795,7 +3848,7 @@ week.addEventListener('drop', e => {
 
 /* =========================================================================
    inbox — 思いついたタスクの仮置き場
-   Slack の自分宛てDMに「タスク」で始まるメッセージを送ると、Claude（taskboard-sync）が
+   Slack の自分宛てDMに「タスク」で始まるメッセージを送ると、Claude（taskboard-slack）が
    inbox.json に書く。この画面は inbox.json を読んで S.inbox に取り込むだけで、書かない。
    プロジェクトを選ぶと、そのプロジェクトの「未着手」に普通のタスクとして移る。
    ========================================================================= */
@@ -3837,7 +3890,7 @@ async function loadInbox(){
 
 /* =========================================================================
    ミッション — ミッション管理シートの進捗
-   正本はシート。Claude（taskboard-sync）が mission_sync.py で読んで missions.json に書く。
+   正本はシート。Claude（taskboard-mission）が mission_sync.py で読んで missions.json に書く。
    この画面は読むだけ。タスクとのつながりは tasks.json の t.mission（ミッション名）に持つ
    ========================================================================= */
 let MIS = null;
@@ -3872,7 +3925,7 @@ function misBar(actual, forecast){
 function renderMissions(el){
   if(!MIS){
     el.innerHTML = '<div class="ib"><div class="ib-empty"><b>ミッションはまだ読み込まれていません</b>' +
-      '<p>「Claude で同期」を押すと、ミッション管理シートから読み込みます。</p></div></div>';
+      '<p>ボタンを押すと、ミッション管理シートから読み込みます。</p>' + jobButton('mission', 'シートから読み込む') + '</div></div>';
     return;
   }
   const d = new Date(MIS.week + 'T00:00');
@@ -3907,9 +3960,10 @@ function renderMissions(el){
   el.innerHTML = '<div class="ms">' +
     '<div class="ms-top"><span>FY26下期</span><span>' + (d.getMonth() + 1) + '/' + d.getDate() + ' の週</span>' +
       (all != null ? '<span>全体（加重平均） <b>' + all + '%</b></span>' : '') +
-      '<a href="https://docs.google.com/spreadsheets/d/' + esc(MIS.sheetId) + '/edit" target="_blank" rel="noopener">シートを開く</a></div>' +
+      '<a href="https://docs.google.com/spreadsheets/d/' + esc(MIS.sheetId) + '/edit" target="_blank" rel="noopener">シートを開く</a>' +
+      jobButton('mission', 'シートから読み込む') + '</div>' +
     cards +
-    '<div class="ib-hint">シートの数字は同期のときに読み込みます。週の実績・着地見込・コメントは、Claude に「ミッションの進捗を書いて」と頼むとシートに書き込みます。' +
+    '<div class="ib-hint">シートの数字は「シートから読み込む」で読み込みます。週の実績・着地見込・コメントは、Claude に「ミッションの進捗を書いて」と頼むとシートに書き込みます。' +
       'タスクは詳細の「ミッション」で紐づけます。</div>' +
   '</div>';
 }
@@ -4010,11 +4064,12 @@ function renderEval(el){
     '</div>';
   }
   el.innerHTML = '<div class="ev">' +
-    '<section><div class="ev-h"><h3>受け箱</h3><span>' + (inbox.length ? inbox.length + '件・Claude が拾った候補' : '新しい候補はありません') + '</span></div>' +
+    '<section><div class="ev-h"><h3>受け箱</h3><span>' + (inbox.length ? inbox.length + '件・Claude が拾った候補' : '新しい候補はありません') + '</span>' +
+      jobButton('eval', '候補を集める') + '</div>' +
       inbox.map(x => evCard(x, true)).join('') + '</section>' +
     '<section><div class="ev-h"><h3>評価項目</h3><span>FY26下期 · 採用 ' + mine.length + '件 · 左の数字は今期のエピソード、右は過去の自己評点' +
-      '</span></div>' + (items.length ? areas : '<div class="ev-none">評価シートがまだ読み込まれていません。「Claude で同期」で読み込みます。</div>') + '</section>' +
-    '<div class="ib-hint">候補は1日1回、同期のときに Claude が Slack・会議・完了したタスクから拾います。期末に、採用したメモと出典から評価シートの文章をまとめて書きます。</div>' +
+      '</span></div>' + (items.length ? areas : '<div class="ev-none">評価シートがまだ読み込まれていません。「候補を集める」で読み込みます。</div>') + '</section>' +
+    '<div class="ib-hint">候補は「候補を集める」を押すと、前回の続きの日から昨日までを Claude が Slack・会議・完了したタスクから拾います。期末に、採用したメモと出典から評価シートの文章をまとめて書きます。</div>' +
   '</div>';
 }
 function evFind(id){
