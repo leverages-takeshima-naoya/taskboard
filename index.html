@@ -587,8 +587,9 @@ button{cursor:pointer;background:none;border:0;padding:0}
 [hidden]{display:none!important}
 
 /* ---------- 週ビュー（左にタスクバー、右に週カレンダー） ---------- */
-.week{flex:1;overflow:auto;padding:12px 20px 40px}
-.wk-top{display:flex;align-items:center;gap:6px;font-size:13px;position:sticky;top:-12px;z-index:9;
+/* カレンダーは横に日が続いていて、右へスライドすると次の週が見える。縦横のスクロールはカレンダーの枠の中だけで起きる */
+.week{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:12px 20px 12px}
+.wk-top{display:flex;align-items:center;gap:6px;font-size:13px;flex:none;
   background:var(--bg);padding:8px 0 10px;margin:-8px 0 0;height:46px;box-sizing:border-box}
 .wk-top button{padding:3px 9px;border:1px solid var(--line);border-radius:6px;color:var(--ink2);font-size:12px}
 .wk-top button:hover{background:var(--hover);color:var(--ink)}
@@ -620,9 +621,9 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .sync-pop button{margin-left:6px;color:inherit;opacity:.7;padding:0 2px}
 .sync-pop button:hover{opacity:1}
 @keyframes syncpop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-.wk-wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px;align-items:start}
-.wk-bar{background:var(--sunk);border-radius:10px;padding:10px 8px;position:sticky;top:34px;
-  max-height:calc(100vh - 150px);overflow-y:auto}
+.wk-wrap{flex:1;min-height:0;display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px}
+.wk-bar{background:var(--sunk);border-radius:10px;padding:10px 8px;min-height:0;overflow-y:auto}
+.wk-main{display:flex;flex-direction:column;min-width:0;min-height:0}
 .wk-bar.drop{box-shadow:inset 0 0 0 2px var(--accent)}
 .wk-bar-h{display:flex;justify-content:space-between;font-size:12px;font-weight:600;padding:2px 4px 8px}
 .wk-bar-h span{font-weight:400;color:var(--ink3)}
@@ -644,11 +645,19 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .wk-more{display:block;width:100%;text-align:left;font-size:12px;color:var(--ink2);padding:10px 4px 6px}
 .wk-more:hover{color:var(--accent)}
 .wk-hint{font-size:11.5px;color:var(--ink3);padding:6px 4px 0;line-height:1.6}
-.wk-cal{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+/* 1日の幅（--wk-dw）は1週がちょうど枠に収まる幅。横スクロールは1日ずつ吸いつく */
+.wk-scroll{flex:1;min-height:0;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  scroll-snap-type:x proximity;scroll-padding-left:44px}
+.wk-cal{width:max-content}
 /* 日付と曜日の行は、下にスクロールしても上に貼りついたまま */
-.wk-head{position:sticky;top:34px;z-index:7;background:var(--panel);border-radius:10px 10px 0 0;
+.wk-head{position:sticky;top:0;z-index:9;background:var(--panel);
   border-bottom:1px solid var(--line2);box-shadow:0 1px 0 var(--line2)}
-.wk-head,.wk-allday,.wk-grid{display:grid;grid-template-columns:44px repeat(7,minmax(150px,1fr));min-width:max-content}
+.wk-head,.wk-allday,.wk-grid{display:grid;grid-template-columns:44px repeat(var(--wk-n,7),var(--wk-dw,150px))}
+.wk-head > div:not(:first-child){scroll-snap-align:start}
+/* 時刻の列は、横にスクロールしても左に貼りついたまま */
+.wk-head > div:first-child,.wk-allday > div:first-child,.wk-hours{position:sticky;left:0;z-index:8;
+  background:var(--panel);box-shadow:1px 0 0 var(--line2)}
+.wk-head div.ws,.wk-allday div.ws,.wk-day.ws{border-left-color:var(--line)}
 .wk-head div{padding:7px 6px;font-size:12px;color:var(--ink2);border-left:1px solid var(--line2)}
 .wk-head div.today{color:var(--accent);font-weight:600}
 .wk-head div.off{color:var(--ink3)}
@@ -686,7 +695,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .wk-ghost{position:absolute;left:2px;right:2px;border:2px solid var(--accent);border-radius:5px;
   background:var(--accent-bg);color:var(--accent);font-size:11px;padding:1px 5px;pointer-events:none;z-index:5}
 .wk-now{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:4;pointer-events:none}
-.wk-legend{display:flex;gap:14px;font-size:11px;color:var(--ink3);margin-top:8px}
+.wk-legend{display:flex;gap:14px;font-size:11px;color:var(--ink3);margin-top:8px;flex:none}
 .wk-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:4px}
 /* ---------- inbox ---------- */
 /* 1行目がタイトル、2行目がチップ。AIの提案は薄いアクセント色の1行（DESIGN.md） */
@@ -894,6 +903,8 @@ a.ev-src:hover{color:var(--accent);text-decoration:underline}
 .brand-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ico{display:inline-grid;place-items:center;border-radius:6px;flex:none;overflow:hidden;line-height:1}
 .ico img{width:100%;height:100%;object-fit:cover;display:block}
+.ico-logo{border-radius:50%}
+.ico-logo svg{width:100%;height:100%;display:block}
 /* ---------- 設定 ---------- */
 .set-open{display:inline-flex;align-items:center;gap:6px}
 .set-open svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -2615,6 +2626,7 @@ $('.side-scroll').addEventListener('click', e => {
   if(b.dataset.view === 'week'){
     if(isPage(UI.project)) UI.project = '*';
     if(UI.view !== 'week') UI.lastView = UI.view;
+    wkFrom = null;   /* 開くたびに今週から */
     UI.view = 'week'; saveUI(); renderAll(); loadCalendar(); return;
   }
   if(UI.view === 'week') UI.view = UI.lastView || 'board';
@@ -3201,7 +3213,10 @@ const DOW = ['日','月','火','水','木','金','土'];
 /* 「この週にやる」に出すステータス。タスク化（＝着手待ち）より後ろ */
 const WK_ACTIVE = new Set(['ticketed', 'doing', 'release']);
 let CAL = null;           // calendar.json の中身。無ければ null
-let wkOffset = 0;         // 0 = 今週。持ち越さない
+let wkFrom = null;        // 横に並べている最初の日（日曜）。null なら先週から並べ直して今週を出す
+let wkWeeks = 6;          // 何週ぶん並べるか。右端・左端に近づくと4週ずつ足す
+let wkPos = null;         // {left: 先頭から何日目か（小数）, top: px}。描画し直してもこの位置に戻す
+let wkDW = 150;           // 1日の幅（px）
 let wkDrag = null;        // {id, grab} grab = 掴んだ位置がブロック上端から何分か
 let wkBacklogOpen = false;
 
@@ -3216,10 +3231,23 @@ function normSchedule(v){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(v.date || '') || !/^\d{2}:\d{2}$/.test(v.start || '')) return null;
   return {date: v.date, start: v.start, setAt: v.setAt || new Date().toISOString()};
 }
-function weekDays(){
+/* n 週あとの日曜。0 = 今週 */
+function weekStart(n){
   const d = new Date(); d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - d.getDay() + wkOffset * 7);
+  d.setDate(d.getDate() - d.getDay() + n * 7);
+  return d;
+}
+const addDays = (iso, n) => { const d = new Date(iso + 'T00:00'); d.setDate(d.getDate() + n); return isoOf(d); };
+const daysBetween = (a, b) => Math.round((new Date(b + 'T00:00') - new Date(a + 'T00:00')) / 864e5);
+/* 今週の7日（サイドバーの「週」の表示用） */
+function weekDays(){
+  const d = weekStart(0);
   return Array.from({length: 7}, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return x; });
+}
+/* 週カレンダーに横に並べる日 */
+function wkDays(){
+  const d = new Date(wkFrom + 'T00:00');
+  return Array.from({length: wkWeeks * 7}, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return x; });
 }
 
 /* --- 置く単位（ユニット）: {id, t, s}。s があればサブタスク --- */
@@ -3340,11 +3368,11 @@ function syncWhen(){
 }
 async function startSync(){
   try{
-    /* 週カレンダーで今週・来週以外を見ていたら、その週も取り込んでもらう */
+    /* 週カレンダーで今週・来週より外を見ていたら、見えている日も取り込んでもらう */
     const req = {job: 'auto'};
-    if(UI.view === 'week' && (wkOffset < 0 || wkOffset > 1)){
-      const d = weekDays().map(isoOf);
-      req.from = d[0]; req.to = d[6];
+    const v = UI.view === 'week' ? wkVisible() : null;
+    if(v && (v[0] < isoOf(weekStart(0)) || v[1] >= isoOf(weekStart(2)))){
+      req.from = v[0]; req.to = v[1];
     }
     const r = await fetch('/api/sync', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(req)});
     syncInfo = await r.json();
@@ -3565,7 +3593,8 @@ function barUnits(){
 
 function renderWeek(){
   const el = $('#week');
-  const days = weekDays();
+  if(!wkFrom){ wkFrom = isoOf(weekStart(-1)); wkWeeks = 6; wkPos = {left: 7, top: wkPos ? wkPos.top : 0}; }
+  const days = wkDays();
   const isos = days.map(isoOf);
   const today = todayISO();
 
@@ -3607,10 +3636,11 @@ function renderWeek(){
   days.forEach((d, i) => {
     const iso = isos[i];
     const off = d.getDay() === 0 || d.getDay() === 6;
-    head += '<div class="' + (iso === today ? 'today' : '') + (off ? ' off' : '') + '">' +
+    const ws = d.getDay() === 0 ? ' ws' : '';   /* 週の境目の線を少し濃くする */
+    head += '<div class="' + (iso === today ? 'today' : '') + (off ? ' off' : '') + ws + '">' +
       mdOf(iso) + ' ' + DOW[d.getDay()] + '</div>';
     /* 終日の end は翌日（排他的）で来る */
-    allday += '<div>' + evs.filter(e => {
+    allday += '<div class="' + ws + '">' + evs.filter(e => {
         if(!e.allDay) return false;
         const s = e.start.slice(0, 10), en = (e.end || '').slice(0, 10);
         return en > s ? (s <= iso && iso < en) : s === iso;
@@ -3659,35 +3689,92 @@ function renderWeek(){
       const now = new Date(), m = now.getHours() * 60 + now.getMinutes();
       if(m > WK_START_H * 60 && m < WK_END_H * 60) blocks += '<div class="wk-now" style="top:' + yOf(m) + 'px"></div>';
     }
-    cols += '<div class="wk-day' + (iso === today ? ' today' : '') + '" data-date="' + iso + '" style="height:' + H +
+    cols += '<div class="wk-day' + (iso === today ? ' today' : '') + ws + '" data-date="' + iso + '" style="height:' + H +
       'px;background-image:' + grid + '">' + blocks + '</div>';
   });
   head += '</div>'; allday += '</div>';
-
-  /* 同期の状態。会議は Claude が取り込んだ範囲しか見えない */
-  const pend = pendingCount();
-  let sync = CAL && CAL.syncedAt
-    ? 'カレンダー取り込み ' + new Date(CAL.syncedAt).toLocaleString('ja-JP', {month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})
-    : 'カレンダー未取り込み';
-  const rngs = CAL ? (CAL.ranges || (CAL.range ? [CAL.range] : [])) : [];
-  if(CAL && rngs.length && !rngs.some(r => r.from <= isos[0] && isos[6] <= r.to))
-    sync += '（この週の会議は未取り込み。「Claude で同期」で取り込めます）';
-  if(pend) sync += ' · <b>未反映 ' + pend + '件</b>';
 
   el.innerHTML =
     '<div class="wk-top">' +
       '<button data-wk="prev" title="前の週">‹</button><button data-wk="now">今週</button>' +
       '<button data-wk="next" title="次の週">›</button>' +
-      '<span class="wk-range">' + mdOf(isos[0]) + ' – ' + mdOf(isos[6]) + '</span>' +
-      '<span class="spacer"></span><span class="wk-sync">' + sync + '</span>' +
+      '<span class="wk-range"></span>' +
+      '<span class="spacer"></span><span class="wk-sync"></span>' +
     '</div>' +
     '<div class="wk-wrap">' + bar +
-      '<div><div class="wk-cal">' + head + allday + '<div class="wk-grid">' + hours + cols + '</div></div>' +
+      '<div class="wk-main"><div class="wk-scroll"><div class="wk-cal" style="--wk-n:' + days.length + '">' +
+        head + allday + '<div class="wk-grid">' + hours + cols + '</div></div></div>' +
       '<div class="wk-legend"><span><i style="background:var(--violet-bg);border:1px solid var(--violet)"></i>タスク</span>' +
       '<span><i style="background:var(--violet-bg);border:1px dashed var(--violet)"></i>カレンダー未反映</span>' +
       '<span><i style="background:var(--sunk);border:1px solid var(--line)"></i>会議（Google カレンダー）</span></div></div>' +
     '</div>';
+
+  /* 1日の幅は、1週（7日）がちょうど枠に収まる幅。狭い画面では150pxを下回らない */
+  const sc = $('.wk-scroll', el);
+  wkDW = Math.max(150, Math.floor((sc.clientWidth - 44) / 7));
+  el.style.setProperty('--wk-dw', wkDW + 'px');
+  sc.scrollLeft = wkPos.left * wkDW;
+  sc.scrollTop = wkPos.top;
+  wkLabel();
 }
+/* いま枠に見えている最初と最後の日 */
+function wkVisible(){
+  const sc = $('.wk-scroll', $('#week'));
+  if(!sc || !wkFrom || !sc.clientWidth) return null;
+  const a = Math.round(sc.scrollLeft / wkDW);
+  const n = Math.max(1, Math.floor((sc.clientWidth - 44) / wkDW + .05));
+  return [addDays(wkFrom, a), addDays(wkFrom, a + n - 1)];
+}
+/* 上の段の期間と同期の状態。スクロールするたびに書き換える。会議は Claude が取り込んだ範囲しか見えない */
+function wkLabel(){
+  const v = wkVisible(); if(!v) return;
+  $('.wk-range', $('#week')).textContent = mdOf(v[0]) + ' – ' + mdOf(v[1]);
+  const pend = pendingCount();
+  let sync = CAL && CAL.syncedAt
+    ? 'カレンダー取り込み ' + new Date(CAL.syncedAt).toLocaleString('ja-JP', {month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})
+    : 'カレンダー未取り込み';
+  const rngs = CAL ? (CAL.ranges || (CAL.range ? [CAL.range] : [])) : [];
+  if(CAL && rngs.length && !rngs.some(r => r.from <= v[0] && v[1] <= r.to))
+    sync += '（見えている日の会議は未取り込み。「Claude で同期」で取り込めます）';
+  if(pend) sync += ' · <b>未反映 ' + pend + '件</b>';
+  $('.wk-sync', $('#week')).innerHTML = sync;
+}
+/* 先頭から left 日目が見えるように、足りなければ4週ずつ前後に足して描画し直す。足したら true */
+function wkExtend(left){
+  const sc = $('.wk-scroll', $('#week'));
+  const vis = (sc.clientWidth - 44) / wkDW;
+  if(left + vis > wkWeeks * 7 - 7){ wkWeeks += 4; renderWeek(); return true; }
+  if(left < 3){
+    wkFrom = addDays(wkFrom, -28); wkWeeks += 4; wkPos.left += 28;
+    renderWeek(); return true;
+  }
+  return false;
+}
+/* ‹ › と「今週」。週の頭（日曜）へなめらかに動かす */
+function wkGo(a){
+  const cur = wkPos.left;
+  let to = a === 'prev' ? Math.ceil(cur / 7 - .01) * 7 - 7
+         : a === 'next' ? Math.floor(cur / 7 + .01) * 7 + 7
+         : daysBetween(wkFrom, isoOf(weekStart(0)));
+  const before = wkFrom;
+  wkExtend(to);
+  to += daysBetween(wkFrom, before);   /* 前に足したら、そのぶん位置がずれる */
+  $('.wk-scroll', $('#week')).scrollTo({left: to * wkDW, behavior: 'smooth'});
+}
+/* scroll は泡立たないので、捕まえる段階で拾う */
+$('#week').addEventListener('scroll', e => {
+  const sc = e.target;
+  if(!sc.classList || !sc.classList.contains('wk-scroll')) return;
+  wkPos = {left: sc.scrollLeft / wkDW, top: sc.scrollTop};
+  wkLabel();
+  if(!wkDrag && !wkResize) wkExtend(wkPos.left);   /* ドラッグ中に描画し直すと掴んでいるものが消える */
+}, true);
+let wkResizeRaf = 0;
+window.addEventListener('resize', () => {
+  if(UI.view !== 'week' || $('#week').hidden) return;
+  cancelAnimationFrame(wkResizeRaf);
+  wkResizeRaf = requestAnimationFrame(renderWeek);
+});
 
 /* --- 週ビューの操作 --- */
 const week = $('#week');
@@ -3741,10 +3828,8 @@ week.addEventListener('click', e => {
   const b = e.target.closest('[data-wk]');
   if(b){
     const a = b.dataset.wk;
-    if(a === 'prev') wkOffset--;
-    else if(a === 'next') wkOffset++;
-    else if(a === 'now') wkOffset = 0;
-    else if(a === 'backlog') wkBacklogOpen = !wkBacklogOpen;
+    if(a === 'prev' || a === 'next' || a === 'now'){ wkGo(a); return; }
+    if(a === 'backlog') wkBacklogOpen = !wkBacklogOpen;
     else if(a === 'sync'){ startSync(); return; }
     renderWeek(); return;
   }
@@ -3808,16 +3893,23 @@ week.addEventListener('dragend', () => {
   wkDrag = null; wkClearDrop();
   $$('.dragging', week).forEach(x => x.classList.remove('dragging'));
 });
-/* ドラッグしたまま画面の上端・下端に近づけると、カレンダーが自動でスクロールする
-   （ドラッグ中はマウスホイールが効かないため）。端に近いほど速い */
-const WK_EDGE = 70;
+/* ドラッグしたままカレンダーの上下左右の端に近づけると、自動でスクロールする
+   （ドラッグ中はマウスホイールが効かないため）。端に近いほど速い。左右は別の週へ運ぶため */
+const WK_EDGE = 70, WK_EDGE_X = 40;
 function wkAutoScroll(e){
-  const r = week.getBoundingClientRect();
-  const top = r.top + 90;                 /* 上に貼りついている週の切り替えと日付の行の下から数える */
+  const sc = $('.wk-scroll', week); if(!sc) return;
+  const r = sc.getBoundingClientRect();
+  const top = r.top + 40;                 /* 上に貼りついている日付の行の下から数える */
   let v = 0;
   if(e.clientY < top + WK_EDGE) v = -Math.ceil((top + WK_EDGE - e.clientY) / 4);
   else if(e.clientY > r.bottom - WK_EDGE) v = Math.ceil((e.clientY - (r.bottom - WK_EDGE)) / 4);
-  if(v) week.scrollTop += Math.max(-30, Math.min(30, v));
+  if(v) sc.scrollTop += Math.max(-30, Math.min(30, v));
+  if(e.clientY < r.top || e.clientY > r.bottom) return;
+  const left = r.left + 44;               /* 時刻の列の右から数える */
+  let h = 0;
+  if(e.clientX > left && e.clientX < left + WK_EDGE_X) h = -Math.ceil((left + WK_EDGE_X - e.clientX) / 3);
+  else if(e.clientX > r.right - WK_EDGE_X && e.clientX < r.right) h = Math.ceil((e.clientX - (r.right - WK_EDGE_X)) / 3);
+  if(h) sc.scrollLeft += Math.max(-20, Math.min(20, h));
 }
 week.addEventListener('dragover', e => {
   if(!wkDrag) return;
@@ -4369,7 +4461,9 @@ function ibFocus(id){
 }
 document.addEventListener('keydown', e => {
   if(UI.project !== INBOX_P || UI.view === 'week' || pkOpen || $('#modalRoot').innerHTML) return;
-  if(/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+  /* メニューで選んだあとはフォーカスがチップ（.pk）に残る。そこからも続けてキーで動けるようにする */
+  const onChip = e.target.classList && e.target.classList.contains('pk') && list.contains(e.target);
+  if((!onChip && /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName)) || e.ctrlKey || e.metaKey || e.altKey) return;
   const k = e.key.toLowerCase();
   if(k === 'c'){ const a = $('#ibAdd'); if(a){ e.preventDefault(); a.focus(); } return; }
   const L = ibList();
@@ -4405,9 +4499,15 @@ list.addEventListener('focusout', e => {
    tasks.json の settings に持つ。どのブラウザで開いても同じ見た目になるように
    ========================================================================= */
 const ICON_BGS = [
-  ['#6db52d', 'ハタラグリーン'], ['#f29419', 'ハタラオレンジ'], ['#2A6F97', '青'],
+  ['#1F2238', '黒藍'], ['#2A6F97', '青'],
   ['#5B4A8A', '紫'], ['#5F5E5A', 'グレー'], ['', 'なし']
 ];
+/* taskboard 独自のアイコン（黒藍のグラデの丸に一段の階段）。Figma「taskboard アイコン案」の R3 */
+const LOGO_SVG = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tbLogoG" x1="0" y1="0" x2="0" y2="1">' +
+  '<stop offset="0" stop-color="#1F2238"/><stop offset="1" stop-color="#12131F"/></linearGradient></defs>' +
+  '<circle cx="32" cy="32" r="32" fill="url(#tbLogoG)"/><g transform="translate(32 32) scale(.86) translate(-32 -32)">' +
+  '<rect x="12" y="32" width="22" height="20" rx="2.5" fill="#fff" fill-opacity=".6"/>' +
+  '<rect x="32" y="12" width="20" height="40" rx="2.5" fill="#fff"/></g></svg>';
 const ICON_EMOJIS = ['📋', '✅', '🗂️', '🌱', '🔥', '⚡', '🎯', '🚀', '☕', '🐣'];
 function normSettings(v){
   v = v && typeof v === 'object' ? v : {};
@@ -4418,16 +4518,18 @@ function normSettings(v){
   return {
     name: String(v.name || 'task backlog').slice(0, 20),
     icon: {
-      type: ic.type === 'image' && ic.image ? 'image' : 'emoji',
+      type: ic.type === 'image' && ic.image ? 'image' : ic.type === 'emoji' ? 'emoji' : 'logo',
       emoji: String(ic.emoji || '📋'),
       image: typeof ic.image === 'string' && ic.image.startsWith('data:image/') ? ic.image : '',
-      bg: typeof ic.bg === 'string' ? ic.bg : '#6db52d'
+      bg: typeof ic.bg === 'string' ? ic.bg : '#1F2238'
     },
     theme: ['auto', 'light', 'dark'].includes(v.theme) ? v.theme : (UI && UI.theme) || 'auto',
     calStart: cs, calEnd: ce
   };
 }
 function iconHTML(ic, size){
+  if(ic.type === 'logo')
+    return '<span class="ico ico-logo" style="width:' + size + 'px;height:' + size + 'px">' + LOGO_SVG + '</span>';
   const st = 'width:' + size + 'px;height:' + size + 'px;background:' + (ic.bg || 'transparent') +
     ';font-size:' + Math.round(size * .62) + 'px';
   return ic.type === 'image'
@@ -4436,6 +4538,7 @@ function iconHTML(ic, size){
 }
 /* ファビコンは canvas に描いて data URL にする（背景の角丸＋絵文字か画像） */
 function drawFavicon(ic){
+  if(ic.type === 'logo'){ $('#favicon').href = 'data:image/svg+xml,' + encodeURIComponent(LOGO_SVG); return; }
   const c = document.createElement('canvas'); c.width = c.height = 64;
   const g = c.getContext('2d');
   if(ic.bg){
@@ -4511,6 +4614,7 @@ function openSettings(){
         '<input class="set-in" id="setName" maxlength="20" value="' + esc(draft.name) + '" placeholder="task backlog">' +
         '<span class="set-l">アイコン</span>' +
         '<div><div class="set-tabs" id="setIconType">' +
+          '<button data-t="logo" class="' + (draft.icon.type === 'logo' ? 'on' : '') + '">taskboard</button>' +
           '<button data-t="emoji" class="' + (draft.icon.type === 'emoji' ? 'on' : '') + '">絵文字</button>' +
           '<button data-t="image" class="' + (draft.icon.type === 'image' ? 'on' : '') + '">画像</button></div>' +
         '<div id="setEmojiBox"' + (draft.icon.type === 'emoji' ? '' : ' hidden') + '>' +
@@ -4519,8 +4623,8 @@ function openSettings(){
         '<div id="setImageBox"' + (draft.icon.type === 'image' ? '' : ' hidden') + '>' +
           '<label class="set-file"><input type="file" id="setImage" accept="image/png,image/jpeg,image/webp,image/gif">画像を選ぶ</label>' +
           '<span class="set-note">正方形に切り抜いて小さくしてから保存します</span></div></div>' +
-        '<span class="set-l">背景色</span>' +
-        '<div class="set-bgs" id="setBgs">' + ICON_BGS.map(([c, n]) =>
+        '<span class="set-l" id="setBgL"' + (draft.icon.type === 'logo' ? ' hidden' : '') + '>背景色</span>' +
+        '<div class="set-bgs" id="setBgs"' + (draft.icon.type === 'logo' ? ' hidden' : '') + '>' + ICON_BGS.map(([c, n]) =>
           '<button data-bg="' + c + '" title="' + n + '" class="' + (c === draft.icon.bg ? 'on' : '') + '" style="background:' +
           (c || 'transparent') + '">' + (c ? '' : 'なし') + '</button>').join('') + '</div>' +
       '</div>') +
@@ -4546,12 +4650,14 @@ function openSettings(){
   $('#setIconType').onclick = e => {
     const b = e.target.closest('[data-t]'); if(!b) return;
     /* 画像はまだ選んでいなければ、選んだ時点で切り替える（それまでは絵文字のまま） */
-    if(b.dataset.t === 'emoji') draft.icon.type = 'emoji';
+    if(b.dataset.t === 'logo' || b.dataset.t === 'emoji') draft.icon.type = b.dataset.t;
     else if(draft.icon.image) draft.icon.type = 'image';
     else $('#setImage').click();
     $$('#setIconType button').forEach(x => x.classList.toggle('on', x === b));
     $('#setEmojiBox').hidden = b.dataset.t !== 'emoji';
     $('#setImageBox').hidden = b.dataset.t !== 'image';
+    /* taskboard のアイコンは地の色を持っているので背景色は選ばせない */
+    $('#setBgL').hidden = $('#setBgs').hidden = b.dataset.t === 'logo';
     preview();
   };
   $('.set-emojis').onclick = e => {
