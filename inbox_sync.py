@@ -31,7 +31,17 @@ Slack で自分に来た依頼（DM・メンション）も拾う。読むのは
         JSON は {"add": [{"id", "title", "due"}, ...], "done": [id, ...]}。
         add は対応が要ると判定した候補。title は依頼の要約、due は依頼文から読んだ期日（YYYY-MM-DD、無ければ空）。
         done は later のうち、返信で済んだと判定したもの。画面に「返信済み」と出る。
-        候補に出したものは入れなかった分も「見た」ことにして、次から出さない
+        候補に出したものは入れなかった分も「見た」ことにして、次から出さない。
+        add には summary（依頼の中身を2〜3文で）と context（スレッドの前後の発言
+        [{"from", "when", "text", "me"}]）も入れられる。詳細の「概要」に出す
+
+依頼の詳細で「方針を出して」を押したときや、コメントを書いたときに Claude が使う（taskboard-plan スキル）:
+
+    python inbox_sync.py plan-get <id>
+        依頼の中身・スレッドの前後・これまでの方針・竹島のコメントを出す。
+        コメントは画面から server.py 経由で sync_tmp/plan-<id>.json に置かれたものを読む
+    python inbox_sync.py plan-set <方針の JSON ファイル>
+        JSON は {"id", "plan", "questions": [...], "reply"}。項目の plans に1件足す。画面は最新を方針・返信案として出す
 
 書き込むのは inbox.json だけ。tasks.json への取り込みは画面（index.html）がやる。
 """
@@ -61,6 +71,8 @@ SELF_DM = 'D06861H4RNW'   # 自分宛てDM。ここは「タスク」メモの i
 CAND = ROOT / 'sync_tmp' / 'intake_candidates.json'
 SEEN_KEEP = 2000
 QUOTE = 300               # カードに残す元メッセージの長さ
+CONTEXT_KEEP, CONTEXT_LEN = 12, 600   # 概要に残すスレッドの前後の件数と、1件の長さ
+PLANS_KEEP = 20           # 1件の依頼に残す方針の数（すり合わせのたびに増える）
 JST = datetime.timezone(datetime.timedelta(hours=9))
 RESULT = re.compile(r'^### Result \d+ of \d+\s*$', re.M)
 FIELD = {
@@ -350,7 +362,9 @@ def cmd_intake_add(a):
         doc['items'].append({'id': c['id'], 'title': p['title'].strip(), 'src': 'intake',
                              'receivedAt': when.isoformat().replace('+00:00', 'Z'), 'due': due,
                              'from': c['from'], 'chName': c['chName'], 'url': c['url'],
-                             'quote': c['text'][:QUOTE]})
+                             'quote': c['text'][:QUOTE],
+                             'summary': str(p.get('summary') or '').strip()[:400],
+                             'context': context_of(p.get('context'))})
         have.add(c['id'])
         added.append(p['title'].strip())
     for x in doc['items']:
@@ -370,6 +384,56 @@ def cmd_intake_add(a):
     print()
 
 
+def context_of(v):
+    """スレッドの前後の発言を、決まった形に揃えて短くする"""
+    out = []
+    for m in (v if isinstance(v, list) else [])[-CONTEXT_KEEP:]:
+        if isinstance(m, dict) and str(m.get('text', '')).strip():
+            out.append({'from': str(m.get('from', ''))[:40], 'when': str(m.get('when', ''))[:20],
+                        'text': str(m['text']).strip()[:CONTEXT_LEN], 'me': bool(m.get('me'))})
+    return out
+
+
+def plan_req(iid):
+    """画面のコメント。server.py が sync_tmp/plan-<id>.json に置く"""
+    path = ROOT / 'sync_tmp' / ('plan-' + re.sub(r'[^\w.-]', '_', iid) + '.json')
+    try:
+        with open(path, encoding='utf-8') as fh:
+            got = json.load(fh)
+        return got.get('talk') if isinstance(got.get('talk'), list) else []
+    except (OSError, json.JSONDecodeError, AttributeError):
+        return []
+
+
+def cmd_plan_get(a):
+    x = next((x for x in load()['items'] if x['id'] == a.id), None)
+    if not x:
+        sys.exit(f'inbox.json に {a.id} がありません')
+    keys = ('id', 'title', 'summary', 'from', 'chName', 'url', 'receivedAt', 'due', 'quote', 'context', 'plans')
+    out = {k: x.get(k, [] if k in ('context', 'plans') else '') for k in keys}
+    json.dump({**out, 'talk': plan_req(a.id)}, sys.stdout, ensure_ascii=False, indent=1)
+    print()
+
+
+def cmd_plan_set(a):
+    with open(a.file, encoding='utf-8') as fh:
+        p = json.load(fh)
+    doc = load()
+    x = next((x for x in doc['items'] if x['id'] == p.get('id')), None)
+    if not x:
+        sys.exit(f'inbox.json に {p.get("id")} がありません')
+    if not str(p.get('plan', '')).strip():
+        sys.exit('plan が空です')
+    qs = [str(q).strip() for q in (p.get('questions') or []) if str(q).strip()]
+    entry = {'at': datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z'),
+             'plan': str(p['plan']).strip(), 'questions': qs[:5], 'reply': str(p.get('reply') or '').strip()}
+    x['plans'] = (x.get('plans', []) + [entry])[-PLANS_KEEP:]
+    save(doc)
+    json.dump({'id': x['id'], 'plans': len(x['plans']), 'questions': len(qs[:5]), 'reply': bool(entry['reply'])},
+              sys.stdout, ensure_ascii=False)
+    print()
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
@@ -384,10 +448,14 @@ def main():
     p.add_argument('files', nargs='+')
     p = sub.add_parser('intake-add')
     p.add_argument('file')
+    p = sub.add_parser('plan-get')
+    p.add_argument('id')
+    p = sub.add_parser('plan-set')
+    p.add_argument('file')
     a = ap.parse_args()
     {'since': cmd_since, 'ingest': cmd_ingest, 'pending': cmd_pending, 'suggest': cmd_suggest,
      'intake-since': cmd_intake_since, 'intake-parse': cmd_intake_parse,
-     'intake-add': cmd_intake_add}[a.cmd](a)
+     'intake-add': cmd_intake_add, 'plan-get': cmd_plan_get, 'plan-set': cmd_plan_set}[a.cmd](a)
 
 
 if __name__ == '__main__':
