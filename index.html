@@ -717,6 +717,14 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .ib-title:hover{background:var(--sunk)}
 .ib-title:focus{outline:none;background:var(--sunk)}
 .ib-when{font-size:12px;color:var(--ink3);flex:none;font-variant-numeric:tabular-nums}
+.ib-req{flex-wrap:wrap;gap:4px 8px;margin:2px 0 0 6px;font-size:12px;color:var(--ink2)}
+.ib-req-tag{font-size:11px;padding:0 5px;border-radius:4px;background:var(--sunk);color:var(--ink2);font-weight:500;flex:none}
+.ib-req-done{background:var(--accent-bg);color:var(--accent)}
+.ib-req-from{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib-req-link{color:var(--accent);text-decoration:none;flex:none}
+.ib-req-link:hover{text-decoration:underline}
+.ib-req-quote{flex-basis:100%;color:var(--ink3);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
 .ib-go{height:22px;padding:0 10px;border-radius:5px;font-size:12px;font-weight:500;color:var(--accent);margin-left:2px}
 .ib-go:hover{background:var(--accent-bg)}
 .ib-go:disabled{color:var(--ink3);background:none;cursor:default}
@@ -1136,7 +1144,8 @@ function normalize(st){
       .filter(x => x && x.title)
       .map(x => ({id: x.id || uid('i_'), title: String(x.title), receivedAt: x.receivedAt || '', src: x.src || '',
                    pid: x.pid || '', parent: x.parent || '', due: x.due || '', estimate: normEstimate(x.estimate),
-                   sgOff: !!x.sgOff})),
+                   sgOff: !!x.sgOff, from: x.from || '', chName: x.chName || '', url: x.url || '',
+                   quote: x.quote || ''})),
     inboxSeen: (Array.isArray(st.inboxSeen) ? st.inboxSeen : []).slice(-1000),
     /* eventMoves … ボードで動かした「自分だけの予定」。{eventId: {date, start, end, setAt}}。
        同期でカレンダーに反映されたら消える */
@@ -3793,6 +3802,8 @@ week.addEventListener('drop', e => {
 /* inbox.json の各項目に Claude が書いた振り分け先の提案。{id: {pid, parent, newParent, reason}}。
    tasks.json には持たない（書き手は Claude）ので、読むたびに作り直す */
 let IB_SUGGEST = {};
+/* Slack の依頼のうち、inbox に入ったあとで自分が返信したものの id。これも Claude が inbox.json に書く */
+let IB_REPLIED = new Set();
 async function loadInbox(){
   let doc;
   try{
@@ -3804,12 +3815,17 @@ async function loadInbox(){
   IB_SUGGEST = {};
   for(const it of (doc && Array.isArray(doc.items) ? doc.items : []))
     if(it && it.id && it.suggest && it.suggest.pid) IB_SUGGEST[it.id] = it.suggest;
-  if(JSON.stringify(IB_SUGGEST) !== prev && UI.project === INBOX_P) renderList();
+  const prevR = [...IB_REPLIED].join();
+  IB_REPLIED = new Set((doc && Array.isArray(doc.items) ? doc.items : []).filter(it => it && it.replied).map(it => it.id));
+  if((JSON.stringify(IB_SUGGEST) !== prev || [...IB_REPLIED].join() !== prevR) && UI.project === INBOX_P) renderList();
   const seen = new Set(S.inboxSeen);
   let n = 0;
   for(const it of (doc && Array.isArray(doc.items) ? doc.items : [])){
     if(!it || !it.id || !it.title || seen.has(it.id)) continue;
-    S.inbox.push({id: it.id, title: String(it.title), receivedAt: it.receivedAt || '', src: it.src || 'slack'});
+    /* src: 'intake' は Slack で自分に来た依頼。送り主・チャンネル・元のリンク・依頼文から読んだ期日が付く */
+    S.inbox.push({id: it.id, title: String(it.title), receivedAt: it.receivedAt || '', src: it.src || 'slack',
+                  due: it.due || '', from: it.from || '', chName: it.chName || '', url: it.url || '',
+                  quote: it.quote || ''});
     S.inboxSeen.push(it.id); seen.add(it.id); n++;
   }
   if(!n) return;
@@ -4081,6 +4097,14 @@ function renderInbox(el){
         '<span class="ib-when">' + when(x.receivedAt) + (x.src === 'slack' ? ' · Slack' : '') + '</span>' +
         '<button class="ib-del" data-ibdel="' + id + '" title="消す">' + IC_X + '</button>' +
       '</div>' +
+      (x.src !== 'intake' ? '' :
+        '<div class="ib-line ib-req">' +
+          '<span class="ib-req-tag">依頼</span>' +
+          (IB_REPLIED.has(x.id) ? '<span class="ib-req-tag ib-req-done">返信済み</span>' : '') +
+          '<span class="ib-req-from">' + esc(x.from) + (x.chName ? ' · ' + esc(x.chName) : '') + '</span>' +
+          (x.url ? '<a class="ib-req-link" href="' + esc(x.url) + '" target="_blank" rel="noopener">元のメッセージ</a>' : '') +
+          (x.quote ? '<div class="ib-req-quote">' + esc(x.quote) + '</div>' : '') +
+        '</div>') +
       '<div class="ib-line ib-ctl">' +
         '<select data-ibf="pid" data-id="' + id + '">' + projOpts + '</select>' +
         '<select data-ibf="parent" data-id="' + id + '"' + (x.pid ? '' : ' disabled') + '>' + parentOpts + '</select>' +
@@ -4180,7 +4204,12 @@ function inboxMove(id, quiet){
   }else{
     const sec = ensureStatusSection(p, STATUS[0][1]);
     const t = addTask(p.id, sec.id, x.title);
-    if(t){ t.due = x.due || ''; t.estimate = normEstimate(x.estimate); save(); }
+    if(t){
+      t.due = x.due || ''; t.estimate = normEstimate(x.estimate);
+      /* Slack の依頼は元のメッセージに戻れるようにしておく */
+      if(x.src === 'intake'){ t.url = x.url || ''; t.notes = x.from + (x.chName ? '（' + x.chName + '）' : '') + '\n' + (x.quote || ''); }
+      save();
+    }
     if(!quiet) toast('「' + x.title + '」を ' + p.name + ' へ');
   }
   if(!quiet){ renderSide(); renderList(); }
