@@ -703,6 +703,12 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .ib-all{margin-left:auto;height:28px;padding:0 12px;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);
   font-size:12.5px;font-weight:500}
 .ib-all:hover{filter:brightness(1.08)}
+.ib-snz{margin-left:auto;height:24px;padding:0 8px;border-radius:5px;color:var(--ink3);font-size:12px}
+.ib-snz:hover,.ib-snz.on{background:var(--sunk);color:var(--ink2)}
+.ib-snz + .ib-all{margin-left:0}
+.ib-none{padding:10px 10px 14px;font-size:12.5px;color:var(--ink3)}
+/* スヌーズ中の項目は、出したときも少し沈めて見せる */
+.ib-row.snz .ib-title,.ib-row.snz .ib-when{color:var(--ink3)}
 .ib-add input{width:100%;background:none;border:0;border-radius:var(--radius);
   padding:7px 10px;font-size:13px;color:var(--ink);margin-bottom:4px}
 .ib-add input::placeholder{color:var(--ink3)}
@@ -1016,6 +1022,8 @@ const LS_DATA = 'inc.take.backlog.data';
 const LS_UI   = 'inc.take.backlog.ui';
 /* サイドバーの inbox を選んでいるときの UI.project */
 const INBOX_P = '~inbox';
+/* ibAwakeN … サイドバーに出した inbox の件数（スヌーズ中を除く）。ibSnzOpen … inbox にスヌーズ中の項目も並べるか */
+let ibAwakeN = 0, ibSnzOpen = false;
 /* サイドバーの「ミッション」を選んでいるときの UI.project */
 const MIS_P = '~mission';
 /* サイドバーの「評価」を選んでいるときの UI.project */
@@ -1151,7 +1159,7 @@ function normalize(st){
       .map(x => ({id: x.id || uid('i_'), title: String(x.title), receivedAt: x.receivedAt || '', src: x.src || '',
                    pid: x.pid || '', parent: x.parent || '', due: x.due || '', estimate: normEstimate(x.estimate),
                    sgOff: !!x.sgOff, from: x.from || '', chName: x.chName || '', url: x.url || '',
-                   quote: x.quote || ''})),
+                   quote: x.quote || '', snooze: x.snooze || ''})),
     inboxSeen: (Array.isArray(st.inboxSeen) ? st.inboxSeen : []).slice(-1000),
     /* eventMoves … ボードで動かした「自分だけの予定」。{eventId: {date, start, end, setAt}}。
        同期でカレンダーに反映されたら消える */
@@ -1606,10 +1614,11 @@ function renderSide(){
   /* 週は「画面」なので、開いている間は週だけを選んだ状態に見せる（プロジェクトの絞り込みは残る） */
   const inWeek = UI.view === 'week' && !isPage(UI.project);
   const wk = weekDays();
+  ibAwakeN = ibShown().length;
   $('#viewList').innerHTML = `<div class="prow${UI.project===INBOX_P?' on':''}">
       <button class="pitem" data-p="${INBOX_P}">
         <span class="swatch ib-swatch"></span>
-        <span class="nm">inbox</span><span class="ct${S.inbox.length?' ib-ct':''}">${S.inbox.length}</span></button></div>
+        <span class="nm">inbox</span><span class="ct${ibAwakeN?' ib-ct':''}">${ibAwakeN}</span></button></div>
     <div class="prow${inWeek?' on':''}">
       <button class="pitem" data-view="week" title="週カレンダーを開いて、タスクを時間に置く">
         <span class="swatch" style="background:var(--accent)"></span>
@@ -3311,7 +3320,7 @@ async function loadCalendar(){
 }
 window.addEventListener('focus', () => { loadInbox(); loadMissions(); loadEval(); if(UI.view === 'week') loadCalendar(); });
 /* 平日 10〜19時は server.py が30分ごとに自動で同期する。開きっぱなしでも反映されるよう、5分ごとに読み直す */
-setInterval(() => { loadInbox(); if(UI.view === 'week') loadCalendar(); }, 5 * 60 * 1000);
+setInterval(() => { loadInbox(); ibWake(); if(UI.view === 'week') loadCalendar(); }, 5 * 60 * 1000);
 
 /* --- 「Claude に同期を頼む」ボタン ---
    server.py が裏で Claude Code（コマンド版）にカレンダー同期と Slack の取り込み（job: auto）を頼む。
@@ -3566,7 +3575,7 @@ function renderWeek(){
   const hrs = list => showHours(list.reduce((a, u) => a + uMins(u) / 60, 0));
 
   const q = (UI.q || '').toLowerCase();
-  const ibs = S.inbox.filter(x => !q || x.title.toLowerCase().includes(q));
+  const ibs = ibShown().filter(x => !q || x.title.toLowerCase().includes(q));
   let bar = '<div class="wk-bar" data-wbar="1">' +
     (ibs.length
       ? '<div class="wk-bar-h">inbox<span>' + ibs.length + '件</span></div>' +
@@ -4124,8 +4133,9 @@ function renderInbox(el){
     const d = new Date(iso);
     return isNaN(d) ? '' : (d.getMonth() + 1) + '/' + d.getDate() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
   };
-  if(!S.inbox.some(x => x.id === ibCur)) ibCur = S.inbox.length ? S.inbox[0].id : '';
-  const rows = S.inbox.map(x => {
+  const shown = ibList(), nAwake = ibShown().length, nSnz = S.inbox.length - nAwake;
+  if(!shown.some(x => x.id === ibCur)) ibCur = shown.length ? shown[0].id : '';
+  const rows = shown.map(x => {
     const id = esc(x.id);
     const projOpts = '<option value="">プロジェクト</option>' + S.projects.map(p =>
       '<option value="' + esc(p.id) + '"' + (x.pid === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('');
@@ -4146,7 +4156,7 @@ function renderInbox(el){
             '<span>' + esc(b.title) + (b.estimate != null ? '<i>' + showHours(b.estimate) + '</i>' : '') + '</span>').join('') +
           (sg.ref ? '<em>「' + esc(sg.ref) + '」を参考</em>' : '') + '</div>' : '') +
       '</div>';
-    return '<div class="ib-row' + (x.id === ibCur ? ' cur' : '') + '" data-ib="' + id + '">' +
+    return '<div class="ib-row' + (x.id === ibCur ? ' cur' : '') + (ibAwake(x) ? '' : ' snz') + '" data-ib="' + id + '">' +
       '<div class="ib-line">' +
         '<input class="ib-title" data-ibt="' + id + '" value="' + esc(x.title) + '">' +
         '<span class="ib-when">' + when(x.receivedAt) + (x.src === 'slack' ? ' · Slack' : '') + '</span>' +
@@ -4167,14 +4177,15 @@ function renderInbox(el){
         '<input type="date" data-ibf="due" data-id="' + id + '" value="' + esc(x.due || '') + '">' +
         '<input type="number" min="0" step="' + EST_STEP + '" data-ibf="estimate" data-id="' + id + '"' +
           ' value="' + (x.estimate != null ? x.estimate : '') + '">' +
+        '<select data-ibf="snooze" data-id="' + id + '" title="選んだ日まで inbox から隠す">' + ibSnoozeOpts(x) + '</select>' +
         '<button class="ib-go" data-ibgo="' + id + '"' + (x.pid ? '' : ' disabled') + '>' +
           (x.parent ? 'サブタスクにする' : '移す') + '</button>' +
       '</div>' +
       sgRow +
     '</div>';
   }).join('');
-  const nSg = S.inbox.filter(x => ibSuggest(x)).length;
-  if(!rows){
+  const nSg = ibShown().filter(x => ibSuggest(x)).length;
+  if(!S.inbox.length){
     el.innerHTML = '<div class="ib">' +
       '<div class="ib-add"><input id="ibAdd" placeholder="＋ inbox に追加（Enter）"></div>' +
       '<div class="ib-empty">' +
@@ -4186,14 +4197,51 @@ function renderInbox(el){
     return;
   }
   el.innerHTML = '<div class="ib">' +
-    '<div class="ib-bar"><span class="n">' + S.inbox.length + '件・振り分け待ち</span>' +
+    '<div class="ib-bar"><span class="n">' + nAwake + '件・振り分け待ち</span>' +
+      (nSnz ? '<button class="ib-snz' + (ibSnzOpen ? ' on' : '') + '" data-ibsnz="1">スヌーズ中 ' + nSnz + '件</button>' : '') +
       (nSg ? '<button class="ib-all" data-iball="1">提案をまとめて移す（' + nSg + '）</button>' : '') + '</div>' +
     '<div class="ib-add"><input id="ibAdd" placeholder="＋ inbox に追加（Enter）"></div>' +
+    (nAwake ? '' : '<div class="ib-none">振り分け待ちはありません</div>') +
     rows +
-    ('<div class="ib-keys"><span><kbd>↑</kbd> <kbd>↓</kbd> 選ぶ</span><span><kbd>Enter</kbd> 提案（なければ選んだ先）へ移す</span>' +
-      '<span><kbd>P</kbd> プロジェクト</span><span><kbd>D</kbd> 期日</span><span><kbd>E</kbd> 工数</span><span><kbd>X</kbd> 提案を消す</span><span><kbd>C</kbd> 追加</span></div>') +
+    ('<div class="ib-keys"><span><kbd>↑</kbd> <kbd>↓</kbd> 選ぶ</span><span><kbd>1</kbd> 提案（なければ選んだ先）へ移す</span>' +
+      '<span><kbd>2</kbd> 消す</span><span><kbd>3</kbd> スヌーズ</span>' +
+      '<span><kbd>P</kbd> プロジェクト</span><span><kbd>Shift</kbd>+<kbd>D</kbd> 期日</span><span><kbd>E</kbd> 工数</span>' +
+      '<span><kbd>X</kbd> 提案を消す</span><span><kbd>C</kbd> 追加</span></div>') +
     '<div class="ib-hint">「移す」でプロジェクトの「未着手」へ。親タスクも選ぶとサブタスクになります。</div>' +
     '</div>';
+}
+
+/* スヌーズ … 選んだ日（snooze）の前日まで inbox から隠し、その日になったら戻す。
+   隠している間はサイドバーの件数と週の inbox にも出さない */
+function ibAwake(x){ return !x.snooze || x.snooze <= todayISO(); }
+function ibShown(){ return S.inbox.filter(ibAwake); }
+/* 画面に並べる順。スヌーズ中も出すときは、戻る日の近い順で後ろにつける */
+function ibList(){
+  const z = ibSnzOpen ? S.inbox.filter(x => !ibAwake(x)).sort((a, b) => a.snooze < b.snooze ? -1 : 1) : [];
+  return ibShown().concat(z);
+}
+const ibMD = v => +v.slice(5, 7) + '/' + +v.slice(8, 10);
+function ibSnoozeOpts(x){
+  const t = new Date(todayISO() + 'T00:00');
+  const plus = n => { const d = new Date(t); d.setDate(d.getDate() + n); return isoOf(d); };
+  const z = ibAwake(x) ? '' : x.snooze;
+  const opts = [['明日', plus(1)], ['明後日', plus(2)], ['来週の月曜', plus((8 - t.getDay()) % 7 || 7)], ['2週間後', plus(14)]]
+    .filter(([, v]) => v !== z);
+  return '<option value="">' + (z ? 'スヌーズを解除' : 'スヌーズ') + '</option>' +
+    (z ? '<option value="' + z + '" selected>' + ibMD(z) + ' まで</option>' : '') +
+    opts.map(([l, v]) => '<option value="' + v + '">' + l + '（' + ibMD(v) + '）</option>').join('');
+}
+function ibSnooze(x, v){
+  const was = x.snooze;
+  if(v && x.id === ibCur && !ibSnzOpen){ const l = ibList(), i = l.indexOf(x); ibCur = (l[i + 1] || l[i - 1] || {}).id || ''; }
+  x.snooze = v; save(); renderSide(); renderList();
+  if(v) toast('「' + x.title + '」を ' + ibMD(v) + ' まで隠します', '元に戻す', () => { x.snooze = was; save(); renderSide(); renderList(); });
+}
+/* 開きっぱなしでもスヌーズが明けた項目を戻す。入力中は inbox を描き直さない */
+function ibWake(){
+  if(ibShown().length === ibAwakeN) return;
+  renderSide();
+  if(UI.project === INBOX_P && UI.view !== 'week' && !list.contains(document.activeElement)) renderList();
 }
 
 /* 提案が今のボードでも通用するときだけ返す。親タスクが完了・削除済みなら、その提案は出さない */
@@ -4233,7 +4281,7 @@ function inboxAccept(id, quiet){
   inboxMove(id, quiet);
 }
 function inboxAcceptAll(){
-  const ids = S.inbox.filter(x => ibSuggest(x)).map(x => x.id);
+  const ids = ibShown().filter(x => ibSuggest(x)).map(x => x.id);
   if(!ids.length) return;
   ids.forEach(id => inboxAccept(id, true));
   save(); renderSide(); renderList();
@@ -4279,6 +4327,7 @@ list.addEventListener('change', e => {
   else if(f === 'parent') x.parent = v;
   else if(f === 'due') x.due = v;
   else if(f === 'estimate'){ x.estimate = normEstimate(v); e.target.value = x.estimate != null ? x.estimate : ''; }
+  else if(f === 'snooze'){ ibSnooze(x, v); return; }
   save();
   if(f === 'pid' || f === 'parent') renderList();     /* 親タスクの候補とボタンの文言が変わる */
 });
@@ -4290,16 +4339,19 @@ list.addEventListener('click', e => {
   if(d.ibsg){ inboxAccept(d.ibsg); return; }
   if(d.ibsgno){ inboxDismiss(d.ibsgno); return; }
   if(d.iball){ inboxAcceptAll(); return; }
+  if(d.ibsnz){ ibSnzOpen = !ibSnzOpen; renderList(); return; }
+  if(d.ibdel){ inboxDelete(d.ibdel); return; }
   const row = e.target.closest('.ib-row');
   if(row && !b && row.dataset.ib !== ibCur) ibFocus(row.dataset.ib);
-  const id = d.ibdel; if(!id) return;
+});
+function inboxDelete(id){
   const at = S.inbox.findIndex(x => x.id === id);
   const x = inboxTake(id); if(!x) return;
   save(); renderSide(); renderList();
   toast('「' + x.title + '」を消しました', '元に戻す', () => {
     S.inbox.splice(Math.min(at, S.inbox.length), 0, x); save(); renderSide(); renderList();
   });
-});
+}
 list.addEventListener('keydown', e => {
   if(e.key !== 'Enter' || e.isComposing) return;
   if(e.target.id === 'ibAdd'){
@@ -4320,21 +4372,25 @@ document.addEventListener('keydown', e => {
   if(/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
   const k = e.key.toLowerCase();
   if(k === 'c'){ const a = $('#ibAdd'); if(a){ e.preventDefault(); a.focus(); } return; }
-  const i = S.inbox.findIndex(x => x.id === ibCur); if(i < 0) return;
+  const L = ibList();
+  const i = L.findIndex(x => x.id === ibCur); if(i < 0) return;
+  const x = L[i], next = (L[i + 1] || L[i - 1] || {}).id || '';
   const row = list.querySelector('.ib-row.cur');
   const chip = f => { const el = row && row.querySelector('[data-ibf="' + f + '"]'); if(el && el._pk){ e.preventDefault(); pkOpenMenu(el._pk); } };
-  if(k === 'arrowdown' || k === 'j'){ e.preventDefault(); if(S.inbox[i + 1]) ibFocus(S.inbox[i + 1].id); }
-  else if(k === 'arrowup' || k === 'k'){ e.preventDefault(); if(S.inbox[i - 1]) ibFocus(S.inbox[i - 1].id); }
-  else if(k === 'enter'){
-    const x = S.inbox[i];
-    if(!ibSuggest(x) && !x.pid) return;
+  if(k === 'arrowdown' || k === 'j'){ e.preventDefault(); if(L[i + 1]) ibFocus(L[i + 1].id); }
+  else if(k === 'arrowup' || k === 'k'){ e.preventDefault(); if(L[i - 1]) ibFocus(L[i - 1].id); }
+  /* 数字キーで行き先を決める（Linear の Triage と同じ並び）。1 移す・2 消す・3 スヌーズ */
+  else if(k === 'enter' || k === '1'){
+    /* 行き先がまだ無ければ、プロジェクトを選ぶメニューを開く */
+    if(!ibSuggest(x) && !x.pid){ chip('pid'); return; }
     e.preventDefault();
-    const next = (S.inbox[i + 1] || S.inbox[i - 1] || {}).id || '';
     if(ibSuggest(x)) inboxAccept(x.id); else inboxMove(x.id);
     ibFocus(next);
   }
+  else if(k === '2'){ e.preventDefault(); inboxDelete(x.id); ibFocus(next); }
+  else if(k === '3' || k === 'h') chip('snooze');
   else if(k === 'p') chip('pid');
-  else if(k === 'd') chip('due');
+  else if(k === 'd') chip('due');      /* Shift+D（Linear と同じ）。D だけでも開く */
   else if(k === 'e') chip('estimate');
   else if(k === 'x'){ e.preventDefault(); inboxDismiss(ibCur); }
 });
